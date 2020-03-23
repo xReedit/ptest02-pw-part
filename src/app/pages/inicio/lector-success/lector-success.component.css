@@ -1,0 +1,50 @@
+:global .text-simple {
+     display: none;
+ }
+
+.content-body {
+    min-height: calc(100vh - 74px);
+}
+
+.fondo-beige {
+    background: beige;    
+}
+.content-num-mesa  {
+    border: solid 1px #616161;
+    border-radius: 50%;
+    overflow: hidden;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    color: #424242;  
+}
+
+.num-mesa {
+    padding: 15px;
+    margin: 0px;    
+    font-size: 42px;
+}
+
+.info-establecimiento-content {
+    padding: 15px;
+}
+
+.content-register {
+    padding: 10px;
+    background: #303f9f;
+    color: white;
+}
+
+.content-ready {
+    padding: 25px;
+    background: #00695c;
+    color: white;
+}
+
+.xp-15 {
+ padding: 15px;
+}
+
+p {
+    margin: 0px;    
+}

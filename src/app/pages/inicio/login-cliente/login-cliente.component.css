@@ -1,0 +1,31 @@
+.div-list-date {
+    padding: 10px;
+}
+
+.item-list-date {
+    padding-top: 10px;
+    padding-bottom: 10px;    
+}
+
+.item-list-date.selected {
+    background-attachment: lightyellow;
+}
+
+.btn-social {
+    margin: 15px;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.btn-social.fb {
+    background: dodgerblue;
+}
+
+.btn-social.gmail {
+    background: #d32f2f;
+}
+
+.btn-social.dni {
+    background: #5e35b1;
+}

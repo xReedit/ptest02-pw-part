@@ -1,0 +1,67 @@
+<p>busqueda works!</p>
+<!-- <button (click)="buscar()">aaa</button> -->
+<!-- items -->
+<div class="xtransicion m-main-pt-40 color-fondo-ul">
+        <ng-container>
+          <ul>
+              <!-- [ngClass]="{'li-padding-selected': item.selected}" -->
+            <li *ngFor="let item of objCartaBus">
+              <div class="xcontent border-left-item-{{getEstadoStockItem(item.cantidad)}}"> 
+                <div class="m1 d-flex xtitulo" matRipple [matRippleColor]="rippleColor" [ngClass]="{'li-tachado': item.cantidad==='0'}" (click)="selectedItemBusq(item)">
+                  <div class="w-100"><span>{{item.des}}</span></div>
+                  <div class="text-right d-flex">
+                    <div class="flag-stock text-center estado-color-{{getEstadoStockItem(item.cantidad)}}">
+                      <div [ngClass]="{'xanimated xwobble': item.cantidad===0}">
+                        <span class="fs-9">Stock</span><br>
+                        <span class="fs-15">{{item.cantidad}}</span>
+                      </div>
+                    </div>
+                    <span>{{item.precio | number:'0.2' }}</span>
+                  </div>
+                </div>              
+                
+                <!-- <ng-container *ngIf="item.selected">
+                  <div>
+                    -- detalle --
+                    <ng-container *ngIf="item.detalles === ''; else elseTemplate">
+                      <br>
+                    </ng-container>
+                    <ng-template #elseTemplate>
+                      <div class="pl-3 pr-3">
+                        <span class="fs-14 text-secondary">{{ item.detalles | lowercase }}</span>
+                      </div>
+                      <hr>                    
+                    </ng-template>
+                    
+                    -- especificaciones --
+                    <div class="pl-3 pr-3">
+                      <mat-form-field class="w-100 margin-input">
+                        <input matInput placeholder="Escribe aqui las especificaciones" [(ngModel)]="itemSelected.indicaciones" name="indicaciones" #txtIdicaciones (keyup)="addItemIndicaciones(item, txtIdicaciones.value)">
+                      </mat-form-field>
+                    </div>
+                    <hr>
+                    -- tipos de consumo --
+                    <div class="pl-3 pr-3">
+                      <table width="100%" class="tb-tpc">
+                        <tr *ngFor="let tp of objItemTipoConsumoSelected">
+                          <td>{{tp.descripcion}}</td>
+                          <td>
+                            <div class="d-flex float-right">
+                              <span [hidden]="tp.cantidad_seleccionada === 0" class="fs-19 pr-2">{{tp.cantidad_seleccionada}}</span>
+                              <div class="btn-tbl bg-danger xCursor" matRipple (click)="addItemToPedido(tp, 1)">-</div>
+                              <div class="btn-tbl bg-success xCursor" matRipple (click)="addItemToPedido(tp, 0)">+</div>
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                      <br>
+                    </div>                  
+                  </div>                
+                </ng-container> -->
+                
+              </div>            
+            </li>          
+          </ul>        
+        </ng-container>
+      </div>
+      <br>

@@ -1,0 +1,53 @@
+<div class="text-left h-100">
+    <div class="border-bottom m-0 p-3" matRipple [matRippleColor]="rippleColor">
+        <span class="fw-100 fs-12 text-secondary">Direccion de entrega:</span>
+        <p class="m-0 fs-14">
+            <strong>{{direccionCliente.titulo}}</strong> <br> {{direccionCliente.direccion}}
+        </p>
+    </div>
+    <div class="border-bottom m-0 p-3" matRipple [matRippleColor]="rippleColor">
+        <!-- <span class="fw-100 fs-12 text-secondary">Hora de entrega:</span> -->            
+        <p class="m-0"><i class="fa fa-clock-o"></i><span class="fs-14"> Tiempo de entrega: {{infoEstablecimiento.tiempo_aprox_entrega}}</span></p>
+    </div>
+
+    <!-- metodo de pago -->
+    <div class="border-bottom m-0 p-3 d-flex justify-content-between" matRipple [matRippleColor]="rippleColor" (click)="openDialogMetodoPago()">
+        <p class="m-0 fs-14">Metodo de pago: <strong>{{metodoPagoSelected.descripcion}}</strong></p>
+        <i class="fa fa-caret-down" aria-hidden="true"></i>
+    </div>
+    <!-- metodo de pago -->
+
+    <!-- telefono -->
+    <div class="m-0 pl-3 pr-3 pt-2" matRipple [matRippleColor]="rippleColor" (click)="openDialogsendSMS()">                
+        <span class="text-danger fs-12 fw-100" [hidden]="isValidForm">Es necesario el numero de su telefono</span>        
+        <p class="m-0 fs-14">Telefono: <strong>{{ infoToken.telefono }}</strong></p>
+        <!-- <mat-form-field class="w-100">
+            <input type="number" matInput 
+            placeholder="Telefono" 
+            (keyup) = "verificarNum(telefono.value)" 
+            [value] = "infoToken.telefono"
+            #telefono required>
+        </mat-form-field> -->
+        <span class="fw-100 fs-12 text-secondary" [hidden]="isValidForm">Añade un número de teléfono para que podamos contactarte e informarte de tu pedido.</span>        
+    </div>
+
+    <div class="m-0 p-3">        
+        <!-- <div class="row"> -->
+            <!-- subtotales -->    
+            <div class="div-total w-100">
+                <ul class="w-100 ul-total">
+                    <li class="d-flex div-plr li-item" *ngFor="let item of _listSubtotales" matRipple
+                    [matRippleColor]="rippleColor">
+                    <div class="w-100">{{item.descripcion | titlecase}}</div>
+                    <div>{{item.importe | number:'0.2' }}</div>
+                    </li>
+                </ul>
+            </div>        
+            <div class="pb-2 text-right">
+                <span class="text-danger fs-12 fw-100" [hidden]="isValidForm">Importe minimo S/. {{montoMinimoPedido | number:'.2'}}</span>
+            </div>
+            <br>
+        <!-- </div> -->
+    </div>    
+    <br><br>
+</div>

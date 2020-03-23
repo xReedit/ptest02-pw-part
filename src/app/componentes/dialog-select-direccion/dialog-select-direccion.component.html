@@ -1,0 +1,25 @@
+<div [hidden]="isShowAddDireccion">
+    <p class="fs-14 fw-600 pl-3 pt-3">Direccion de entrega:</p>
+    <hr>
+    <app-seleccionar-direccion (direccionSelected)="setDireccion($event)"></app-seleccionar-direccion>
+    <br>
+    <div class="text-center">
+        <button mat-flat-button mat-dialog-close class="mr-3">
+            <i class="fa fa-arrow-left"></i>
+            Atras
+        </button>
+
+        <button mat-flat-button 
+        color="primary" 
+        (click)="showAddDireccion()"
+        > 
+            <i class="fa fa-plus"></i>
+            Agregar Direccion
+        </button>
+    </div>
+    <br>
+</div>
+
+<div [hidden]="!isShowAddDireccion">
+    <app-agregar-direccion (saveDireccionOk)="setDireccion($event)" ></app-agregar-direccion>
+</div>

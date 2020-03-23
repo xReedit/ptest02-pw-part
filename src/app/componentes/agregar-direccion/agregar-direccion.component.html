@@ -1,0 +1,103 @@
+<!-- <div class="form-group">
+    <label>Enter address</label>
+    <input type="text" class="form-control">
+</div> -->
+
+<!-- <h5>Address: {{address}}</h5> -->
+<!-- <div>Latitude: {{latitude}}</div>
+<div>Longitude: {{longitude}}</div>  -->
+<div class="bg-warning pt-3 pr-3 pl-3 p-1">
+    <p class="fs-13">Indique la direccion exacta de entrega. <strong>Se tomara como referencia el punto que especifica en el mapa.</strong></p>
+</div>
+<div>
+    <form [formGroup]="registerForm">
+        <div class="w-100">
+            <div class="p-3">                                
+                <mat-form-field class="w-100">
+                    <input matInput class="input-headline" placeholder="Direccion" formControlName="direccion" [(ngModel)]="dataCliente.direccion" (keydown.enter)="$event.preventDefault()" (keyup)="checkDireccion(search.value)" autocorrect="off" autocapitalize="off" spellcheck="off" type="text" #search id="search">
+                </mat-form-field>            
+                <mat-form-field class="w-100">
+                    <input matInput class="input-headline" placeholder="Referencia / piso / oficina" formControlName="referencia" [(ngModel)]="dataCliente.referencia">
+                </mat-form-field>
+
+                <div hidden="true">
+                    <mat-form-field class="w-100">
+                        <input matInput class="input-headline" placeholder="Referencia / piso / oficina" formControlName="longitude" [(ngModel)]="longitude">
+                    </mat-form-field>
+                    <mat-form-field class="w-100">
+                        <input matInput class="input-headline" placeholder="Referencia / piso / oficina" formControlName="latitude" [(ngModel)]="latitude">
+                    </mat-form-field>
+                </div>
+            
+
+            <!-- mapa -->
+                <div class="border">
+                    <agm-map 
+                        [latitude]="latitude" 
+                        [longitude]="longitude"
+                        [zoom]="zoom" >
+                        <agm-marker 
+                            [latitude]="latitude" 
+                            [longitude]="longitude"
+                            [markerDraggable]="true"
+                            (dragEnd)="markerDragEnd($event)"
+                            >
+                        </agm-marker>
+                    </agm-map>                
+                </div>
+
+            </div>
+
+            <!-- mapa -->
+            </div>            
+        </form>
+        
+        <div class="p-3">
+            <p class="fw-600 fs-13">Esta es la dirección de mi:</p>
+            <!-- <mat-radio-group aria-label="Select an option" class="fs-13" [(ngModel)]="dataCliente.titulo"> -->
+            <mat-radio-group class="fs-13" [(ngModel)]="dataCliente.titulo" #radioGroup="matRadioGroup">                
+                <mat-radio-button class="pr-3" checked value="Casa">Casa</mat-radio-button>
+                <mat-radio-button class="pr-3" value="Trabajo">Trabajo</mat-radio-button>
+                <mat-radio-button class="pr-3" value="Novi@">Novi@</mat-radio-button>
+                <mat-radio-button class="pr-3" value="Otro">Otro</mat-radio-button>
+            </mat-radio-group>            
+        </div>
+        
+
+
+        <div class="text-center pb-3">
+
+            <button mat-flat-button mat-dialog-close class="mr-3">
+                <i class="fa fa-arrow-left"></i>
+                Atras
+            </button>
+
+
+            <button mat-flat-button 
+                color="primary" 
+                [disabled]="!registerForm.valid || loader > 0"
+                (click)="saveDireccion()"
+                >        
+                <ng-container *ngIf="loader === 0; then thenTemplate; else elseTemplate"></ng-container>
+                <ng-template #thenTemplate>            
+                    Listo Guardar
+                </ng-template>
+                <ng-template #elseTemplate>
+                    <ng-container *ngIf="loader === 1; else elseTemplateHecho">
+                        <i class="fa fa-spinner fa-spin fa-fw"></i>
+                        Guardando ...
+                    </ng-container>
+                    <ng-template #elseTemplateHecho>
+                        <i class="fa fa-check"></i>
+                        Hecho
+                    </ng-template>                    
+                </ng-template>
+                
+            </button>                 
+            
+            
+        </div>  
+    
+    
+
+</div>

@@ -1,0 +1,64 @@
+<!-- <mat-drawer-container class="example-container">
+    <mat-drawer #drawer mode="over">
+
+    </mat-drawer>
+    <mat-drawer-content> -->
+
+
+        <div class="animated fadeInUp content-body-app">
+            <div class="header-app p-3 d-inline-box">            
+                <i class="fa fa-arrow-left" [routerLink]="['../']"></i>
+                <div matRipple class="text-center" (click)="openDialogDireccion()">
+                    <span class="pl-2 fs-13 fw-100">{{ nomDireccionCliente }}</span>
+                    <i class="fa fa-caret-down pl-2" aria-hidden="true"></i>
+                </div>
+            </div>
+        
+            <!-- body -->
+            <div>        
+                <router-outlet></router-outlet>
+            </div>
+            <!-- body -->
+
+            
+            <!-- <footer></footer> -->
+            <div class="xfooter">
+                <div>
+                    <mat-tab-group class="fondo-tab-group" 
+                    color="accent"                     
+                    (selectedTabChange)="clickTab($event)"
+                    headerPosition="below" 
+                    mat-stretch-tabs>
+                        <mat-tab>
+                          <ng-template mat-tab-label>
+                              <div class="header-tab-cliente">
+                                  <i class="fa fa-home" aria-hidden="true"></i>
+                                  <span class="fs-10">Inicio</span>      
+                              </div>
+                          </ng-template>          
+                        </mat-tab>
+                      
+                        <mat-tab>
+                          <ng-template mat-tab-label>
+                            <div class="header-tab-cliente">
+                                <i class="fa fa-sticky-note" aria-hidden="true"></i>
+                                <span class="fs-10">Mis Pedidos</span>      
+                            </div>
+                          </ng-template>          
+                        </mat-tab>
+                      
+                        <mat-tab>
+                          <ng-template mat-tab-label>
+                            <div class="header-tab-cliente">
+                                <i class="fa fa-user" aria-hidden="true"></i>
+                                <span class="fs-10">Cuenta</span>      
+                            </div>
+                          </ng-template>          
+                        </mat-tab>
+                      </mat-tab-group>
+                </div>
+            </div>
+        </div>
+
+    <!-- </mat-drawer-content>
+</mat-drawer-container> -->

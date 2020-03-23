@@ -1,0 +1,36 @@
+<div class="p-4">
+    <p class="fs-18 fw-600">Metodo de pago</p>
+    <hr>
+    <div class="xoption w-100" matRipple *ngFor="let subitem of listMetodoPago">
+        <mat-checkbox 
+            class="w-100"
+            (change)="chageItem(subitem)" 
+            [(ngModel)]="subitem.checked"             
+        >
+            <div class="w-100 d-flex">
+                <span>{{subitem.descripcion}} </span>                
+            </div>
+        </mat-checkbox>                        
+    </div>    
+    <ng-container *ngIf="isMontoVisible">
+        <hr>
+        <span class="text-danger fs-12 fw-100">indique con cuanto pagara:</span>        
+        <mat-form-field class="w-100">
+            <input type="number" matInput 
+            placeholder="Paga con" 
+            [(ngModel)]="importeIndicado"
+            (keyup) = "verificarImporte(importe.value)" 
+            #importe required>
+        </mat-form-field>
+    </ng-container>
+    <hr>
+
+
+    <div class="text-center">
+        <button 
+            mat-flat-button color="primary"
+            [disabled]="!formValid"
+            (click)="cerrarDlg()">Listo</button>
+    </div>
+    
+</div>

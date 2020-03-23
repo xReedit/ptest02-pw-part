@@ -1,0 +1,81 @@
+<div class="animated fadeIn">
+    <div class="text-center p-3 encabezado-encuesta">
+        <p class="fs-17 fw-600 m-0">{{nomSede[0]}}</p>
+        <span class="fs-14 fw-100 p-0">{{nomSede[1]}}</span>        
+    </div>
+    <!-- <hr> -->
+    <div class="text-center xcontainer-centrado p-3 hv-50">
+        <!-- <div> 
+            <div>
+                <div>
+                    <div class="opitem" id="item-i" *ngIf="ini_visible" #opitem>
+                        <p class="fs-17 fw-600">{{titulo_inicio}}</p>
+                        <img src="assets/images/reactions_1.gif" width="100%" alt=".">
+                    </div>
+
+                    <div *ngFor="let item of listPreguntas">
+                        <div class="opitem" id="item-i" #opitem>
+                            <p class="fs-17 fw-600">{{item.pregunta}}</p>
+                            <app-encuesta-opcion class="d-flex" [ListOption] = "listOption"></app-encuesta-opcion>
+                        </div>
+                    </div>
+
+                    <div class="opitem" id="item-i" #opitem>
+                        <p class="fs-17 fw-600">{{titulo_fin}}</p>                        
+                    </div>
+
+                </div>                
+            </div>                   
+
+            <hr>
+
+            <button mat-flat-button color="primary">Listo, Comenzar</button>            
+
+        </div>     -->
+
+        <mat-tab-group [disableRipple]="true" [dynamicHeight]="false" [selectedIndex]="selectedTabEncuesta" class="contain-size">
+            <mat-tab disabled class="overflow-hidden">
+                <br><br>
+                <div class="overflow-hidden">
+                    <p class="fs-17 fw-600">{{titulo_inicio}}</p>
+                    <img src="assets/images/reactions_1.gif" width="100%" alt=".">
+                    <br><br><br>
+                    <button mat-flat-button color="primary" (click)="pasarTab()">Ok, Empezar</button>   
+                </div>
+            </mat-tab>
+
+            <mat-tab disabled *ngFor="let item of listPreguntas">
+                <br><br>
+                <div class="overflow-hidden">
+                    <div #opitem>
+                        <p class="fs-17 fw-600">{{item.pregunta}}</p>
+                        <ng-container *ngIf="item.obligatorio === '1'; else elseTemplate">
+                            <div>
+                                <textarea id="txt_comentario" style="width: 70%;" id="txt_comentario" cols="100" rows="3" #txt_comentario></textarea>
+                                <br><br>
+                                <button mat-flat-button color="primary" (click)="pasarTab(listOption, item, txt_comentario.value)">Listo, Enviar</button>   
+                            </div>
+                        </ng-container>
+                        <ng-template #elseTemplate>
+                            <app-encuesta-opcion class="d-flex" [ListOption] = "listOption" (NextPregunta)="pasarTab($event, item)"></app-encuesta-opcion>
+                        </ng-template>
+                        
+                    </div>
+                </div>
+            </mat-tab>
+
+            <mat-tab disabled>
+                <br><br>
+                <div class="overflow-hidden">
+                    <p class="fs-17 fw-600">{{titulo_fin}}</p>        
+                    <br>
+                    <p class="text-secondary fs-50 fw-100">{{countFin | number: '2.'}}</p>  
+                </div>
+            </mat-tab>
+          </mat-tab-group>
+    </div>
+
+    <footer class="xfooter text-center bg-white p-3" *ngIf="selectedTabEncuesta === 0">
+        <button mat-flat-button color="accent" (click)="cerrarSession()">En otro momento, gracias.</button>
+    </footer>
+</div>

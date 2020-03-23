@@ -1,0 +1,54 @@
+<div class="p-4">
+    <div>
+        <p class="fs-14 fw-600"><i class="fa fa-arrow-left pr-2" (click)="cerrarDlg()"></i> Numero de telefono:</p>
+    </div>
+
+    <mat-form-field class="w-100">
+        <input type="number" matInput 
+        placeholder="Telefono" 
+        (keyup) = "verificarNum(telefono.value)" 
+        [value] = "data.numberphone"
+        #telefono required>
+    </mat-form-field>
+    <p *ngIf="isNumberSuccess ===2 " class="text-danger">Número no valido.</p>
+    <br>
+    <button 
+        mat-flat-button color="primary"
+        [disabled]="!isValidForm"
+        (click)="sendSMS()"        
+        *ngIf="!isSendSMS"
+    >
+        Verificar telefono
+    </button>
+    
+</div>
+<hr>
+<div class="p-4" *ngIf="isSendSMS">
+    <p class="text-success fs-600">Recibiras un mensaje de texto. Escribelo el codigo aqui:</p>
+    <mat-form-field class="w-100">
+        <input type="number" matInput 
+        placeholder="Codigo" #txtCodigo>
+    </mat-form-field>
+    <br>
+    <button 
+        mat-flat-button color="primary"        
+        (click)="verificarCodigoSMS(txtCodigo.value)"   
+        [disabled]="loader !== 0 && loader !== 3"
+    >
+        <ng-container *ngIf="loader === 0 || loader === 3; else elseTemplate">
+            Verificar Codigo
+        </ng-container>
+        <ng-template #elseTemplate>
+            <ng-container *ngIf="loader === 1; else elseTemplateHecho">
+                <i class="fa fa-spinner fa-spin fa-fw"></i>
+                Verificando ...
+            </ng-container>
+            <ng-template #elseTemplateHecho>
+                <i class="fa fa-check"></i>
+                Hecho
+            </ng-template> 
+        </ng-template>            
+    </button>
+    <p *ngIf="loader > 0 && !isVerificacionOk" class="text-danger fw-600">Codigo ingresado incorrecto.</p>
+</div>
+<!-- <hr> -->

@@ -1,0 +1,106 @@
+/* .mat-tab-header {
+  z-index: 9999;
+  position: sticky !important;
+  top: 0px;
+  background-color: white !important;
+} */
+
+/* ::ng-deep .mat-tab-body-wrapper {
+  height: calc(100vh - 105px);
+} */
+
+/* .color-fondo {
+  background: #eeeeee;
+} */
+
+.main-contemt {
+    overflow:  hidden !important;
+}
+
+.x100 {
+    height: 100vh;
+    overflow: auto;    
+}
+
+.toolbar-main {
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+}
+
+
+@keyframes fadeOutTool {
+  from {    
+    margin-top: 0px;
+  }
+
+  to {     
+    margin-top: -60px;
+    display: none; 
+    visibility: hidden;
+  }
+}
+
+.toolbar-main.fadeOutTool {
+  animation-name: fadeOutTool;
+}
+
+@keyframes fadeInTool {
+  from {    
+    margin-top: -60px;
+    display: inline-block;
+  }
+
+  to {    
+    margin-top: 0px;
+  }
+}
+
+.toolbar-main.fadeInTool {
+  animation-name: fadeInTool;
+}
+
+.x100-toolbar-visible {    
+  height: calc(100vh - 105px);
+  overflow: auto;
+}
+
+.x100-toolbar-hidden {
+  position: relative;
+  height: calc(100vh - 49px);
+  overflow: auto;
+}
+
+.countItem {
+  padding: 2px 6px 2px 3px;
+  border-radius: 50%;
+  line-height: 18px;
+  font-size: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.countTotal {
+  float: right;
+  background: #f44336;  
+  color: #eeeeee;
+}
+
+
+::ng-deep.header-less-tabs.mat-tab-group .mat-tab-header { display: none; }
+
+/* #loader-wrapper .loader-msj {
+  color: #e0e0e0;
+  width: 100%;
+  z-index: 2000;
+  position: absolute;
+  text-align: center;
+  font-size: 12px;
+  bottom: 25%;
+} */
+
+/* .loaded #loader-wrapper .loader-msj {
+  opacity: 0;
+  -webkit-transition: all 0.3s ease-out;
+          transition: all 0.3s ease-out;
+} */

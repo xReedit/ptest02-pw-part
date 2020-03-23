@@ -1,0 +1,19 @@
+.container-ini {
+    position: relative;
+    min-height: 100vh;
+}
+
+.container-body {
+    padding-bottom: 3.5rem
+}
+
+.xfooter {
+    position: absolute;
+    bottom: 0px;
+    /* position: fixed; */
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+    /* height: 2.5rem; */
+}
+

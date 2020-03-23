@@ -1,0 +1,18 @@
+<div class="text-center p-3">
+  <!-- <ng-container *ngIf="isSusccess; else elseTemplate"> -->
+      <!-- <div class="text-center" class="animated fadeInDown" *ngIf="isSusccess">
+        <span>
+      </div>     -->
+  <!-- </ng-container> -->
+  <!-- <ng-template #elseTemplate> -->
+    <div class="fw-100 fs-18">
+      <ng-container *ngIf="!isSusccess; else elseTemplate">
+          <span><i class="fa fa-spinner fa-spin fa-2x fa-fw pr-1"></i>Enviando ...</span>  
+      </ng-container>
+      <ng-template #elseTemplate>          
+          <span class="animated fadeInLeft"><i class="fa fa-check text-success pr-1" aria-hidden="true"></i>Envio correcto</span>
+      </ng-template>          
+      <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+    </div>
+  <!-- </ng-template> -->
+</div>

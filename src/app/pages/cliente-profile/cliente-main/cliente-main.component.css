@@ -1,0 +1,36 @@
+.content-pago {
+    height: 100vh;
+    background: #E5EFF7;
+}
+
+.header-pago {
+    /* background: #003770; */
+    background: #3f51b5;
+    color: white;
+    width: 100%;
+
+    top: 0;    
+    position: fixed;
+    z-index: 1;
+}
+
+.fondo-tab-group {
+    /* background: #0154A0; */
+    background: #303f9f;
+    top: 50px;
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+}
+
+.header-tab-cliente {
+    display: grid !important;
+    color: white;
+}
+
+.mt-body {
+    height: 100vh;
+    margin-top: 99px !important;
+}
+
+

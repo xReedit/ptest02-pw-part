@@ -1,0 +1,91 @@
+<div>
+  <div class="text-center container-ini">
+    <div class="container-body">
+      
+      <!-- header -->
+      <div class="header">
+        <div class="d-flex">
+          <!-- <div>
+              <i class="fa fa-key p-2" aria-hidden="true" [routerLink]="['/login-personal-autorizado']"></i>
+          </div> -->
+          <div class="text-right text-white" style="position: absolute; right: 0px;">
+              <!-- <button *ngIf="isLogin" mat-button color="accent" (click)="cerrarSession()">Cerrar sesion</button> -->
+              <!-- <button mat-flat-button color="warn" [routerLink]="['/login-personal-autorizado']">Personal Autorizado</button> -->
+            <i *ngIf="isLogin" class="fa fa-user-circle-o p-2" (click)="showClienteProfile()" aria-hidden="true"></i>
+          </div>      
+        </div>      
+        <div class="inner-header flex">
+          <br>
+          <div>      
+            <img src="assets/images/papaya_text-white.png" width="190px">
+            <p>Express <span class="fs-12">v.1S</span></p>
+          </div>
+        </div>
+
+        <!--Waves Container-->
+        <div>
+          <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+          <defs>
+          <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+          </defs>
+          <g class="parallax">
+          <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+          <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+          <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+          <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+          </g>
+          </svg>
+        </div>
+        <!--Waves end-->                            
+
+      </div>
+      <!--Header ends-->
+
+
+      <!-- body -->
+
+      <div class="text-center pl-4 pr-4">
+        <img src="assets/images/img-ini.png" style="max-width: 320px; width: 100%;" alt="ini">
+        <p class="fs-14" style="color: #616161;">Software especializado para negocios gastronomicos.</p>
+      </div>
+
+      <!-- <br> -->
+      <!-- <div class="text-center">        
+        <img src="assets/images/en.png" alt="en">
+      </div> -->
+
+      <div *ngIf="isLogin" class="border-bottom" style="background: blanchedalmond;">
+        <hr>
+        <p class="fs-13">Hola <strong>{{nombreClientSocket}}</strong>, que quieres pedir hoy?</p>        
+      </div>
+
+      <div>
+        <div matRipple class="p-3 border-bottom border-top" [routerLink]="['/lector-qr']">
+          <img src="assets/images/btn_scan.png" alt="btn-scan">
+          <span class="pl-2">Scanear Código QR</span>
+        </div>        
+
+        <div matRipple class="p-3 border-bottom border-top" (click)="showDelivery()">
+          <img src="assets/images/btn_delivery.png" alt="btn-scan">
+          <span class="pl-2">Pedir un Delivery</span>
+        </div>        
+      </div>
+
+      <br>
+      <!-- <hr>     -->
+    </div>
+
+
+    <div class="xfooter bg-white">
+      <button mat-button color="primary" [routerLink]="['/login-personal-autorizado']">Personal Autorizado</button>
+    </div>    
+    <!-- <hr> -->
+    <!-- <h4>Hola bienvenidos al sistema de toma de pedidos</h4>
+    <hr>
+    <button mat-flat-button color="primary">Pide tu codigo</button>
+    <hr>
+    <button mat-flat-button color="accent">Pedir un delivery</button> -->
+  </div>
+
+</div>

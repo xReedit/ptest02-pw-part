@@ -1,0 +1,8 @@
+<div *ngFor="let option of ListOption">    
+    <div class="divBtn text-center" (click)="xNextPregunta(option)">        
+        <div class="op">
+            <img src="assets/images/encuesta-img/{{option.img}}" class="btnIco" alt="btnOption">            
+            <span>{{option.descripcion}}</span>            
+        </div>
+    </div>
+</div>

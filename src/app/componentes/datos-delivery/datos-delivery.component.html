@@ -1,0 +1,40 @@
+<div>
+  <div class="text-center">
+    <p class="fw-100 fs-20">Datos del Delivery</p>
+  </div>
+
+  <form [formGroup]="myForm">
+    <div class="w-100">
+      <!-- <i title="Cerrar Sesion" class="fa fa-search" aria-hidden="true"></i> -->
+      <mat-form-field class="w-100">
+        <input matInput placeholder="DNI" type="number" formControlName="dni" (keyup.enter)="buscarDNI()" required>
+        <button mat-icon-button matSuffix (click)="buscarDNI()">            
+            <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
+      </mat-form-field>
+      <div class="w-100">
+        <mat-progress-bar style="bottom: 20px;" [hidden]="!loadConsulta" mode="indeterminate"></mat-progress-bar>
+      </div>
+
+      <mat-form-field class="w-100">
+        <input matInput placeholder="Nombre y apellidos" formControlName="nombre" required>
+      </mat-form-field>
+
+      <mat-form-field class="w-100">
+        <input matInput placeholder="Direccion" formControlName="direccion" required>
+      </mat-form-field>
+
+      <mat-form-field class="w-100">
+        <input matInput placeholder="Telefono" formControlName="telefono" required>
+      </mat-form-field>
+
+      <mat-form-field class="w-100">
+        <input type="number" matInput placeholder="Paga con" formControlName="paga_con" required>
+      </mat-form-field>
+
+      <mat-form-field class="w-100">
+        <input matInput placeholder="Dato Adicional" formControlName="dato_adicional">
+      </mat-form-field>
+    </div>
+  </form>
+</div>

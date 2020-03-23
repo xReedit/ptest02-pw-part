@@ -1,0 +1,10 @@
+<ng-container *ngIf="timerLimitService.isPorgressVisible$ | async">
+    <mat-progress-bar 
+        class="animated fadeInDown"
+        mode="determinate" 
+        color="accent" 
+        [value]="timerLimitService.countdown$ | async"    
+    ></mat-progress-bar>
+</ng-container>
+
+

@@ -1,0 +1,221 @@
+<div class="loader-pago" *ngIf="isLoaderTransaction">
+  <div>
+    <span>Verificando, un momento por favor...</span>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+</div>
+
+<div class="animated fadeIn content-pago">    
+
+  <!-- header -->
+  <div class="header-pago p-3">    
+    <i *ngIf="!isTrasctionSuccess" class="fa fa-arrow-left" (click)="goBack()" [routerLink]="['../']"></i>    
+    <span class="pl-2">Pagar con {{ infoToken.metodoPago.descripcion }}</span>
+  </div>
+
+
+  <!-- pago -->
+
+  <div *ngIf="!dataResTransaction" class="animated fadeInUp">    
+    <!-- body -->
+    <div class="p-3">
+
+      <mat-card class="mt-2 mb-2">
+        <div class="text-center">
+            <p>Importe a pagar:</p>
+            <div>              
+              <p class="fs-30 fw-600"><span class="fs-15">S/.</span>  <span id="importe">{{estadoPedido.importe | number: '0.2'}}</span> </p>
+            </div>            
+            <hr>
+
+            <!-- correo -->
+            <div *ngIf="isRequiredEmail" class="w-100">              
+              <p class="fs-13 fw-100" ng [ngClass]="{'text-danger animated flash': isViewAlertEmail}">Se requiere un coreo para notificarle.</p>
+              <mat-form-field class="w-100 text-center">
+                <input matInput         
+                  type="email" 
+                  name="email"
+                  class="text-center"
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                  placeholder="Correo electronico" 
+                  (keyup) = "verificarCorreo(txtCorreo)"
+                  #txtCorreo>
+                </mat-form-field>
+                <span class="fs-13 fw-100 text-danger m-0 p-0" [hidden]="isEmailValid">Correo no valido</span>
+                <hr>
+            </div>
+
+            <!-- check terminos -->
+            <div class="text-center" *ngIf="isDisabledCheck && isEmailValid">
+              <mat-checkbox  (click)="goPagar()">Acepto los <a href="http://papaya.com.pe/terminos-condiciones.html" target="_blank">Terminos y condiciones</a></mat-checkbox>
+              <p *ngIf="isViewAlertTerminos" class="fw-100 fs-14 text-danger animated flash">Acepte los terminos.</p>
+              <hr>
+            </div>
+
+            <!-- <div class="w-70">
+              <mat-checkbox  (click)="goPagar()">Acepto los <a href="http://papaya.com.pe/terminos-condiciones.html" target="_blank">Terminos y condiciones</a></mat-checkbox>
+              <p *ngIf="isViewAlertTerminos" class="fw-100 fs-14 text-danger animated flash">Acepte los terminos.</p>
+              <hr>
+            </div> -->
+            
+            <div class="div-btn">
+              <div id="btn_pago">
+  
+              </div>
+  
+              <div id="btn-disabled" class="btn-pago-disabled" (click)="verificarCheckTerminos()">
+                <span [hidden]="!isLoadBtnPago" class="fa fa-spinner fa-spin"></span> 
+                <span [hidden]="isLoadBtnPago">Pagar Aqui</span>
+              </div>
+            </div>
+        </div>
+      </mat-card>      
+
+        <mat-accordion>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  Datos de Facturación
+                </mat-panel-title>                
+              </mat-expansion-panel-header>
+          
+              <!-- <mat-form-field>
+                <input matInput placeholder="First name">
+              </mat-form-field>
+          
+              <mat-form-field>
+                <input matInput placeholder="Age">
+              </mat-form-field> -->
+
+              <span class="fw-100 text-secondary">Muy pronto podrás obtener tu comprobante de consumo por este medio. Por el momento lo puede solicitar en caja.</span>
+            </mat-expansion-panel>            
+        </mat-accordion>              
+    
+    </div>
+  </div>
+
+
+  <!-- respuesta -->
+  <div *ngIf="dataResTransaction" class="animated fadeIn">
+
+    <ng-container *ngIf="dataResTransaction.error; else elseTemplate">
+      <div class="text-center fs-20 fw-100 banner-res-error p-3">
+        <i class="fa fa-times-circle-o fa-2x" aria-hidden="true"></i>
+        <p>Ups! hubo un problema.</p>
+      </div>      
+
+      <div class="p-3 bg-white">
+        <div class="text-center">
+          <span class="fw-100">
+            {{dataResTransaction.errorMessage}} <br>
+            {{dataResTransaction.data.ACTION_DESCRIPTION}} <br>
+            {{dataResTransaction.data.CARD}} <br>
+          </span>
+        </div>
+      </div>
+
+
+      <div class="p-3 bg-white">
+        <div class="text-center">
+          <button mat-flat-button color="accent" (click)="actionAfterTransaction()">Regresar</button>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <ng-template #elseTemplate>
+     
+      <!-- transaccion exitosa -->
+      <ng-container *ngIf="!this.infoToken.isDelivery; else esClienteDelivery">
+        
+        <!-- no delivery -->
+          <div class="text-center fs-20 fw-100 banner-res-ok p-3">
+            <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>            
+            <p>Transacción Existosa.</p>
+            
+          </div>
+    
+          <div class="p-3 bg-white">
+            <div class="text-center">
+              <span class="fw-100">
+                {{dataResTransaction.dataMap.ACTION_DESCRIPTION}}
+              </span>
+            </div>
+          </div>
+    
+          <div class="p-3">
+            <div class="text-left fw-100">
+              <table>
+                <tr>
+                  <td>Fecha</td>
+                  <td>: {{fechaTransaction | date: 'dd/mm/yy h:mm:ss a'}}</td>
+                </tr>
+                <tr>
+                  <td>N° Pedido</td>
+                  <td>: {{dataResTransaction.order.purchaseNumber}}</td>
+                </tr>
+                <tr>
+                  <td>N° Tarjeta</td>
+                  <td>: {{dataResTransaction.dataMap.CARD}}</td>
+                </tr>
+                <tr>
+                  <td>Descripcion</td>
+                  <td>: Pago de cuenta</td>
+                </tr>            
+                <tr>
+                  <td>Mesa</td>
+                  <td>: {{infoToken.numMesaLector}}</td>
+                </tr>
+                <tr>
+                  <td>Importe</td>
+                  <td>: {{estadoPedido.importe | number: '0.2'}} {{dataResTransaction.order.currency}}</td>
+                </tr>            
+              </table>
+            </div>
+          </div>     
+
+
+      </ng-container>
+      <ng-template #esClienteDelivery>
+        
+        <!-- cliente delivery -->
+        <div class="text-center fs-20 fw-100 banner-res-ok p-3">
+          <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+          <ng-container *ngIf="!pagaConEefectivo; else divPagoEfectivo">              
+          </ng-container>
+            <p>Transacción Existosa.</p>
+          <ng-template #divPagoEfectivo>
+            <p>Listo.</p>
+          </ng-template>
+        </div>
+
+      </ng-template>
+      
+      
+
+
+      <div class="p-3 bg-white">
+        <div class="text-center">
+          <p class="fs-20">Pedido Confirmado</p>
+          <hr>
+          <p>Su orden llegara pronto.</p>
+          <hr>
+          <img src="./assets/images/food_delivery.gif" alt="delivery" width="160px">
+          <hr>
+          <p>Puede ver el estado de este en <br><strong>Mis Pedidos</strong>.</p>
+          <!-- <span class="fw-100 fs-25">{{ countFin | number: '2.' }}</span>
+          <p>Notificando pago a control de caja ...</p> -->
+          <button mat-flat-button color="primary" (click)="finDelivery()"> Listo. </button>
+          <br>
+        </div>
+      </div>
+
+    </ng-template>        
+    <!-- <mat-card class="mt-2 mb-2">
+      <div class="text-center">
+         
+      </div>
+    </mat-card> -->
+  </div>
+</div>
+

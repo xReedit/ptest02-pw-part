@@ -1,0 +1,97 @@
+<div class="item-content">
+    <div class="i-header">
+        <div class="d-flex">
+            <div class="w-75 fs-15 fw-600">
+                <span class="i-stock estado-color-{{getEstadoStockItem(item.cantidad)}}"> {{item.cantidad | number : '2.'}}</span>
+                <span>{{item.des}}</span>
+            </div>
+            <div class="i-btn-exit" matRipple (click)="cerrarDlg()">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </div>
+        </div>
+    </div>    
+
+    <div class="i-body fw-100 fs-13">
+        <!-- imagen -->
+        <ng-container *ngIf="item.img.length > 0">
+            <div>
+                <img class="img-carta" src="{{url_img}}{{item.img}}" alt="{{item.img}}">
+            </div>
+        </ng-container>
+        
+        <!-- detalles -->
+        <ng-container *ngIf="item.detalles.length > 0">
+            <p class="titlo-detalle" >{{item.detalles}}</p>
+            <hr>
+        </ng-container>
+        <!-- detalles -->
+
+        <!-- subitems -->
+        <ng-container *ngIf="item.subitems">
+            <div *ngFor="let contentSub of item.subitems; let i = index">
+                <div class="pb-3 mb-3">
+                    <div>
+                        <span class="txt-obligatorio" [hidden]="!contentSub.isObligatorio">Obligatorio</span>
+                        <div class="sub-i-titulo">
+                            <p class="m-0">{{contentSub.des}}</p>
+                            <span class="fs-12 text-secondary">{{contentSub.des_cant_select}} {{contentSub.subitem_cant_select}}</span>
+                        </div>
+                    </div>                            
+
+                    <!-- subitems - opciones -->
+                    <div>
+                        <div class="xoption w-100" matRipple *ngFor="let subitem of contentSub.opciones; let i = index">
+                            <mat-checkbox 
+                                class="w-100"
+                                (change)="addSubItem(contentSub, subitem)" 
+                                [(ngModel)]="subitem.selected" 
+                                [ngClass]="{'li-tachado': subitem.cantidad < 1}"
+                                [disabled]="subitem.cantidad < 1"
+                            >
+                                <div class="w-100 d-flex">
+                                    <span>{{subitem.des | lowercase}} </span>
+                                    <span class="xprecio pl-1" [hidden]="!subitem.cantidad_visible"> | {{subitem.cantidad}}</span>
+                                    <div *ngIf="subitem.precio != 0" class="xprecio aling-derecha"> 
+                                        + {{subitem.precio | number:'0.2'}}
+                                    </div>
+                                </div>
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- especificaciones -->
+        <div class="borde-bajo mb-2">
+            <!-- <span class="text-bold">Instrucciones adicionales</span> -->
+            <mat-form-field class="w-100">
+                <input matInput placeholder="Agregue una nota (poco aji, sin arroz, etc.)" [(ngModel)]="item.indicaciones" (keyup)="setIndicaciones(txtIdicaciones.value)" name="indicaciones" #txtIdicaciones>
+            </mat-form-field>
+        </div>
+
+        <!-- tipos de consumo -->
+        <span class="fs-12 text-danger" [hidden]="isOptionRequeridosComplet">Hay opciones obligatorias por marcar</span>
+        <div class="mb-2" id="tpc_content" [attr.disabled]="!isOptionRequeridosComplet ? true : null">
+            <table width="100%" class="tb-tpc">
+                <tr *ngFor="let tp of objItemTipoConsumoSelected">
+                <td>{{tp.descripcion}}</td>
+                <td>
+                    <div class="d-flex float-right">
+                        <div [hidden]="tp.cantidad_seleccionada === 0" [ngClass]="{'bounceIn': tp.animar_cantidad}" class="fs-19 pr-2 animated">{{tp.cantidad_seleccionada}}</div>
+                        <div appDebounceClick (debounceClick)="addItemToDialogItem(tp, 1)" (debounceWait)="isWaitBtnMenos" class="btn-tbl bg-danger xCursor" matRipple><i class="fa fa-arrow-right" *ngIf="isWaitBtnMenos"></i>  -</div>
+                        <div appDebounceClick (debounceClick)="addItemToDialogItem(tp, 0)" class="btn-tbl bg-success xCursor" matRipple>+</div>
+                    </div>
+                </td>
+                </tr>
+            </table>            
+        </div>    
+
+
+    </div>
+
+    <div class="i-footer">
+        <button mat-flat-button color="primary" (click)="cerrarDlg()">Listo, continuar</button>
+        <div class="i-precio">S/. {{precioProducto | number:'0.2'}}</div>
+    </div>
+</div>

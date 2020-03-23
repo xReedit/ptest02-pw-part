@@ -1,0 +1,36 @@
+<div class="text-center animated fadeIn">
+    <br>
+    <img src="assets/images/login-user.gif" alt=".." style="max-width: 360px;">
+    <div class="text-center ml-5 mr-5">
+      <img src="assets/images/papaya_text-2.png" width="190px">
+      <p class="fs-16 fw-100 text-secondary">Personal Autorizado</p>            
+
+      <form class="content-login-us" (ngSubmit)="logear()" #frmpass="ngForm">
+        <div class="row ">
+          <div class="col-sm-6">
+            <mat-form-field class="w-100">
+              <input matInput placeholder="Usuario" [(ngModel)]="usuario.nomusuario" name="nomusuario" required>
+            </mat-form-field>
+          </div>
+          <div class="col-sm-6">
+            <mat-form-field class="w-100">
+              <input matInput type="password" [(ngModel)]="usuario.pass" name="pass" placeholder="Clave" required>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <mat-progress-bar [hidden]="!loading" mode="indeterminate"></mat-progress-bar>
+          <span class="fs-14 font-weight-bold text-danger animated flash" [hidden]="!msjErr">Credenciales
+            Incorrectas.</span>
+        </div>
+
+        <hr>
+        <div class="text-center">
+          <!-- <button mat-flat-button [disabled]="!frmpass.valid">Listo, Ingresar</button> -->
+          <button mat-flat-button color="primary" [disabled]="!frmpass.valid">Listo, Ingresar</button>
+        </div>
+      </form>
+
+    </div>
+</div>

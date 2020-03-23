@@ -1,0 +1,40 @@
+<div class="pb-2" matRipple (click)="_itemSelected()">
+    <mat-card>
+    <div class="content-img-comercio">
+        <img class="img-comercio" src="/assets/comercios/{{itemEstablecimiento.pwa_delivery_img}}" alt="">
+    </div>
+    <div >
+        <div class="div-info-comercio">
+            <p class="fw-600 fs-18">{{itemEstablecimiento.nombre | titlecase}}</p>
+            <p class="fs-13" *ngIf="itemEstablecimiento.eslogan.length > 0">{{itemEstablecimiento.eslogan | titlecase}}</p>
+            <p class="fw-100 fs-12">{{itemEstablecimiento.sub_categoria}}</p>
+        </div>
+        <hr>
+        <div class="d-flex div-sub-info-comercio">
+            <ng-container *ngIf="!isCerrado; else elseTemplate">
+                            
+                    <div>
+                        <i class="fa fa-clock-o"></i>
+                        10 - 15 min
+                    </div>
+                    <div>
+                        <i class="fa fa-bicycle"></i>
+                        S/.{{ itemEstablecimiento.c_servicio | number: '0.2'}}
+                    </div>
+                    <!-- <div>5.0</div>             -->
+
+            </ng-container>
+            <ng-template #elseTemplate>
+                
+                <div class="div-cerrado">
+                    <p>Cerrado</p>
+                    <p class="fs-15 fw-600">Abre: {{itemEstablecimiento.hora_ini}} {{amPm}}</p>
+                </div>
+
+            </ng-template>
+            
+            
+        </div>
+    </div>
+    </mat-card>
+</div>

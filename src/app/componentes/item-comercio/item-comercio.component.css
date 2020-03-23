@@ -1,0 +1,46 @@
+
+.content-img-comercio {
+    border: 1px solid lightgray;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.img-comercio {
+    max-width: 100%;
+    /* max-width: 330px; */
+    max-height: 115px;
+}
+
+.div-info-comercio {
+    padding-top: 15px;
+    margin: 0px;
+    line-height: 0.35em;
+}
+
+.div-sub-info-comercio{
+    background: #eeeeee;
+    margin-top: -15px;
+}
+
+.div-sub-info-comercio div {
+    border-radius: 2px;    
+    font-size: 13px;
+    padding: 5px;    
+    padding-right: 15px;
+}
+
+.div-cerrado {
+    width: 100%;
+    background: lavenderblush;
+    margin-top: -200px;
+    opacity: 0.6;
+    text-align: center;    
+}
+
+.div-cerrado p {
+    font-size: 25px;
+    font-weight: 800;
+    width: 100%;
+    top: 10%;
+    position: relative;
+}

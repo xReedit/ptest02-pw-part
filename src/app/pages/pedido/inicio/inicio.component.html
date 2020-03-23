@@ -1,0 +1,31 @@
+
+<div class="h-100 overflow-hidden"> 
+  <div class="toolbar-main" [ngClass]="{'fadeInTool': isVisibleToolBar, 'fadeOutTool': !isVisibleToolBar}">
+    <app-tool-bar></app-tool-bar>
+  </div>
+  <div>
+    <mat-tab-group backgroundColor="primary" color="accent" class="main-contemt transicion">
+      <mat-tab label="Carta">
+        <div class="x100-toolbar-hidden" (scroll)="onScroll($event)">
+          <app-carta></app-carta>
+          <br>
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span>Mi Pedido</span>
+          <div *ngIf="countTotalItems > 0" class="countItem countTotal animated fadeInUp">
+            {{countTotalItems | number: '2.'}}</div>
+        </ng-template>
+        <div class="x100-toolbar-hidden" (scroll)="onScroll($event)">
+          <app-resumen-pedido></app-resumen-pedido>
+          <br>
+        </div>
+      </mat-tab>
+      <!-- <mat-tab label="Estado">
+        <app-estado-pedido></app-estado-pedido>
+      </mat-tab> -->
+    </mat-tab-group>
+  </div>
+
+</div>

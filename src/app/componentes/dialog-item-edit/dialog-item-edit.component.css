@@ -1,0 +1,170 @@
+::ng-deep .mat-checkbox-layout { margin: 0px; width: 100%; position: relative;}
+::ng-deep .mat-checkbox-inner-container { margin-left: 0px !important; }
+::ng-deep .mat-dialog-container {
+    padding: 0px;
+    min-width: 300px;
+    overflow: hidden;
+}
+
+::ng-deep .cdk-overlay-dark-backdrop {
+    background: rgba(0,0,0,.52);
+}
+
+.item-content {
+    position: relative;
+}
+
+.i-header {
+    padding: 15px;
+    border-bottom: 1px solid lightgray;
+    background: #eeeeee;
+}
+
+.titlo-detalle {
+    font-size: 13px;
+    font-family: Ubuntu-Light;
+    color: #616161;
+    text-transform: lowercase;
+  }
+
+.i-stock {
+    border-radius: 5px;
+    text-align: center;
+    margin-right: 5px;
+    padding: 5px;    
+}
+
+.i-btn-exit {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: 8px;    
+    line-height: 10px;
+    background: rgba(189,189,189,0.7);
+    border-radius: 4px;
+}
+
+.li-tachado {
+    text-decoration: line-through;
+    color: red;
+  }
+
+.sub-i-titulo-content {
+    padding-bottom: 20px;
+}
+
+.sub-i-titulo {
+    line-height: 1.2;
+}
+
+.borde-bajo {
+    border-bottom: 1px solid lightgray;
+}
+
+.i-body {    
+    max-height: 60vh;    
+    overflow: auto;
+    padding: 15px;
+}
+
+.txt-obligatorio {
+    font-size: 12px;
+    background: #e0e0e0;
+    padding: 3px;
+    margin-left: 5px;
+    border-radius: 8px;
+    position: relative;
+    float: right;
+    /* top: -18px; */
+}
+
+.mat-checkbox-layout {
+    margin: 0px;
+}
+
+.xoption {        
+    padding-right: 8px;
+    min-width: 150px;
+    font-size: 12px;
+    display: inline-flex;
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 2px;
+    padding-top: 2px;
+}
+
+.xoption .agotado {
+    text-decoration: line-through;
+    color: palevioletred;
+}
+
+.xoption .xprecio {
+    font-size: 10px;
+    color: #757575;
+}
+
+.xprecio.aling-derecha{
+    position: absolute;
+    float: right;
+    right: 0;
+}
+
+.i-footer {
+    display: flex;
+    position: sticky;    
+    z-index: 1;
+    border-top: 1px solid lightgray;    
+    background: white;    
+    width: 100%;
+    padding: 15px;
+    background: #eeeeee;
+}
+
+.i-precio {
+    position: absolute;
+    right: 15px;
+    font-size: 20px;
+    font-weight: 600;
+    top: 18px;
+}
+
+.tb-tpc tr>td {
+    font-size: 12px;
+    border-bottom: 1px dashed #e0e0e0;
+  }
+
+.btn-tbl {
+  text-align: center;
+  color: white;
+  padding: 7px 16px 7px 16px;
+  font-size: 15px;
+  border-radius: 5px;
+  margin-left: 4px;
+  margin-bottom: 4px;
+}
+
+#tpc_content[disabled] {
+    pointer-events:none;opacity:0.43;
+}
+
+
+.estado-color-verde {
+  background: #43a047;
+  color: #e0e0e0;
+}
+
+.estado-color-amarillo {
+  background: #ffb300;
+  color: #424242;
+}
+
+.estado-color-rojo {
+  background: #d81b60;
+  color: #e0e0e0;
+}
+
+.img-carta {
+    width: 100%;
+    border-radius: 3px;
+    border: solid 1px #e0e0e0;
+    margin-bottom: 5px;
+}

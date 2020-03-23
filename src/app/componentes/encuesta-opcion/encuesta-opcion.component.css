@@ -1,0 +1,29 @@
+.btnIco {
+    opacity: 0.7;
+    padding: 10px;
+    cursor: pointer;
+    /* width: 112px; */
+    transition: transform .2s; /* Animation */
+}
+
+.btnIco:hover {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+.divBtn {
+    display: grid;
+}
+
+.divBtn span {
+    color: #757575;
+}
+
+.op {
+    text-align: center;    
+    line-height: 1;
+}
+
+.op img {
+    width: 65px;
+}

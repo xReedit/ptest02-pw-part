@@ -1,0 +1,84 @@
+<div class="animated fadeIn">
+    <div *ngIf="!isViewLoginDNI" class="text-center">
+        <div class="p-3 pt-5">
+            <p class="fs-18 fw-600">Registrate para comenzar hacer tu pedido.</p>
+        </div>
+        <hr>
+        <div class="p-3">
+            <div class="btn-social fb" matRipple (click)="goFb()">                
+                <i class="fa fa-facebook" aria-hidden="true"></i>
+                <span class="pl-2">Con Facebook</span> 
+            </div>
+            <div class="btn-social gmail" matRipple (click)="goGmail()">                
+                <i class="fa fa-google" aria-hidden="true"></i>
+                <span class="pl-2">Con Gmail</span>
+            </div>
+    
+            <hr>
+    
+            <div class="btn-social dni" matRipple  (click)="viewLoginDni()">
+                <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                <span class="pl-2">Con DNI</span>
+            </div>
+        </div>
+    </div>
+    
+    <div *ngIf="isViewLoginDNI" class="animated fadeInUp">
+
+        <!-- encabezado -->
+        <div class="pr-5 pt-5 pl-5 pb-2" (click)="viewLoginDni()">
+            <p class="fs-18 fw-600"><i class="fa fa-arrow-left pr-2"></i> Escriba su DNI.</p>
+        </div>
+        <hr>
+
+        <div class="pr-5 pt-2 pl-5 pb-0">
+            <div *ngIf="!isPaseOk">
+                <mat-form-field class="w-100">
+                    <input matInput placeholder="DNI" maxlength="8" type="number" (keyup.enter)="buscarDNI(dni.value)" #dni>
+                    <button mat-flat-button color="primary" matSuffix (click)="buscarDNI(dni.value)">            
+                        <i class="fa fa-arrow-right" aria-hidden="true"></i>                        
+                    </button>
+                </mat-form-field>
+                <div class="w-100">
+                    <mat-progress-bar style="bottom: 20px;" [hidden]="!loadConsulta" mode="indeterminate"></mat-progress-bar>
+                    <span class="fs-13 text-danger">{{msj_error}}</span>                    
+                </div>
+        
+                <ng-container *ngIf="isValidDNI" class="animated fadeInUp">
+                    <p class="fs-13 fw-600">
+                        {{dataCliente.name}}
+                    </p>
+            
+                    <span class="fs-13 text-info">Para confirmar su identidad, indique la fecha en que nacio.</span>
+                    
+                    <div class="div-list-date text-center">
+                        <div matRipple 
+                            class="item-list-date border-bottom" 
+                            [ngClass]="{'selected': item.selected}" 
+                            (click)="verificarDNI(item)"
+                            *ngFor="let item of listViewDate">
+                            <div>{{item.fecha}}</div>                            
+                        </div>
+                    </div>                        
+                                
+                </ng-container>
+            </div>
+            
+            <div class="text-center">
+                <ng-container *ngIf="isListDateSelect" class="animated pulse">
+                    <ng-container *ngIf="isDateBirthdayValid && isPaseOk; else elseTemplate">
+                        <span class="text-success fs-20">Excelente usuario validado.</span>
+                    </ng-container>
+                    <ng-template #elseTemplate>
+                        <span class="text-danger fs-14">Seleccione con cuidado, de lo contrario no podra registrase con este documento.</span>
+                    </ng-template>
+                </ng-container>
+            </div>
+    </div>
+        
+
+        
+        
+
+    </div>
+</div>
