@@ -33,7 +33,7 @@ export class LoginPersonalAutorizadoComponent implements OnInit {
           this.authService.setLoggedStatus(true);
           this.authService.setLocalUsuario(this.usuario);
           this.infoToken.converToJSON();
-          this.router.navigate(['./pedido']);
+          this.router.navigate(['./repartidor']);
           // this.loading = false;
         } else {
           this.loading = false;

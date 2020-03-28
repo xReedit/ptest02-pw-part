@@ -1,0 +1,26 @@
+<div class="animated fadeInDown">
+    <div class="p-3 bg-dark text-white fs-13 d-flex justify-content-between">
+        <div>
+            <span>Efectivo en mano</span>
+        </div>
+        <div>
+            <span>S/. {{efectivoMano | number: '.2'}}</span>
+        </div>
+    </div>
+</div>
+
+<!-- lista pedidos -->
+<div class="w-100">
+    <mat-tab-group mat-stretch-tabs>
+        <mat-tab label="Pendientes"> 
+            
+            <div class="p-3">
+                <div *ngFor="let item of listPedidos">
+                    <app-item-pedido [infoPedido] = "item" (aceptaPedido)="aceptaPedido($event)"></app-item-pedido>
+                </div>
+            </div>
+
+        </mat-tab>
+        <mat-tab label="Atendidos"> Content 2 </mat-tab>        
+    </mat-tab-group>
+</div>

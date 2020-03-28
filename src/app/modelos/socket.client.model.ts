@@ -17,4 +17,6 @@ export class SocketClientModel {
     isDelivery: boolean;
     direccionEnvioSelected: DeliveryDireccionCliente;
     telefono: string;
+    efectivoMano: number; // repartidor efectivo en mano
+    socketId: string;
 }

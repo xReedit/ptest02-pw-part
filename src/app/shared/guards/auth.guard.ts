@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+// import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { VerifyAuthClientService } from '../services/verify-auth-client.service';
-import { InfoTockenService } from '../services/info-token.service';
+// import { VerifyAuthClientService } from '../services/verify-auth-client.service';
+// import { InfoTockenService } from '../services/info-token.service';
 // import { InfoTockenService } from '../services/info-token.service';
 
 @Injectable({
@@ -12,8 +12,8 @@ import { InfoTockenService } from '../services/info-token.service';
 export class AuthGuard implements CanActivate {
   constructor(
     private authService: AuthService,
-    private verifyClientService: VerifyAuthClientService,
-    private infoTokenService: InfoTockenService,
+    // private verifyClientService: VerifyAuthClientService,
+    // private infoTokenService: InfoTockenService,
   ) {}
 
   // canActivate(
@@ -25,8 +25,8 @@ export class AuthGuard implements CanActivate {
 
   canActivate() {
     const us = this.authService.getLoggedStatus();
-    const infoToken = this.infoTokenService.getInfoUs();
-    const res = infoToken.isCliente ? infoToken.isDelivery ? true : this.verifyClientService.getIsQrSuccess() && us : us;
+    // const infoToken = this.infoTokenService.getInfoUs();
+    const res = us;
     // console.log('canActivate', us);
     // if ( us )
     return res;

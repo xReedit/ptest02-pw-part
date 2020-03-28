@@ -97,6 +97,22 @@ export class InfoTockenService {
     this.setMetodoPago( metodoPagoInit );
   }
 
+  setEfectivoMano( val: number) {
+    this.infoUsToken.efectivoMano = val;
+    this.set();
+  }
+
+  setisOnline( val: boolean) {
+    this.infoUsToken.isOnline = val;
+    this.set();
+  }
+
+  setSocketId( val: string) {
+    this.infoUsToken.socketId = val;
+    this.set();
+  }
+
+
   // guarda en el local storage
   set() {
     const _token = `eyCJ9.${btoa(JSON.stringify(this.infoUsToken))}`;
@@ -104,7 +120,8 @@ export class InfoTockenService {
   }
   //
 
-  getToken(): any { return localStorage.getItem('::token'); }
+  getToken(): any { return localStorage.getItem('::token'); } // este lo modificamos
+  getTokenAuth(): any { return localStorage.getItem('::token-auth'); } // este se mantiene desde la session (original)
 
   converToJSON(): void {
     if (localStorage.getItem('::token')) {
@@ -130,12 +147,13 @@ export class InfoTockenService {
         _newUs.importeDelivery = _token.importeDelivery;
         _newUs.isPagoSuccess = _token.isPagoSuccess;
         _newUs.metodoPago = _token.metodoPago;
+        _newUs.efectivoMano = _token.efectivoMano;
         this.infoUsToken = _newUs;
 
         // agregar el metodo pago prederteminado tarjeta
         if (!this.infoUsToken.metodoPago)  { this.setIniMetodoPago(); }
       } else {
-        this.infoUsToken = <UsuarioTokenModel>_token.usuario;
+        this.infoUsToken = <UsuarioTokenModel>_token;
         this.infoUsToken.isCliente = false;
       }
     } else {

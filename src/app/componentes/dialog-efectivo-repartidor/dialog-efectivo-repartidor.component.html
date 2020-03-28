@@ -1,0 +1,35 @@
+<div>
+    <p>Parametros Iniciales: </p>
+    <hr>
+    <!-- geoposition -->
+    <ng-container *ngIf="!isOnGeoPosition">
+        <span class="fw-100">Active su ubicación (GPS).</span>
+        <hr>
+    </ng-container>
+
+    <!-- notificaciones -->
+    <ng-container *ngIf="!isOnNotificactionPush">
+        <span class="fw-100">Acepte las notificaciones para recibir indicaciones.</span>
+        <hr>
+    </ng-container>
+
+    <!-- efectivo en mano -->
+    <div>
+        <mat-form-field class="w-100">
+            <input type="number" matInput 
+            placeholder="Efectivo en mano"            
+            (keyup)="validImporte(importe.value)"
+            #importe required>
+        </mat-form-field>
+        <span class="fs-12 text-secondary fw-100">Según este importe se le asignaran pedidos que debe pagar en efectivo</span>
+    </div>
+
+    <hr>
+    <div class="text-center">
+        <button 
+            mat-flat-button color="primary"
+            [disabled]="importeIndicado === 0"
+            (click)="guardarEfectivoMano()" mat-dialog-close>Listo</button>
+    </div>
+    
+</div>

@@ -9,14 +9,18 @@ export class TimerLimitService {
 
   private countdownTimerRef = null;
   private init = 0;
-  public maxTime: number; // 3min defult
+  public maxTime = 60; // 1min defult
   private valPorcentaje = 0;
   private isPlayTimer = false;
-  private dateNow = new Date();
+  private countTimer = 0; // cuenta el tiempo en segundo
+  // private dateNow = new Date();
 
 
   private countdownSource = new BehaviorSubject<number>(0);
   public countdown$ = this.countdownSource.asObservable();
+
+  private countTimeSource = new BehaviorSubject<number>(0);
+  public countTime$ = this.countTimeSource.asObservable();
 
   private isTimeLimitSource = new BehaviorSubject<boolean>(false);
   public isTimeLimitComplet$ = this.isTimeLimitSource.asObservable();
@@ -25,7 +29,7 @@ export class TimerLimitService {
   public isPorgressVisible$ = this.isPorgressVisibleSource.asObservable();
 
   constructor(
-    private infoToken: InfoTockenService,
+    // private infoToken: InfoTockenService,
   ) {
    }
 
@@ -34,14 +38,14 @@ export class TimerLimitService {
   }
 
   playCountTimerLimit(): void {
-    if ( this.infoToken.isDelivery() ) { return; } // cuando es delivery no cuenta tiempo
+    // if ( this.infoToken.isDelivery() ) { return; } // cuando es delivery no cuenta tiempo
     if (this.isPlayTimer) {return; }
     this.isPlayTimer = true;
     this.initCount();
   }
 
   resetCountTimerLimit(): void {
-    if ( this.infoToken.isDelivery() ) { return; } // cuando es delivery no cuenta tiempo
+    // if ( this.infoToken.isDelivery() ) { return; } // cuando es delivery no cuenta tiempo
     if (localStorage.getItem('sys::tcount') ) {
       this.isPlayTimer = true;
       this.initCount();
@@ -51,11 +55,15 @@ export class TimerLimitService {
   }
 
   private initCount(): void {
-    if ( this.infoToken.isDelivery() ) { return; } // cuando es delivery no cuenta tiempo
+    // if ( this.infoToken.isDelivery() ) { return; } // cuando es delivery no cuenta tiempo
     this.valPorcentaje = 0;
     this.init = localStorage.getItem('sys::tcount') ? parseInt(localStorage.getItem('sys::tcount'), 0) : 0;
     this.isTimeLimitSource.next(false);
     this.isPorgressVisibleSource.next(true);
+
+    // restar 60 - 1
+    this.countTimer = this.maxTime - this.setTimeDate();
+
     this.progressCount();
   }
 
@@ -64,6 +72,7 @@ export class TimerLimitService {
     if ( !this.isPlayTimer ) {return; }
     this.countdownTimerRef = setTimeout(() => {
       this.init = this.setTimeDate();
+      this.countTimer--;
       this.valPorcentaje = Math.round((this.init / this.maxTime) * 100);
       // guardamos en el
       localStorage.setItem('sys::tcount', this.init.toString());
@@ -82,6 +91,8 @@ export class TimerLimitService {
         }
         this.progressCount();
       }
+
+      this.countTimeSource.next(this.countTimer);
 
       lastValPorcentaje = this.valPorcentaje;
 
@@ -103,6 +114,7 @@ export class TimerLimitService {
     this.isPlayTimer = false;
     this.init = 0;
     this.valPorcentaje = 0;
+    this.countTimer = 0;
     localStorage.removeItem('sys::tcount');
     localStorage.removeItem('sys::tnum');
     this.clearTimeout();

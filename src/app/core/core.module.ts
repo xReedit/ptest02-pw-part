@@ -10,13 +10,15 @@ import { MaterialModule } from './material/material.module';
 import { ToolBarComponent } from './tool-bar/tool-bar.component';
 import { ProgressTimeLimitComponent } from './progress-time-limit/progress-time-limit.component';
 import { HttpConfigInterceptorService } from '../shared/services/http-config-interceptor.service';
+import { ToolBarRepartidorComponent } from './tool-bar-repartidor/tool-bar-repartidor.component';
 
 
 @NgModule({
   declarations: [
     LayoutMainComponent,
     ToolBarComponent,
-    ProgressTimeLimitComponent
+    ProgressTimeLimitComponent,
+    ToolBarRepartidorComponent
   ],
   imports: [
     CommonModule,
@@ -27,7 +29,8 @@ import { HttpConfigInterceptorService } from '../shared/services/http-config-int
   exports: [
     MaterialModule,
     ToolBarComponent,
-    ProgressTimeLimitComponent
+    ProgressTimeLimitComponent,
+    ToolBarRepartidorComponent
   ],
   providers: [
     CrudHttpService,

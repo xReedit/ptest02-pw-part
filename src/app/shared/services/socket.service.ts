@@ -12,8 +12,8 @@ import { TipoConsumoModel } from 'src/app/modelos/tipoconsumo.model';
 import { ItemTipoConsumoModel } from 'src/app/modelos/item.tipoconsumo.model';
 import { InfoTockenService } from './info-token.service';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-import { MipedidoService } from './mipedido.service';
+// import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+// import { MipedidoService } from './mipedido.service';
 import { Router } from '@angular/router';
 
 
@@ -60,12 +60,15 @@ export class SocketService {
     const infToken = this.infoTockenService.infoUsToken || infoUser;
 
     const dataSocket = {
-      idorg: infToken.idorg,
-      idsede: infToken.idsede,
-      idusuario: infToken.idusuario,
-      idcliente: infToken.idcliente,
-      iscliente: infToken.isCliente,
-      isFromApp: opFrom
+      // idorg: infToken.idorg,
+      // idsede: infToken.idsede,
+      idrepartidor: infToken.usuario.idrepartidor,
+      // idusuario: infToken.idusuario,
+      // idcliente: infToken.idcliente,
+      // iscliente: infToken.isCliente,
+      isFromApp: opFrom,
+      isRepartidor: true,
+      firts_socketid: infToken.socketId
     };
 
     // console.log('dataSocket', dataSocket);
@@ -112,6 +115,15 @@ export class SocketService {
 
     // this.onListenSocketDisconnet();
   }
+
+
+  onRepartidorNuevoPedido() {
+      return new Observable(observer => {
+          this.socket.on('repartidor-nuevo-pedido', (res: any) => {
+          observer.next(res);
+        });
+      });
+    }
 
   onGetCarta() {
     // if ( this.isSocketOpen ) { return new Observable(observer => {observer.next(null); }); }

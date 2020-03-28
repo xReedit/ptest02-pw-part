@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { DeliveryDireccionCliente } from 'src/app/modelos/delivery.direccion.cliente.model';
 import { DeliveryEstablecimiento } from 'src/app/modelos/delivery.establecimiento';
+import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
+import {
+  insideCircle
+} from 'geolocation-utils';
 
 
 @Injectable({
@@ -65,6 +69,14 @@ export class CalcDistanciaService {
 
     dirEstablecimiento.c_servicio = c_servicio;
       return c_servicio;
+  }
+
+
+  // retorna true si esta cerca
+  calcDistancia(coordOrigen: GeoPositionModel, coordDetino: GeoPositionModel): boolean {
+    const center = {lat: coordDetino.latitude, lon: coordDetino.longitude };
+    const radius = 900; // meters
+    return insideCircle({lat: coordOrigen.latitude, lon: coordOrigen.longitude}, center, radius);  // false
   }
 
   // regla x km adicional

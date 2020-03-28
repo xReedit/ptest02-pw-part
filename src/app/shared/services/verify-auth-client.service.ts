@@ -153,6 +153,7 @@ export class VerifyAuthClientService {
       this.clientSocket.usuario = this.clientSocket.datalogin.given_name;
       this.clientSocket.isCliente = true;
       this.clientSocket.telefono = rpt.data[0].telefono;
+      this.clientSocket.efectivoMano = 0;
 
       // guarda en el usuario temporal
       // console.log(this.clientSocket);

@@ -1,0 +1,68 @@
+<div class="animated fadeInDown container-body">
+
+    <div class="p-3 bg-dark text-white fs-13 d-flex justify-content-between">
+        <div>
+            <span>Pasos para entregar el pedido</span>
+        </div>
+        <div>
+            <span>#12355</span>
+        </div>
+    </div>
+
+    <!-- mapa -->
+    <div class="border">
+        <app-mapa-solo [coordenadas]="coordenadasDestino"></app-mapa-solo>        
+    </div>    
+    <!-- pasos -->
+    <!-- por default solo 3 pasos -->
+    <div class="p-3">
+        <div class="item-paso d-flex active" [ngClass]="{'success': dataPedido.paso_va > 1}">
+            <div class="num">1</div>
+            <div class="instrunccion p-2 fs-13">
+                <p class="text-secondary fw-600 fs-12">Dirigirse al comercio:</p>
+                <p class="fw-100">{{ dataPedido.datosComercio.nombre }}</p>
+                <p class="fw-100">{{ dataPedido.datosComercio.direccion }}</p>
+            </div>
+        </div>
+
+        <div class="item-paso d-flex" [ngClass]="{'active': dataPedido.paso_va === 2, 'success': dataPedido.paso_va > 2}">
+            <div class="num">2</div>
+            <div class="instrunccion p-2 fs-13">
+                <p class="text-secondary fw-600 fs-12">Recoger el pedido #{{ dataPedido.idpedido }}:</p>                
+                <p class="fw-600">{{ descripcionPago}}</p>
+                <p class="fw-100">Pedir comprobante.</p>
+                <div *ngIf="dataPedido.paso_va >= 2">
+                    <hr>
+                    <p class="text-info">Ver detalle del pedido.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="item-paso d-flex" [ngClass]="{'active': dataPedido.paso_va === 3, 'success': dataPedido.paso_va > 3}">
+            <div class="num">3</div>
+            <div class="instrunccion p-2 fs-13">
+                <p class="text-secondary fw-600 fs-12">Entregar Pedido:</p>
+                <p class="fw-100"> <span class="fw-600">En: </span> {{ dataPedido.datosDelivery.direccion }}</p>
+                <p class="fw-100" *ngIf="dataPedido.datosDelivery.referencia"> <span class="fw-600">Referencia: </span> {{ dataPedido.datosDelivery.referencia }}</p>
+                <p class="fw-100"> <span class="fw-600">A: </span> {{ dataPedido.datosDelivery.nombre | titlecase }}</p>
+                <p class="fw-100" *ngIf="dataPedido.datosCliente.referencia"> <span class="fw-600">Referencia: </span> {{ dataPedido.datosCliente.referencia }}</p>
+                <div *ngIf="this.dataPedido.datosDelivery.metodoPago.idtipo_pago" class="fw-100">
+                    <p><span class="fw-600">Importe a cobrar: </span> S/. {{ importeEfectivoPedido | number: '.2' }}</p>
+                    <p><span class="fw-600">Paga con: </span> {{ dataPedido.datosDelivery.paga_con }}</p>
+                </div>
+                <div *ngIf="dataPedido.paso_va >= 3">
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6 border-right text-info"><i class="fa fa-phone" aria-hidden="true"></i> LLamar</div>
+                        <div class="col-6 text-info"><i class="fa fa-commenting-o" aria-hidden="true"></i> Enviar Mensaje</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- footer boton -->
+    <div [hidden]="!btnIsVisible" matRipple class="xfooter bg-success w-100 fs-20 text-white" (click)="btnEjecutar()">
+        <span>{{btnTitlePasos}}</span>
+    </div> 
+</div>

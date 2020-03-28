@@ -16,6 +16,8 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCardModule } from '@angular/material/card';
 import {MatRadioModule} from '@angular/material/radio';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+
 // import {MatSidenavModule} from '@angular/material/sidenav';
 // import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -38,6 +40,7 @@ import {MatRadioModule} from '@angular/material/radio';
     MatExpansionModule,
     MatCardModule,
     MatRadioModule,
+    MatSlideToggleModule
     // MatSidenavModule
     // MatTooltipModule
   ],
@@ -56,6 +59,7 @@ import {MatRadioModule} from '@angular/material/radio';
     MatExpansionModule,
     MatCardModule,
     MatRadioModule,
+    MatSlideToggleModule
     // MatSidenavModule
     // MatTooltipModule
   ]

@@ -22,11 +22,10 @@ export class NotificacionPushService {
 
     // this.showMessages();
 
-    this.swPush.notificationClicks.subscribe( event => {
-      // console.log('Received notification: ', event);
-      const url = event.notification.data.url;
-      window.open(url, '_blank');
-    });
+    // this.swPush.notificationClicks.subscribe( event => {
+    //   const url = event.notification.data.url;
+    //   window.open(url, '_blank');
+    // });
   }
 
   getIsTienePermiso(): boolean {
@@ -67,7 +66,7 @@ export class NotificacionPushService {
       idcliente: this.infoTokenService.infoUsToken.idcliente
     };
 
-    this.crudService.postFree(_data, 'push', 'suscripcion', false)
+    this.crudService.postFree(_data, 'repartidor', 'push-suscripcion', true)
       .subscribe(res => console.log(res));
   }
 

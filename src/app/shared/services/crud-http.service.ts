@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { InfoTockenService } from './info-token.service';
 import { URL_SERVER, URL_CONSULTA_RUC_DNI, TOKEN_CONSULTA, TOKEN_SMS } from '../config/config.const';
 import { catchError } from 'rxjs/operators';
+import { UsuarioTokenModel } from 'src/app/modelos/usuario.token.model';
 
 
 @Injectable()
@@ -116,7 +117,7 @@ export class CrudHttpService {
 
     // login manda los datos en json
     loginUsuarioAutorizado(datos: any): Observable<any> {
-        const url = this.setUrl('login-usuario-autorizado', '');
+        const url = this.setUrl('login-usuario-autorizado-repartidor', '');
         const header = this.getHeaderHttpClientFormNoToken();
 
         return this.httpClient.post<any>(url, datos, { headers: header });
@@ -131,12 +132,14 @@ export class CrudHttpService {
 
     refreshToken() {
         const _jwt = this.infoTockenService.getInfoUs();
+        const __jwt: any = !_jwt.pass ? _jwt.usuario : _jwt;
+
         const _data = {
-            nomusuario: _jwt.usuario,
-            pass: atob(_jwt.pass)
+            nomusuario: __jwt.usuario,
+            pass: atob(__jwt.pass)
           };
 
-        const url = this.setUrl('login-usuario-autorizado', '');
+        const url = this.setUrl('login-usuario-autorizado-repartidor', '');
         const header = this.getHeaderHttpClientFormNoToken();
 
         return this.httpClient.post<any>(url, _data , { headers: header });
@@ -174,7 +177,7 @@ export class CrudHttpService {
     private getHeaderHttpClientForm(): HttpHeaders {
         const headers = new HttpHeaders()
             .set('Content-Type', 'application/json')
-            .set('Authorization', this.infoTockenService.getToken());
+            .set('Authorization', this.infoTockenService.getTokenAuth());
         return headers;
     }
 

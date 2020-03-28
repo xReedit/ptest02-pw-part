@@ -15,6 +15,15 @@ export class StorageService {
     return localStorage.getItem(key);
   }
 
+  setBtoa(key: string, data: string) {
+    localStorage.setItem(key, btoa(data));
+  }
+
+  getAtob(key: string, isJson = false) {
+    const _rpt = atob(localStorage.getItem(key));
+    return isJson ? JSON.parse(_rpt) : _rpt;
+  }
+
   isExistKey(key: string): boolean {
     return localStorage.getItem(key) ? true : false;
   }

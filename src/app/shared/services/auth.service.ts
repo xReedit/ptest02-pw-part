@@ -29,7 +29,8 @@ export class AuthService {
     }
 
     setLocalToken(token: string) {
-        localStorage.setItem('::token', token);
+        localStorage.setItem('::token', token); // esto se modifica
+        localStorage.setItem('::token-auth', token); // este se mantiene
         // guardo tambien la hora que esta iniciando session
         const ms_tieme_init_session = new Date().getTime();
         localStorage.setItem('sys::numtis', ms_tieme_init_session.toString());

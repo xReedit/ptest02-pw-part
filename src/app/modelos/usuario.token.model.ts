@@ -30,4 +30,7 @@ export class UsuarioTokenModel {
     importeDelivery: string; // importe pendiente de confirmacion
     isPagoSuccess: boolean; // si ya pago, si es que actualiza cuando ya pago
     metodoPago: MetodoPagoModel; // metodo pago seleccionado
+    efectivoMano: number; // repartidor efectivo en mano
+    isOnline: boolean; // si esta en linea activo
+    socketId: string; // guarda el socket id de conexion, para mantenerlo
 }
