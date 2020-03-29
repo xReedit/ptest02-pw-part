@@ -20,6 +20,8 @@ import { DialogEfectivoRepartidorComponent } from './dialog-efectivo-repartidor/
 import { ProgressTimeLimitComponent } from './progress-time-limit/progress-time-limit.component';
 import { ItemPedidoComponent } from './item-pedido/item-pedido.component';
 import { MapaSoloComponent } from './mapa-solo/mapa-solo.component';
+import { CompPedidoDetalleComponent } from './comp-pedido-detalle/comp-pedido-detalle.component';
+import { DialogImgItemComponent } from './dialog-img-item/dialog-img-item.component';
 // import { DialogSelectDireccionComponent } from './dialog-select-direccion/dialog-select-direccion.component';
 
 @NgModule({
@@ -40,6 +42,8 @@ import { MapaSoloComponent } from './mapa-solo/mapa-solo.component';
     ProgressTimeLimitComponent,
     ItemPedidoComponent,
     MapaSoloComponent,
+    CompPedidoDetalleComponent,
+    DialogImgItemComponent,
     // DialogSelectDireccionComponent,
     // DialogUbicacionComponent
   ],
@@ -67,13 +71,16 @@ import { MapaSoloComponent } from './mapa-solo/mapa-solo.component';
     DialogEfectivoRepartidorComponent,
     ProgressTimeLimitComponent,
     ItemPedidoComponent,
-    MapaSoloComponent
+    MapaSoloComponent,
+    CompPedidoDetalleComponent,
+    DialogImgItemComponent
   ],
 
   entryComponents: [
     DialogMetodoPagoComponent,
     DialogVerificarTelefonoComponent,
     DialogDesicionComponent,
+    DialogImgItemComponent
   ]
 })
 export class ComponentesModule { }

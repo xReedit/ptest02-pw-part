@@ -55,6 +55,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
       pedido.datosDelivery = res[1].dataDelivery;
       pedido.datosComercio = res[1].dataDelivery.establecimiento;
       pedido.datosCliente = res[1].dataDelivery.direccionEnvioSelected;
+      pedido.datosSubtotales = this.pedidoRepartidorService.darFormatoSubTotales(res[1].dataDelivery.subTotales);
       pedido.estado = 0;
 
       this.pedidoRepartidorService.setLocal(pedido);

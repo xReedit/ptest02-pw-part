@@ -4,5 +4,6 @@ export class PedidoRepartidorModel {
     datosDelivery: any;
     datosCliente: any;
     datosComercio: any;
+    datosSubtotales: any;
     paso_va: number; // paso en que va 1=ir a comercio 2=recoger 3 entregar
 }

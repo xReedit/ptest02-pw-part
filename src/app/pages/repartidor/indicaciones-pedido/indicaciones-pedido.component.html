@@ -25,7 +25,10 @@
             </div>
         </div>
 
-        <div class="item-paso d-flex" [ngClass]="{'active': dataPedido.paso_va === 2, 'success': dataPedido.paso_va > 2}">
+        <div class="item-paso d-flex" [ngClass]="{'active': dataPedido.paso_va === 2, 'success': dataPedido.paso_va > 2}"
+            matRipple
+            (click)="showDetallePedido()"
+            >
             <div class="num">2</div>
             <div class="instrunccion p-2 fs-13">
                 <p class="text-secondary fw-600 fs-12">Recoger el pedido #{{ dataPedido.idpedido }}:</p>                
@@ -48,7 +51,7 @@
                 <p class="fw-100" *ngIf="dataPedido.datosCliente.referencia"> <span class="fw-600">Referencia: </span> {{ dataPedido.datosCliente.referencia }}</p>
                 <div *ngIf="this.dataPedido.datosDelivery.metodoPago.idtipo_pago" class="fw-100">
                     <p><span class="fw-600">Importe a cobrar: </span> S/. {{ importeEfectivoPedido | number: '.2' }}</p>
-                    <p><span class="fw-600">Paga con: </span> {{ dataPedido.datosDelivery.paga_con }}</p>
+                    <p><span class="fw-600">Cliente paga con: </span> {{ dataPedido.datosDelivery.paga_con }}</p>
                 </div>
                 <div *ngIf="dataPedido.paso_va >= 3">
                     <hr>
@@ -62,7 +65,7 @@
     </div>
 
     <!-- footer boton -->
-    <div [hidden]="!btnIsVisible" matRipple class="xfooter bg-success w-100 fs-20 text-white" (click)="btnEjecutar()">
+    <div [hidden]="!btnIsVisible" matRipple class="xfooter bg-success w-100 fs-20 text-white animated fadeInUp delay-0-5s" (click)="btnEjecutar()">
         <span>{{btnTitlePasos}}</span>
     </div> 
 </div>

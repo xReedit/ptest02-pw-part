@@ -1,0 +1,11 @@
+.div-comprobante {
+    background: lightgrey;
+}
+
+.xfooter {
+    /* position: absolute; */
+    bottom: 0px;
+    text-align: center;
+    width: 100%;
+    /* padding: 14px;     */
+}

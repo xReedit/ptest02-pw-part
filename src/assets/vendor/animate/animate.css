@@ -21,6 +21,14 @@
   animation-duration: 2s;
 }
 
+.delay-0-5s {
+  animation-delay: 0.5s;
+}
+
+.delay-1s {
+  animation-delay: 1s;
+}
+
 .animated.flipOutX,
 .animated.flipOutY,
 .animated.bounceIn,

@@ -4,6 +4,7 @@ import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartid
 import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
 import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
 import { CalcDistanciaService } from 'src/app/shared/services/calc-distancia.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-indicaciones-pedido',
@@ -22,7 +23,8 @@ export class IndicacionesPedidoComponent implements OnInit {
   constructor(
     private pedidoRepartidorService: PedidoRepartidorService,
     private geoPositionService: GpsUbicacionRepartidorService,
-    private calcDistanciaService: CalcDistanciaService
+    private calcDistanciaService: CalcDistanciaService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -83,6 +85,10 @@ export class IndicacionesPedidoComponent implements OnInit {
         this.btnTitlePasos = 'Llegue';
         break;
     }
+  }
+
+  showDetallePedido() {
+    this.router.navigate(['./repartidor/pedido-detalle']);
   }
 
 }

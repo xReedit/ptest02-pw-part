@@ -1,0 +1,68 @@
+<div *ngIf="_miPedido" class="w-100 div-resumen-pedido">
+            <div *ngFor="let tpc of _miPedido.tipoconsumo" class="xCursor">
+                <ng-container *ngIf="tpc.count_items_seccion > 0">
+                    <div class="div-plr titulo-tpc">                        
+                        <span>Detalle del pedido</span>
+                        <div class="countItem countTpc">{{tpc.count_items_seccion}}</div>
+                    </div>
+                    <div *ngFor="let seccion of tpc.secciones">
+                        <ng-container *ngIf="seccion.count_items > 0">
+                            <div class="div-plr titulo-seccion">
+                                <span>{{seccion.des | titlecase}}</span>
+                                <div class="countItem countSeccion">{{seccion.count_items}}</div>
+                            </div>                            
+                            <ul class="w-100">
+                                <div *ngFor="let item of seccion.items">
+                                    <ng-container *ngIf="item.cantidad_seleccionada > 0">
+                                        <!-- <div class="d-flex"> -->
+                                        <!-- <div>
+                                            <img class="img-thumbnail img-carta" src="{{url_img}}{{item.img}}" width="65px" alt="{{item.img}}">
+                                        </div> -->
+                                        <!-- <div class="w-100"> -->
+                                        <li class="d-flex div-plr li-item" matRipple [matRippleColor]="rippleColor" (click)="showImg(item)">                                            
+                                            <div class="pr-2 fw-100">{{item.cantidad_seleccionada | number: '2.'}}</div>
+                                            <div class="w-100 fw-100">{{item.des | lowercase}}  <span [hidden]="!item.indicaciones">( {{item.indicaciones}} )</span></div>
+                                            <div class="fw-100">{{item.precio_print | number:'0.2' }}</div>
+                                        </li>
+                                            <!-- subitems -->
+                                            <ng-container *ngIf="item.subitems_view">                                                
+                                                <div>
+                                                    <ul class="w-100">                                                        
+                                                        <!-- <div *ngFor="let subitem of item.subitems_view">                   -->
+                                                                <!-- (click)="openDlgSubItem(tpc, seccion, item, subitem)"                                       -->
+                                                            <li class="d-flex div-plr li-item fw-100 fs-12 text-secondary subitem-content-resumen" *ngFor="let subitem of item.subitems_view" matRipple [matRippleColor]="rippleColorSubItem">
+                                                                <!-- <div class="w-100 d-flex"> -->
+                                                                    <div class="d-flex w-100 pl-4">                                                                        
+                                                                            {{subitem.cantidad_seleccionada | number: '2.'}} {{subitem.des}}                                                                            
+                                                                    </div>
+
+                                                                    <div class="fs-11 text-right" style="width: 45px;" [hidden]="subitem.precio === 0">
+                                                                        + {{subitem.precio | number:'0.2' }}
+                                                                    </div>                                                                    
+                                                                <!-- </div> -->
+                                                            </li>
+                                                        <!-- </div> -->
+                                                    </ul>
+                                                </div>
+                                            </ng-container>
+                                        <!-- </div> -->
+                                        <!-- </div>                                        -->
+                                    </ng-container>                            
+                                </div>
+                            </ul>            
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>    
+
+            <!-- subtotales -->    
+            <div class="div-total">
+                <ul class="w-100 ul-total">
+                    <li class="d-flex div-plr li-item" *ngFor="let item of _arrSubtotales" matRipple
+                    [matRippleColor]="rippleColor">
+                    <div class="w-100">{{item.descripcion | titlecase}}</div>
+                    <div>{{item.importe | number:'0.2' }}</div>
+                    </li>
+                </ul>
+            </div>                    
+        </div>
