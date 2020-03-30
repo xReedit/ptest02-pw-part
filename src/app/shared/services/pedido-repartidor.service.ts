@@ -5,6 +5,7 @@ import { TipoConsumoModel } from 'src/app/modelos/tipoconsumo.model';
 import { SeccionModel } from 'src/app/modelos/seccion.model';
 import { ItemModel } from 'src/app/modelos/item.model';
 import { PedidoModel } from 'src/app/modelos/pedido.model';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Injectable({
   providedIn: 'root'
@@ -26,10 +27,26 @@ export class PedidoRepartidorService {
 
   setPasoVa(val: number) {
     this.pedidoRepartidor.paso_va = val;
-    this.setLocal();
+    this.setLocal(this.pedidoRepartidor);
   }
 
-  setLocal(obj: PedidoRepartidorModel = this.pedidoRepartidor) {
+  setCostoSercicio(val: string) {
+    this.pedidoRepartidor.c_servicio = val;
+    this.setLocal(this.pedidoRepartidor);
+  }
+
+  setImporteTotalPedido(val: string) {
+    this.pedidoRepartidor.importePedido = val;
+    this.setLocal(this.pedidoRepartidor);
+  }
+
+  setIsHayPropina(val: boolean) {
+    this.pedidoRepartidor.isHayPropina = val;
+    this.setLocal(this.pedidoRepartidor);
+  }
+
+  setLocal(obj = null) {
+    obj = obj ? obj : this.pedidoRepartidor;
     localStorage.setItem(this.keyLocal, btoa(JSON.stringify(obj)));
   }
 
@@ -50,14 +67,34 @@ export class PedidoRepartidorService {
       });
   }
 
+  playAudioNewPedido() {
+    const audio = new Audio();
+    audio.src = './assets/audio/Alarm04.wav';
+    audio.load();
+    audio.play();
+  }
+
   // dar formato subtotales del pedido recibido
   // saca el importe total del pedido separando el importe del servicio de entrega
   darFormatoSubTotales(arrTotales: any) {
+    this.init();
     const rowTotal = arrTotales[arrTotales.length - 1];
-    rowTotal.importe = parseFloat(rowTotal.importe) - parseFloat(arrTotales.filter(x => x.id === -2)[0].importe);
+    // -2 = servicio deliver -3 = propina
+    rowTotal.importe = arrTotales.filter(x => x.id !== -2 && x.id !== -3 && x.descripcion !== 'TOTAL').map(x => parseFloat(x.importe)).reduce((a, b) => a + b, 0);
+    this.pedidoRepartidor.importePedido = rowTotal.importe;
+    // this.setImporteTotalPedido(rowTotal.importe);
+    // costo total del servico + prpina
+    const costoServicio = parseFloat(arrTotales.filter(x => x.id === -2 || x.id === -3).map(x => parseFloat(x.importe)).reduce((a, b) => a + b, 0));
+    this.pedidoRepartidor.c_servicio = costoServicio.toString();
+    // this.setCostoSercicio(costoServicio.toString());
+
+    const _isHayPropina = arrTotales.filter(x => x.id === -3)[0] ? true : false;
+    // this.setIsHayPropina(_isHayPropina);
+    this.pedidoRepartidor.isHayPropina = _isHayPropina;
+    this.setLocal();
     // quitamos el importe del servicio
 
-    return arrTotales.filter(x => x.id !== -2);
+    return arrTotales.filter(x => x.id !== -2 && x.id !== -3);
   }
 
 

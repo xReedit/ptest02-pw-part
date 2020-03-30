@@ -5,7 +5,7 @@
             <span>Pasos para entregar el pedido</span>
         </div>
         <div>
-            <span>#12355</span>
+            <span>#{{ dataPedido.idpedido }}</span>
         </div>
     </div>
 
@@ -56,8 +56,8 @@
                 <div *ngIf="dataPedido.paso_va >= 3">
                     <hr>
                     <div class="row text-center">
-                        <div class="col-6 border-right text-info"><i class="fa fa-phone" aria-hidden="true"></i> LLamar</div>
-                        <div class="col-6 text-info"><i class="fa fa-commenting-o" aria-hidden="true"></i> Enviar Mensaje</div>
+                        <div matRipple class="col-6 border-right text-info" (click)="callPhone()"><i class="fa fa-phone" aria-hidden="true"></i> LLamar</div>
+                        <div matRipple class="col-6 text-info" (click)="redirectWhatsApp()"><i class="fa fa-commenting-o" aria-hidden="true"></i> Enviar Mensaje</div>
                     </div>
                 </div>
             </div>

@@ -43,9 +43,9 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
     // si recarga la pagina chequea si existe pedido pendiente
     this.pedidoRepartidor = this.pedidoRepartidorService.pedidoRepartidor;
-    if ( this.pedidoRepartidor.estado === 0 ) {
+    // if ( this.pedidoRepartidor.estado === 0 ) {
       this.addPedidoToList(this.pedidoRepartidor);
-    }
+    // }
 
     this.socketService.onRepartidorNuevoPedido()
     .pipe(takeUntil(this.destroy$))
@@ -55,7 +55,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
       pedido.datosDelivery = res[1].dataDelivery;
       pedido.datosComercio = res[1].dataDelivery.establecimiento;
       pedido.datosCliente = res[1].dataDelivery.direccionEnvioSelected;
-      pedido.datosSubtotales = this.pedidoRepartidorService.darFormatoSubTotales(res[1].dataDelivery.subTotales);
+      pedido.datosSubtotales = res[1].dataDelivery.subTotales;
       pedido.estado = 0;
 
       this.pedidoRepartidorService.setLocal(pedido);
@@ -68,7 +68,12 @@ export class PedidosComponent implements OnInit, OnDestroy {
   }
 
   private addPedidoToList(pedido: PedidoRepartidorModel): void {
+    pedido.datosSubtotales = this.pedidoRepartidorService.darFormatoSubTotales(pedido.datosDelivery.subTotales);
+    this.pedidoRepartidorService.setLocal(pedido);
     this.listPedidos.push(pedido);
+
+    console.log(pedido);
+    this.pedidoRepartidorService.playAudioNewPedido();
   }
 
   aceptaPedido() {

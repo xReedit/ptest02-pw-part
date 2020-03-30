@@ -39,7 +39,8 @@ export class CompPedidoDetalleComponent implements OnInit {
         console.log(res);
         this._miPedido = this.pedidoRepartidorService.darFormatoPedido(res);
 
-        this._arrSubtotales = this.pedidoRepartidorService.pedidoRepartidor.datosDelivery.subTotales;
+        this._arrSubtotales = this.pedidoRepartidorService.pedidoRepartidor.datosSubtotales;
+        console.log('this._arrSubtotales', this._arrSubtotales);
         console.log('this.elPedido', this._miPedido);
       });
   }

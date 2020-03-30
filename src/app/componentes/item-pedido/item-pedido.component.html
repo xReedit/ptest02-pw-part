@@ -31,11 +31,12 @@
             </div>
             <div>
                 <p class="fw-100">Importe Pedido</p>
-                <span class="fs-15 fw-600">S/. {{ infoPedido.datosDelivery.importeTotal | number: '.2' }}</span>
+                <span class="fs-15 fw-600">S/. {{ infoPedido.importePedido | number: '.2' }}</span>
             </div>
             <div>
                 <p class="fw-100">Ganancia</p>
-                <span class="fs-15 fw-600">S/. {{ infoPedido.datosDelivery.establecimiento.c_servicio | number: '0.2' }}</span>
+                <img *ngIf="infoPedido.isHayPropina" class="img-propina" src="assets/images/r-propina-coin.png" alt="img-propina">
+                <span class="fs-15 fw-600">S/. {{ infoPedido.c_servicio | number: '0.2' }}</span>
             </div>
         </div>
     </div>

@@ -75,7 +75,7 @@ export class CalcDistanciaService {
   // retorna true si esta cerca
   calcDistancia(coordOrigen: GeoPositionModel, coordDetino: GeoPositionModel): boolean {
     const center = {lat: coordDetino.latitude, lon: coordDetino.longitude };
-    const radius = 900; // meters
+    const radius = 75; // meters
     return insideCircle({lat: coordOrigen.latitude, lon: coordOrigen.longitude}, center, radius);  // false
   }
 

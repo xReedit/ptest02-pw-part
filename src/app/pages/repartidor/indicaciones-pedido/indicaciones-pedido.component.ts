@@ -30,6 +30,15 @@ export class IndicacionesPedidoComponent implements OnInit {
   ngOnInit() {
     this.dataPedido = this.pedidoRepartidorService.pedidoRepartidor;
 
+    // this.dataPedido.paso_va = 3;
+
+    if ( this.dataPedido.datosDelivery.metodoPago.idtipo_pago === 1 ) {
+      this.descripcionPago = `Pagar en efectivo S/. ${ parseFloat(this.dataPedido.importePedido).toFixed(2)}`;
+      this.importeEfectivoPedido = parseFloat(this.dataPedido.importePedido) + parseFloat(this.dataPedido.c_servicio);
+    } else {
+      this.descripcionPago = `El pedido ya esta pagado, solo recoger.`;
+    }
+
     this.showPasos();
     this.listenGeoPosition();
   }
@@ -46,9 +55,12 @@ export class IndicacionesPedidoComponent implements OnInit {
       this.geoPositionActual = res;
       const isLLego = this.calcDistanciaService.calcDistancia(this.geoPositionActual, this.coordenadasDestino);
       console.log('distancia listen llego ?', isLLego);
-      if ( isLLego ) {
+      if ( isLLego && this.dataPedido.paso_va === 1) {
         this.dataPedido.paso_va = 2;
-        this.btnIsVisible = true;
+        this.pedidoRepartidorService.setPasoVa(2);
+        this.showPasos();
+        // this.btnIsVisible = true;
+        // this.btnTitlePasos = 'Empezar';
       }
     });
   }
@@ -56,39 +68,60 @@ export class IndicacionesPedidoComponent implements OnInit {
   private showPasos(): void {
     this.dataPedido.paso_va = this.dataPedido.paso_va ? this.dataPedido.paso_va : 1;
 
-    if ( this.dataPedido.datosDelivery.metodoPago.idtipo_pago === 1 ) {
-      this.descripcionPago = `Pagar en efectivo S/. ${ parseFloat(this.dataPedido.datosDelivery.importeTotal).toFixed(2)}`;
-      this.importeEfectivoPedido = this.dataPedido.datosDelivery.importeTotal + this.dataPedido.datosComercio.c_servicio;
-    } else {
-      this.descripcionPago = `El pedido ya esta pagado, solo recoger.`;
-    }
-
     console.log(this.dataPedido);
     switch (this.dataPedido.paso_va) {
       case 1 || null:
         this.coordenadasDestino.latitude = this.dataPedido.datosComercio.latitude;
         this.coordenadasDestino.longitude = this.dataPedido.datosComercio.longitude;
+        this.btnTitlePasos = 'Empezar';
         break;
-      default:
-        this.coordenadasDestino.latitude = this.dataPedido.datosComercio.latitude;
-        this.coordenadasDestino.longitude = this.dataPedido.datosComercio.longitude;
+      case 2: // apuntar a la direccion del cliente
+        this.btnIsVisible = true;
+        this.coordenadasDestino.latitude = this.dataPedido.datosCliente.latitude;
+        this.coordenadasDestino.longitude = this.dataPedido.datosCliente.longitude;
+        this.btnTitlePasos = 'Paso 3 Empezar';
         break;
+      // default:
+      //   this.coordenadasDestino.latitude = this.dataPedido.datosComercio.latitude;
+      //   this.coordenadasDestino.longitude = this.dataPedido.datosComercio.longitude;
+      //   break;
     }
   }
 
   btnEjecutar() {
+    let linkGPS = '';
     switch (this.dataPedido.paso_va) {
       case 1:
-        const linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.coordenadasDestino.latitude},${this.coordenadasDestino.longitude}`;
+        linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.coordenadasDestino.latitude},${this.coordenadasDestino.longitude}`;
         window.open(linkGPS, '_blank');
         this.btnIsVisible = false;
-        this.btnTitlePasos = 'Llegue';
+        // this.btnTitlePasos = 'Llegue';
+        // this.pedidoRepartidorService.setPasoVa(2);
+        break;
+      case 2: // apuntar a la direccion del cliente
+        linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.coordenadasDestino.latitude},${this.coordenadasDestino.longitude}`;
+        window.open(linkGPS, '_blank');
+        this.btnIsVisible = false;
+        // this.btnTitlePasos = 'Llegue';
+        this.dataPedido.paso_va = 3;
+        this.pedidoRepartidorService.setPasoVa(3);
         break;
     }
   }
 
   showDetallePedido() {
-    this.router.navigate(['./repartidor/pedido-detalle']);
+    if ( this.dataPedido.paso_va >= 2 ) {
+      this.router.navigate(['./repartidor/pedido-detalle']);
+    }
+  }
+
+  redirectWhatsApp() {
+    const _link = `https://api.whatsapp.com/send?phone=51${this.dataPedido.datosDelivery.telefono}`;
+    window.open(_link, '_blank');
+  }
+
+  callPhone() {
+    window.open(`tel:${this.dataPedido.datosDelivery.telefono}`);
   }
 
 }
