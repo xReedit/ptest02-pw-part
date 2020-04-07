@@ -43,6 +43,6 @@ import { ComponentesModule } from 'src/app/componentes/componentes.module';
   exports : [
     DialogUbicacionComponent
   ],
-  entryComponents: [DialogUbicacionComponent]
+  // entryComponents: [DialogUbicacionComponent]
 })
 export class InicioModule { }

@@ -28,8 +28,8 @@ import { PedidosAtendidosComponent } from './pedidos-atendidos/pedidos-atendidos
     ComponentesModule,
     MaterialModule,
   ],
-  entryComponents: [
-    DialogEfectivoRepartidorComponent
-  ]
+  // entryComponents: [
+  //   DialogEfectivoRepartidorComponent
+  // ]
 })
 export class RepartidorModule { }

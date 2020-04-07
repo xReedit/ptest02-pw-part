@@ -85,12 +85,12 @@ import { StarRatingModule } from 'angular-star-rating';
     DialogCalificacionComponent,
   ],
 
-  entryComponents: [
-    DialogMetodoPagoComponent,
-    DialogVerificarTelefonoComponent,
-    DialogDesicionComponent,
-    DialogImgItemComponent,
-    DialogCalificacionComponent
-  ]
+  // entryComponents: [
+  //   DialogMetodoPagoComponent,
+  //   DialogVerificarTelefonoComponent,
+  //   DialogDesicionComponent,
+  //   DialogImgItemComponent,
+  //   DialogCalificacionComponent
+  // ]
 })
 export class ComponentesModule { }
