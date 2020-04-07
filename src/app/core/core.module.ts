@@ -7,7 +7,7 @@ import { CrudHttpService } from '../shared/services/crud-http.service';
 import { LayoutMainComponent } from './layout-main/layout-main.component';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from './material/material.module';
-import { ToolBarComponent } from './tool-bar/tool-bar.component';
+
 import { ProgressTimeLimitComponent } from './progress-time-limit/progress-time-limit.component';
 import { HttpConfigInterceptorService } from '../shared/services/http-config-interceptor.service';
 import { ToolBarRepartidorComponent } from './tool-bar-repartidor/tool-bar-repartidor.component';
@@ -16,7 +16,7 @@ import { ToolBarRepartidorComponent } from './tool-bar-repartidor/tool-bar-repar
 @NgModule({
   declarations: [
     LayoutMainComponent,
-    ToolBarComponent,
+    // ToolBarComponent,
     ProgressTimeLimitComponent,
     ToolBarRepartidorComponent
   ],
@@ -28,7 +28,7 @@ import { ToolBarRepartidorComponent } from './tool-bar-repartidor/tool-bar-repar
   ],
   exports: [
     MaterialModule,
-    ToolBarComponent,
+    // ToolBarComponent,
     ProgressTimeLimitComponent,
     ToolBarRepartidorComponent
   ],
