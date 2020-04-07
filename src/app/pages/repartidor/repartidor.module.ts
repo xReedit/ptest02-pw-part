@@ -10,6 +10,7 @@ import { CoreModule } from 'src/app/core/core.module';
 import { ComponentesModule } from 'src/app/componentes/componentes.module';
 import { DialogEfectivoRepartidorComponent } from 'src/app/componentes/dialog-efectivo-repartidor/dialog-efectivo-repartidor.component';
 import { PedidoDetalleComponent } from './pedido-detalle/pedido-detalle.component';
+import { PedidosAtendidosComponent } from './pedidos-atendidos/pedidos-atendidos.component';
 
 
 
@@ -18,7 +19,8 @@ import { PedidoDetalleComponent } from './pedido-detalle/pedido-detalle.componen
     MainComponent,
     PedidosComponent,
     IndicacionesPedidoComponent,
-    PedidoDetalleComponent],
+    PedidoDetalleComponent,
+    PedidosAtendidosComponent],
   imports: [
     CommonModule,
     RepartidorRoutingModule,

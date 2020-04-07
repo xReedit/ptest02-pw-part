@@ -6,6 +6,8 @@ import { SeccionModel } from 'src/app/modelos/seccion.model';
 import { ItemModel } from 'src/app/modelos/item.model';
 import { PedidoModel } from 'src/app/modelos/pedido.model';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { Observable } from 'rxjs/internal/Observable';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,8 @@ export class PedidoRepartidorService {
   keyLocal = 'sys::pr';
 
   constructor(
-    private crudService: CrudHttpService
+    private crudService: CrudHttpService,
+    private router: Router,
   ) {
     this.init();
   }
@@ -24,6 +27,10 @@ export class PedidoRepartidorService {
     this.pedidoRepartidor = this.getLocal();
   }
 
+  private cleanLocal(): void {
+    localStorage.removeItem(this.keyLocal);
+    this.pedidoRepartidor = this.getLocal();
+  }
 
   setPasoVa(val: number) {
     this.pedidoRepartidor.paso_va = val;
@@ -76,8 +83,9 @@ export class PedidoRepartidorService {
 
   // dar formato subtotales del pedido recibido
   // saca el importe total del pedido separando el importe del servicio de entrega
-  darFormatoSubTotales(arrTotales: any) {
+  darFormatoSubTotales(arrTotales: any = null) {
     this.init();
+    arrTotales = arrTotales ? arrTotales : this.pedidoRepartidor.datosSubtotales;
     const rowTotal = arrTotales[arrTotales.length - 1];
     // -2 = servicio deliver -3 = propina
     rowTotal.importe = arrTotales.filter(x => x.id !== -2 && x.id !== -3 && x.descripcion !== 'TOTAL').map(x => parseFloat(x.importe)).reduce((a, b) => a + b, 0);
@@ -91,6 +99,11 @@ export class PedidoRepartidorService {
     const _isHayPropina = arrTotales.filter(x => x.id === -3)[0] ? true : false;
     // this.setIsHayPropina(_isHayPropina);
     this.pedidoRepartidor.isHayPropina = _isHayPropina;
+
+    // cuanto paga el repartidor restando precio_default si el comercio no es afiliado
+
+
+
     this.setLocal();
     // quitamos el importe del servicio
 
@@ -102,6 +115,7 @@ export class PedidoRepartidorService {
   darFormatoPedido(res: any): any {
     const _miPedidoCuenta: PedidoModel = new PedidoModel();
     const c_tiposConsumo: TipoConsumoModel[] = [];
+    let subTotalDefault = 0;
 
 
         res.data.map( (tp: any) => {
@@ -141,6 +155,12 @@ export class PedidoRepartidorService {
           .filter((_tp: any) => _tp.idtipo_consumo.toString() === tp.idtipo_consumo.toString() && _tp.idseccion.toString() === s.idseccion.toString())
           .map((_i: any, i: number) => {
             const hayItem = new ItemModel;
+
+            // precio total si el comercio no es afiliado muestra el precio default (sin comision para que el repartidor sepa el precio a pagar)
+            const precio_default = parseFloat(_i.precio_default) * parseInt(_i.cantidad, 0);
+            const p_unitario = _i.precio_default;
+            subTotalDefault += precio_default;
+
             hayItem.des = _i.descripcion;
             hayItem.detalles = '';
             hayItem.iditem = _i.iditem;
@@ -148,9 +168,9 @@ export class PedidoRepartidorService {
             hayItem.idseccion = _i.idseccion;
             hayItem.isalmacen = _i.isalmacen;
             hayItem.cantidad_seleccionada = parseInt(_i.cantidad, 0);
-            hayItem.precio = _i.punitario;
-            hayItem.precio_print = parseFloat(_i.ptotal);
-            hayItem.precio_total = parseFloat(_i.ptotal);
+            hayItem.precio = p_unitario;
+            hayItem.precio_print = parseFloat(precio_default.toString());
+            hayItem.precio_total = parseFloat(precio_default.toString());
             hayItem.procede = _i.procede === '0' ? 1 : 0;
             hayItem.seccion = _i.des_seccion;
             hayItem.img = _i.img;
@@ -164,7 +184,107 @@ export class PedidoRepartidorService {
       });
 
       _miPedidoCuenta.tipoconsumo = c_tiposConsumo;
+
+      this.reCalcularSubTotal(subTotalDefault);
+
       return _miPedidoCuenta;
+  }
+
+  darFormatoPedidoLocal(pedidoLocal: PedidoModel): any {
+    let subTotalDefault = 0;
+
+    pedidoLocal.tipoconsumo.map(tp => {
+      tp.secciones.map( s => {
+       s.items.map( _i => {
+         const precio_default = parseFloat(_i.precio_default) * _i.cantidad_seleccionada;
+           const p_unitario = _i.precio_default;
+           subTotalDefault += precio_default;
+
+           _i.precio = p_unitario;
+           _i.precio_print = parseFloat(precio_default.toString());
+           _i.precio_total = parseFloat(precio_default.toString());
+       });
+     });
+    });
+
+    this.reCalcularSubTotal(subTotalDefault);
+    return pedidoLocal;
+  }
+
+  // subTotal = recibido del default
+  reCalcularSubTotal( subTotalDefault: number ) {
+    this.init();
+    const _rowSubTotal = this.pedidoRepartidor.datosSubtotales[0];
+    // si el tototal es igual quiere decir de que no hay default comercio afiliado
+    if ( subTotalDefault === parseFloat(_rowSubTotal.importe) ) { return; }
+    const _diffSubTotal  = parseFloat(_rowSubTotal.importe) - subTotalDefault;
+    _rowSubTotal.importe = subTotalDefault;
+
+    // sumamos los totales
+    const rowTotal = this.pedidoRepartidor.datosSubtotales.filter(x => x.descripcion === 'TOTAL')[0];
+
+    // importe que pagara el cliente
+    this.pedidoRepartidor.importePagaCliente = rowTotal.importe;
+
+
+    rowTotal.importe = parseFloat(rowTotal.importe) - _diffSubTotal;
+
+    // this.pedidoRepartidor.datosSubtotales =
+    this.setLocal();
+  }
+
+
+  // verifica el estado del pedido
+  // esto en inidicaciones por si se recarga o no llega la notificaion socket
+  verificarEstadoPedido(idpedido: number) {
+    return new Observable(observer => {
+      const _dataSend = {
+        idpedido: idpedido
+      };
+      this.crudService.postFree(_dataSend, 'repartidor', 'get-estado-pedido')
+        .subscribe(res => {
+          this.pedidoRepartidor.estado = res.data[0].pwa_delivery_status;
+          observer.next(this.pedidoRepartidor.estado);
+        });
+    });
+  }
+
+
+  // fin de pedido // guarda datos del pedido
+  finalizarPedido(): void {
+    const comisionRepartidor = this.pedidoRepartidor.c_servicio;
+    const propinaRepartidor = this.pedidoRepartidor.datosDelivery.propina.value;
+    const costotalServicio = parseFloat(comisionRepartidor) + parseFloat(propinaRepartidor);
+
+    // importeDepositar siempre y cuando el comercio no esta afiliado
+    const importeDepositar = parseFloat(this.pedidoRepartidor.importePagaCliente) - (parseFloat(this.pedidoRepartidor.importePedido) + costotalServicio);
+
+    const _dataSend = {
+      idrepartidor: this.pedidoRepartidor.datosRepartidor.idrepartidor,
+      idpedido: this.pedidoRepartidor.idpedido,
+      idcliente: this.pedidoRepartidor.datosCliente.idcliente,
+      idsede: this.pedidoRepartidor.datosComercio.idsede,
+      operacion: {
+        metodoPago: this.pedidoRepartidor.datosDelivery.metodoPago,
+        importeTotalPedido: parseFloat(this.pedidoRepartidor.importePagaCliente),
+        importePagadoRepartidor: this.pedidoRepartidor.importePedido, // (a)(b)
+        comisionRepartidor: comisionRepartidor,
+        propinaRepartidor: propinaRepartidor,
+        costoTotalServicio: costotalServicio,
+        importeDepositar: parseFloat(importeDepositar.toFixed()).toFixed(2) // (a)
+        // importePagaRepartidor: parseFloat(this.pedidoRepartidor.datosDelivery.importeTotal),
+      }
+    };
+
+    // (a) = cuando el comercio no esta afiliado el importe que el repartidor debe depositar
+    // (b) = precios de los productos sin comision
+
+    this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-entregado')
+      .subscribe(res => {
+        console.log(res);
+        this.cleanLocal();
+        this.router.navigate(['./repartidor/pedidos']);
+      });
   }
 
 }

@@ -45,10 +45,14 @@ export class SocketService {
     private router: Router
     ) {
 
+      this.infoTockenService.converToJSON();
+
   }
 
   connect(infoUser: any = null, opFrom: number = 1) {
-    if ( this.isSocketOpen ) { return; } // para cuando se desconecta y conecta desde el celular
+    if ( this.isSocketOpen ) {
+      this.infoTockenService.setSocketId(this.socket.id);
+      return; } // para cuando se desconecta y conecta desde el celular
 
     // produccion
     // this.socket = io('/', {
@@ -258,6 +262,15 @@ export class SocketService {
     });
   }
 
+  // se lanza despues de que el cliente califica al repartidor
+  onDeliveryPedidoFin() {
+    return new Observable(observer => {
+      this.socket.on('repartidor-notifica-fin-pedido', (res: any) => {
+        observer.next(res);
+      });
+    });
+  }
+
   // onGetDatosSede() {
   //   return this.listen('getDataSede');
   // }
@@ -320,6 +333,8 @@ export class SocketService {
     this.socket.on('connect', () => {
       console.log('socket connect');
       this.statusConexSocket(true, 'connect');
+
+      this.infoTockenService.setSocketId(this.socket.id);
 
       // verifica el tiempo de session
       if (!this.infoTockenService.verificarContunuarSession()) {

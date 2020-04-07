@@ -108,6 +108,7 @@ export class InfoTockenService {
   }
 
   setSocketId( val: string) {
+    // this.infoUsToken.socketId = this.infoUsToken.socketId ? this.infoUsToken.socketId : val;
     this.infoUsToken.socketId = val;
     this.set();
   }
@@ -148,6 +149,7 @@ export class InfoTockenService {
         _newUs.isPagoSuccess = _token.isPagoSuccess;
         _newUs.metodoPago = _token.metodoPago;
         _newUs.efectivoMano = _token.efectivoMano;
+        _newUs.socketId = _token.socketId;
         this.infoUsToken = _newUs;
 
         // agregar el metodo pago prederteminado tarjeta

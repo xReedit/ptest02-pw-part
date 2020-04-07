@@ -7,6 +7,7 @@ import { takeUntil } from 'rxjs/internal/operators/takeUntil';
 import { Subject } from 'rxjs/internal/Subject';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
 import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
+import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
 
 @Component({
   selector: 'app-pedidos',
@@ -17,6 +18,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
   efectivoMano = 0;
   pedidoRepartidor: PedidoRepartidorModel;
   listPedidos = [];
+  _tabIndex = 0;
 
   private destroy$: Subject<boolean> = new Subject<boolean>();
   constructor(
@@ -24,11 +26,15 @@ export class PedidosComponent implements OnInit, OnDestroy {
     // public timerLimitService: TimerLimitService,
     private socketService: SocketService,
     private pedidoRepartidorService: PedidoRepartidorService,
-    private router: Router
+    private router: Router,
+    private listenService: ListenStatusService
   ) { }
 
   ngOnInit() {
     this.efectivoMano = this.infoTokenService.infoUsToken.efectivoMano;
+    this.listenService.setEfectivoMano(this.efectivoMano);
+
+    console.log('this.infoTokenService.infoUsToken', this.infoTokenService.infoUsToken);
 
     // this.listPedidos = new PedidoRepartidorModel[0];
     this.listenPedidos();
@@ -41,6 +47,11 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
   listenPedidos() {
 
+    // escuchar cambios en efectivo mano
+    this.listenService.efectivoManoMano$.subscribe(res => {
+        this.efectivoMano = res === 0 ? this.infoTokenService.infoUsToken.efectivoMano : res;
+    });
+
     // si recarga la pagina chequea si existe pedido pendiente
     this.pedidoRepartidor = this.pedidoRepartidorService.pedidoRepartidor;
     // if ( this.pedidoRepartidor.estado === 0 ) {
@@ -51,11 +62,14 @@ export class PedidosComponent implements OnInit, OnDestroy {
     .pipe(takeUntil(this.destroy$))
     .subscribe(res => {
       const pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
+      pedido.datosRepartidor = res[0];
       pedido.idpedido = res[1].idpedido;
+      pedido.datosItems = res[1].dataItems;
       pedido.datosDelivery = res[1].dataDelivery;
       pedido.datosComercio = res[1].dataDelivery.establecimiento;
       pedido.datosCliente = res[1].dataDelivery.direccionEnvioSelected;
       pedido.datosSubtotales = res[1].dataDelivery.subTotales;
+      pedido.datosSubtotalesShow = res[1].dataDelivery.subTotales;
       pedido.estado = 0;
 
       this.pedidoRepartidorService.setLocal(pedido);
@@ -68,7 +82,12 @@ export class PedidosComponent implements OnInit, OnDestroy {
   }
 
   private addPedidoToList(pedido: PedidoRepartidorModel): void {
-    pedido.datosSubtotales = this.pedidoRepartidorService.darFormatoSubTotales(pedido.datosDelivery.subTotales);
+    if ( !pedido.datosDelivery ) { return; }
+    this.pedidoRepartidorService.darFormatoPedidoLocal(pedido.datosItems);
+
+    const _arrTotal = this.pedidoRepartidorService.darFormatoSubTotales();
+    pedido = this.pedidoRepartidorService.pedidoRepartidor;
+    pedido.datosSubtotalesShow = _arrTotal;
     this.pedidoRepartidorService.setLocal(pedido);
     this.listPedidos.push(pedido);
 
@@ -80,6 +99,11 @@ export class PedidosComponent implements OnInit, OnDestroy {
     console.log('pedido acetpado');
     // this.router.navigate(['/', 'indicaciones']);
     this.router.navigate(['./repartidor/indicaciones']);
+  }
+
+  clickTab($event: any) {
+    console.log('$event.index', $event.index);
+    this._tabIndex = $event.index;
   }
 
   // showPedido() {

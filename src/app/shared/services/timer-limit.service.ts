@@ -11,7 +11,7 @@ export class TimerLimitService {
   private init = 0;
   public maxTime = 60; // 1min defult
   private valPorcentaje = 0;
-  private isPlayTimer = false;
+  isPlayTimer = false;
   private countTimer = 0; // cuenta el tiempo en segundo
   // private dateNow = new Date();
 
@@ -110,7 +110,7 @@ export class TimerLimitService {
 
   }
 
-  private stopCountTimerLimit(): void {
+  stopCountTimerLimit(): void {
     this.isPlayTimer = false;
     this.init = 0;
     this.valPorcentaje = 0;

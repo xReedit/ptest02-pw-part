@@ -1,12 +1,21 @@
-<agm-map 
+<agm-map *ngIf="coordenadas"
     [latitude]="coordenadas.latitude" 
     [longitude]="coordenadas.longitude"
     [zoom]="coordenadas.zoom">
     <agm-marker 
         [latitude]="coordenadas.latitude" 
         [longitude]="coordenadas.longitude"
+        [markerDraggable]="false"        
+        >
+    </agm-marker>
+    
+    <agm-marker 
+        [latitude]="coordenadas.latitude" 
+        [longitude]="coordenadas.longitude"
         [markerDraggable]="true"
         (dragEnd)="markerDragEnd($event)"
+        [label]="Repartidor"
+        [iconUrl]='{"url": "./assets/images/delivery-man.png", "scaledSize": {"height": 25, "width": 25}}'
         >
-    </agm-marker>            
+    </agm-marker>
 </agm-map>   

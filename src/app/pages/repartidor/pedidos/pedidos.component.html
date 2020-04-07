@@ -11,7 +11,7 @@
 
 <!-- lista pedidos -->
 <div class="w-100">
-    <mat-tab-group mat-stretch-tabs>
+    <mat-tab-group mat-stretch-tabs (selectedTabChange)="clickTab($event)">
         <mat-tab label="Pendientes"> 
             
             <div class="p-3">
@@ -21,6 +21,8 @@
             </div>
 
         </mat-tab>
-        <mat-tab label="Atendidos"> Content 2 </mat-tab>        
+        <mat-tab label="Entregados"> 
+            <app-pedidos-atendidos [tabIndex]="_tabIndex"></app-pedidos-atendidos>
+        </mat-tab>        
     </mat-tab-group>
 </div>

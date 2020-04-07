@@ -13,6 +13,7 @@ export class ItemModel {
     procede: number; // tabla de donde descontar 0 = producto 1 = cartalista
     precio: string; // precio unitario
     precio_unitario: string; // para calculo del precio item + precio subitem
+    precio_default: string; // precio por defecto sin comision - con comision en comercios no afiliados
     precio_print: number; // precio que se muestra
     precio_total_calc: number; // preciounitario * cantidad // para calular reglas carta
     precio_total = 0; // preciounitario * cantidad

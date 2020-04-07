@@ -22,6 +22,10 @@ import { ItemPedidoComponent } from './item-pedido/item-pedido.component';
 import { MapaSoloComponent } from './mapa-solo/mapa-solo.component';
 import { CompPedidoDetalleComponent } from './comp-pedido-detalle/comp-pedido-detalle.component';
 import { DialogImgItemComponent } from './dialog-img-item/dialog-img-item.component';
+import { CompCalificacionComponent } from './comp-calificacion/comp-calificacion.component';
+import { DialogCalificacionComponent } from './dialog-calificacion/dialog-calificacion.component';
+
+import { StarRatingModule } from 'angular-star-rating';
 // import { DialogSelectDireccionComponent } from './dialog-select-direccion/dialog-select-direccion.component';
 
 @NgModule({
@@ -44,6 +48,8 @@ import { DialogImgItemComponent } from './dialog-img-item/dialog-img-item.compon
     MapaSoloComponent,
     CompPedidoDetalleComponent,
     DialogImgItemComponent,
+    CompCalificacionComponent,
+    DialogCalificacionComponent,
     // DialogSelectDireccionComponent,
     // DialogUbicacionComponent
   ],
@@ -55,7 +61,8 @@ import { DialogImgItemComponent } from './dialog-img-item/dialog-img-item.compon
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAknWQFyVH1RpR2OAL0vRTHTapaIpfKSqo',
       libraries: ['places']
-    })
+    }),
+    StarRatingModule.forRoot()
   ],
   exports: [
     DatosDeliveryComponent,
@@ -73,14 +80,17 @@ import { DialogImgItemComponent } from './dialog-img-item/dialog-img-item.compon
     ItemPedidoComponent,
     MapaSoloComponent,
     CompPedidoDetalleComponent,
-    DialogImgItemComponent
+    DialogImgItemComponent,
+    CompCalificacionComponent,
+    DialogCalificacionComponent,
   ],
 
   entryComponents: [
     DialogMetodoPagoComponent,
     DialogVerificarTelefonoComponent,
     DialogDesicionComponent,
-    DialogImgItemComponent
+    DialogImgItemComponent,
+    DialogCalificacionComponent
   ]
 })
 export class ComponentesModule { }

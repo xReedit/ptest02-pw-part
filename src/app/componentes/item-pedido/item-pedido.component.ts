@@ -13,6 +13,7 @@ export class ItemPedidoComponent implements OnInit {
   @Input() infoPedido: PedidoRepartidorModel;
   @Output() aceptaPedido = new EventEmitter<boolean>(false);
 
+  estadoPedido = 0;
   DesPagarCon: string; // descripcion de pagar con
   constructor(
     public timerLimitService: TimerLimitService,
@@ -21,16 +22,23 @@ export class ItemPedidoComponent implements OnInit {
 
   ngOnInit() {
     this.DesPagarCon = this.infoPedido.datosDelivery.metodoPago.idtipo_pago === 1 ?  `Pagar con efectivo.` : `El pedido ya esta pagado, solo recoger.`;
+    this.estadoPedido = this.infoPedido.estado;
     this.showPedido();
   }
 
   showPedido() {
-    this.timerLimitService.playCountTimerLimit();
+    if ( this.estadoPedido === 0 ) {
+      this.timerLimitService.isPlayTimer = false;
+      this.timerLimitService.playCountTimerLimit();
+    }
+
   }
 
   // acepta asigna pedido
   aceptarPedido(): void {
-    this.pedidoRepartidorService.asignarPedido();
+    if  ( this.estadoPedido === 0 ) {
+      this.pedidoRepartidorService.asignarPedido();
+    }
     this.aceptaPedido.emit(true);
   }
 

@@ -4,8 +4,19 @@
             <span>Pedido #{{infoPedido.idpedido}}</span>
         </div>
         <div>
-            <span class="fw-600 text-secondary fs-13 pr-2"> {{ timerLimitService.countTime$ | async }}''</span>                            
-            <button class="btn btn-success" (click)="aceptarPedido()">Acepto</button>
+            <span class="fw-600 text-secondary fs-13 pr-2"> {{ timerLimitService.countTime$ | async }}''</span>
+
+            <button class="btn btn-success" (click)="aceptarPedido()">
+
+                <ng-container *ngIf="estadoPedido === 0 ; else elseTemplate">
+                    Aceptar
+                </ng-container>
+                <ng-template #elseTemplate>
+                    En proceso, ver.
+                </ng-template>
+                
+                
+            </button>
         </div>                        
     </div>
     <!-- timer -->

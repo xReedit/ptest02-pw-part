@@ -3,6 +3,7 @@ import { NotificacionPushService } from 'src/app/shared/services/notificacion-pu
 import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
 import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 import { RepartidorService } from 'src/app/shared/services/repartidor.service';
+import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
 
 @Component({
   selector: 'app-dialog-efectivo-repartidor',
@@ -18,7 +19,8 @@ export class DialogEfectivoRepartidorComponent implements OnInit {
     private pushNotificationService: NotificacionPushService,
     private geoPositionService: GpsUbicacionRepartidorService,
     private infoTokenService: InfoTockenService,
-    private repartidorService: RepartidorService
+    private repartidorService: RepartidorService,
+    private listenService: ListenStatusService
   ) { }
 
   ngOnInit() {
@@ -40,6 +42,7 @@ export class DialogEfectivoRepartidorComponent implements OnInit {
     this.geoPositionService.onGeoWatchPosition();
 
     this.infoTokenService.setEfectivoMano(this.importeIndicado);
+    this.listenService.setEfectivoMano(this.importeIndicado);
 
   }
 

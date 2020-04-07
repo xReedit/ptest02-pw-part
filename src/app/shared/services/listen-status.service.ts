@@ -52,9 +52,17 @@ export class ListenStatusService {
   public isChangeDireccionDelivery$ = this.isChangeDireccionDeliverySource.asObservable();
 
 
+  // repartidor
+
+
   // notifica salir del establecimeinto cuando es cliente delivery goback
   private isOutEstablecimientoDeliverySource = new BehaviorSubject<boolean>(false);
   public isOutEstablecimientoDelivery$ = this.isOutEstablecimientoDeliverySource.asObservable();
+
+
+  // notifica efectivo en mano
+  private efectivoManoSource = new BehaviorSubject<number>(0);
+  public efectivoManoMano$ = this.efectivoManoSource.asObservable();
 
   constructor() { }
 
@@ -104,6 +112,10 @@ export class ListenStatusService {
     this.isPagoSuccesSource.next(value);
   }
 
+
+
+  // repartidor
+
   setChangeDireccionDelivery(value: DeliveryDireccionCliente) {
     this.isChangeDireccionDeliverySource.next(value);
   }
@@ -111,5 +123,10 @@ export class ListenStatusService {
   setIsOutEstablecimientoDelivery(value: boolean) {
     this.isOutEstablecimientoDeliverySource.next(value);
   }
+
+  setEfectivoMano(value: number) {
+    this.efectivoManoSource.next(value);
+  }
+
 
 }

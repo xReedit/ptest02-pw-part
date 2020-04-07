@@ -1,0 +1,29 @@
+<!-- aquien califica -->
+
+<ng-container *ngIf="countFin > 0; else msjAgradece">
+    <div class="text-center">
+        <div *ngIf="dataCalificado.showTitulo">
+            <span class="fw-600 fs-13 text-secondary"> {{ dataCalificado.titulo }} </span>
+        </div>
+        
+        <div *ngIf="dataCalificado.showNombre">
+            <span class="fs-15">{{ dataCalificado.nombre }}</span>
+            <br><br>
+        </div>    
+    </div>
+    
+    <star-rating
+        [starType]="'svg'" 
+        size="large" 
+        speed="slow"
+        (ratingChange)="onRatingChange($event)"
+        ></star-rating>
+</ng-container>
+
+<ng-template #msjAgradece>
+    <div class="text-center fs-18 fw-100">
+        <span> Muchas gracias, su calificación se tomara en cuenta.</span>
+        <hr>
+        <button mat-flat-button color="primary" mat-dialog-close>Ok</button>
+    </div>    
+</ng-template>

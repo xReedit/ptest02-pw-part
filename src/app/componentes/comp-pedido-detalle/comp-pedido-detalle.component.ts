@@ -26,23 +26,27 @@ export class CompPedidoDetalleComponent implements OnInit {
   }
 
   private loadPedido() {
+    console.log('this.infoPedido', this.infoPedido);
     console.log('infoPedido componente', this.infoPedido);
-    const _data = {
-      mesa: 0,
-      idsede: this.infoPedido.idsede,
-      idorg: this.infoPedido.idorg,
-      idpedido: this.infoPedido.idpedido
-    };
+    // const _data = {
+    //   mesa: 0,
+    //   idsede: this.infoPedido.idsede,
+    //   idorg: this.infoPedido.idorg,
+    //   idpedido: this.infoPedido.idpedido
+    // };
 
-    this.crudService.postFree(_data, 'pedido', 'lacuenta')
-      .subscribe(res => {
-        console.log(res);
-        this._miPedido = this.pedidoRepartidorService.darFormatoPedido(res);
+    // this.crudService.postFree(_data, 'pedido', 'lacuenta')
+    //   .subscribe(res => {
+    //     console.log(res);
+    //     this._miPedido = this.pedidoRepartidorService.darFormatoPedido(res);
 
-        this._arrSubtotales = this.pedidoRepartidorService.pedidoRepartidor.datosSubtotales;
-        console.log('this._arrSubtotales', this._arrSubtotales);
-        console.log('this.elPedido', this._miPedido);
-      });
+    //     this._arrSubtotales = this.pedidoRepartidorService.pedidoRepartidor.datosSubtotales;
+    //     console.log('this._arrSubtotales', this._arrSubtotales);
+    //     console.log('this.elPedido', this._miPedido);
+    //   });
+
+    this._miPedido = this.pedidoRepartidorService.darFormatoPedidoLocal(this.pedidoRepartidorService.pedidoRepartidor.datosItems);
+    this._arrSubtotales = this.pedidoRepartidorService.pedidoRepartidor.datosSubtotalesShow;
   }
 
   showImg(item: any) {
