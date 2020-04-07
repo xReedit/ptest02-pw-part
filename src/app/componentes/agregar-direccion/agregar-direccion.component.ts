@@ -37,8 +37,8 @@ export class AgregarDireccionComponent implements OnInit {
   //   codigo: ''
   // };
 
-  @ViewChild('search', {static: false}) public searchElementRef: ElementRef;
-  @ViewChild('registerForm', {static: false}) myForm;
+  @ViewChild('search') public searchElementRef: ElementRef;
+  @ViewChild('registerForm') myForm;
 
   @Output() dataMaps = new EventEmitter<any>();
   @Output() saveDireccionOk = new EventEmitter<DeliveryDireccionCliente>();

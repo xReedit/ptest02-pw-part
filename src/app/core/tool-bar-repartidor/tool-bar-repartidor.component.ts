@@ -11,7 +11,7 @@ import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 export class ToolBarRepartidorComponent implements OnInit {
   @Output() public changeTogle = new EventEmitter<boolean>(false);
 
-  private isTogleActive = false;
+  isTogleActive = false;
   constructor(
     private infoTokenService: InfoTockenService,
     // private socketService: SocketService
