@@ -12,10 +12,10 @@ export class RepartidorService {
   ) { }
 
   // guarda efectivo inicial
-  guardarEfectivo(importe: number) {
+  guardarEfectivo(importe: number, _online = 1) {
     const _data = {
       efectivo: importe,
-      online: 1
+      online: _online
     };
 
     this.crudService.postFree(_data, 'repartidor', 'set-efectivo-mano', true)

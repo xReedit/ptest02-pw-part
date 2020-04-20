@@ -8,6 +8,7 @@ import { Subject } from 'rxjs/internal/Subject';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
 import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
 import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
+import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
 
 @Component({
   selector: 'app-pedidos',
@@ -27,7 +28,8 @@ export class PedidosComponent implements OnInit, OnDestroy {
     private socketService: SocketService,
     private pedidoRepartidorService: PedidoRepartidorService,
     private router: Router,
-    private listenService: ListenStatusService
+    private listenService: ListenStatusService,
+    public timerLimitService: TimerLimitService,
   ) { }
 
   ngOnInit() {
@@ -60,17 +62,23 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
     this.socketService.onRepartidorNuevoPedido()
     .pipe(takeUntil(this.destroy$))
-    .subscribe(res => {
-      const pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
-      pedido.datosRepartidor = res[0];
-      pedido.idpedido = res[1].idpedido;
-      pedido.datosItems = res[1].dataItems;
-      pedido.datosDelivery = res[1].dataDelivery;
-      pedido.datosComercio = res[1].dataDelivery.establecimiento;
-      pedido.datosCliente = res[1].dataDelivery.direccionEnvioSelected;
-      pedido.datosSubtotales = res[1].dataDelivery.subTotales;
-      pedido.datosSubtotalesShow = res[1].dataDelivery.subTotales;
-      pedido.estado = 0;
+    .subscribe((res: any) => {
+      let pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
+      if ( res[1]?.is_reasignado ) { // si es reasignado
+        pedido = res[1];
+      } else {
+        pedido.datosRepartidor = res[0];
+        pedido.idpedido = res[1].idpedido;
+        // pedido.datosItems = res[1].dataItems || res[1].datosItem;
+        // pedido.datosDelivery = res[1].dataDelivery || res[1].datosDelivery;
+        pedido.datosItems = res[1].json_datos_delivery.p_body;
+        pedido.datosDelivery = res[1].json_datos_delivery.p_header.arrDatosDelivery;
+        pedido.datosComercio = pedido.datosDelivery.establecimiento;
+        pedido.datosCliente = pedido.datosDelivery.direccionEnvioSelected;
+        pedido.datosSubtotales = pedido.datosDelivery.subTotales;
+        pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales;
+        pedido.estado = 0;
+      }
 
       this.pedidoRepartidorService.setLocal(pedido);
 
@@ -78,6 +86,18 @@ export class PedidosComponent implements OnInit, OnDestroy {
       console.log('nuevo pedido resivido', pedido);
       this.addPedidoToList(pedido);
       // this.listPedidos.push(pedido);
+    });
+
+
+    this.socketService.onRepartidorServerQuitaPedido()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((idpedido_res: any) => {
+      console.log('onRepartidorServerQuitaPedido', idpedido_res);
+      if ( this.pedidoRepartidorService.pedidoRepartidor.idpedido === idpedido_res ) {
+        this.listPedidos = [];
+        this.pedidoRepartidorService.cleanLocal();
+        this.timerLimitService.stopCountTimerLimit();
+      }
     });
   }
 
@@ -99,6 +119,20 @@ export class PedidosComponent implements OnInit, OnDestroy {
     console.log('pedido acetpado');
     // this.router.navigate(['/', 'indicaciones']);
     this.router.navigate(['./repartidor/indicaciones']);
+
+    // emitir pedido aceptado para comercio
+    const _dataPedido = {
+      idsede: this.pedidoRepartidorService.pedidoRepartidor.datosComercio.idsede,
+      idpedido: this.pedidoRepartidorService.pedidoRepartidor.idpedido,
+      idrepatidor: this.infoTokenService.infoUsToken.usuario.idrepatidor,
+      nombre: this.infoTokenService.infoUsToken.usuario.nombre,
+      apellido: this.infoTokenService.infoUsToken.usuario.apellido,
+      telefono: this.infoTokenService.infoUsToken.usuario.telefono,
+    };
+
+    console.log('repartidor-acepta-pedido', _dataPedido);
+
+    this.socketService.emit('repartidor-acepta-pedido', _dataPedido);
   }
 
   clickTab($event: any) {

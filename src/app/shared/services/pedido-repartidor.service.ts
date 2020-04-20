@@ -8,6 +8,7 @@ import { PedidoModel } from 'src/app/modelos/pedido.model';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Observable } from 'rxjs/internal/Observable';
 import { Router } from '@angular/router';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ export class PedidoRepartidorService {
   constructor(
     private crudService: CrudHttpService,
     private router: Router,
+    private socketService: SocketService
   ) {
     this.init();
   }
@@ -27,7 +29,7 @@ export class PedidoRepartidorService {
     this.pedidoRepartidor = this.getLocal();
   }
 
-  private cleanLocal(): void {
+  cleanLocal(): void {
     localStorage.removeItem(this.keyLocal);
     this.pedidoRepartidor = this.getLocal();
   }
@@ -285,6 +287,21 @@ export class PedidoRepartidorService {
         this.cleanLocal();
         this.router.navigate(['./repartidor/pedidos']);
       });
+  }
+
+  // // fin timer // busca otro repartidor
+  pedidoNoAceptadoReasingar() {
+    // estado = 1 es aceptado
+    if ( this.pedidoRepartidor.estado === 0 ) {
+      console.log('termina tiempo reasigna pedido repartidor-declina-pedido', this.pedidoRepartidor);
+      const _num_reasignado = this.pedidoRepartidor.num_reasignado ? this.pedidoRepartidor.num_reasignado + 1 : 0;
+      this.pedidoRepartidor.num_reasignado = _num_reasignado === 0 ? 1 : _num_reasignado;
+      this.pedidoRepartidor.is_reasignado = true;
+      // this.socketService.emit('repartidor-declina-pedido', this.pedidoRepartidor);
+
+      // clear local pedido
+      this.cleanLocal();
+    }
   }
 
 }

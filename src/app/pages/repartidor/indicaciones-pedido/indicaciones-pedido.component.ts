@@ -70,13 +70,27 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
 
     // this.dataPedido.paso_va = 2;
 
-    if ( this.dataPedido.datosDelivery.metodoPago.idtipo_pago === 1 ) {
-      this.descripcionPago = `Pagar en efectivo S/. ${ parseFloat(this.dataPedido.importePedido).toFixed(2)}`;
-      // this.importeEfectivoPedido = parseFloat(this.dataPedido.importePedido) + parseFloat(this.dataPedido.c_servicio);
-      this.importeEfectivoPedido = parseFloat(this.dataPedido.importePagaCliente);
-    } else {
-      this.descripcionPago = `El pedido ya esta pagado, solo recoger.`;
+    switch (this.dataPedido.datosDelivery.metodoPago.idtipo_pago) {
+      case 1:
+        this.descripcionPago = `Pagar S/. ${ parseFloat(this.dataPedido.importePedido).toFixed(2)}`;
+        this.importeEfectivoPedido = parseFloat(this.dataPedido.importePagaCliente);
+        break;
+      case 2:
+        this.descripcionPago = `El pedido ya esta pagado, solo entregar.`;
+        break;
+      case 3: // yape
+      this.descripcionPago = `Pagar S/. ${ parseFloat(this.dataPedido.importePedido).toFixed(2)}`;
+        this.importeEfectivoPedido = parseFloat(this.dataPedido.importePagaCliente);
+        break;
     }
+
+    // if ( this.dataPedido.datosDelivery.metodoPago.idtipo_pago === 1 ) {
+    //   this.descripcionPago = `Pagar en efectivo S/. ${ parseFloat(this.dataPedido.importePedido).toFixed(2)}`;
+    //   // this.importeEfectivoPedido = parseFloat(this.dataPedido.importePedido) + parseFloat(this.dataPedido.c_servicio);
+    //   this.importeEfectivoPedido = parseFloat(this.dataPedido.importePagaCliente);
+    // } else {
+    //   this.descripcionPago = `El pedido ya esta pagado, solo recoger.`;
+    // }
 
     this.showPasos();
     this.listenGeoPosition();

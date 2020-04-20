@@ -120,15 +120,6 @@ export class SocketService {
     // this.onListenSocketDisconnet();
   }
 
-
-  onRepartidorNuevoPedido() {
-      return new Observable(observer => {
-          this.socket.on('repartidor-nuevo-pedido', (res: any) => {
-          observer.next(res);
-        });
-      });
-    }
-
   onGetCarta() {
     // if ( this.isSocketOpen ) { return new Observable(observer => {observer.next(null); }); }
     return new Observable(observer => {
@@ -283,6 +274,35 @@ export class SocketService {
   //     });
   //   });
   // }
+
+  onRepartidorNuevoPedido() {
+    return new Observable(observer => {
+        this.socket.on('repartidor-nuevo-pedido', (res: any) => {
+        observer.next(res);
+      });
+    });
+  }
+
+
+
+  //// cuando se termina el tiempo de aceptar el servidor quita pedido
+  onRepartidorServerQuitaPedido() {
+    return new Observable(observer => {
+      this.socket.on('repartidor-notifica-server-quita-pedido', (res: any) => {
+        observer.next(res);
+      });
+    });
+  }
+
+
+  //// esto se ejecuta cuando se conecta
+  onRepartidorGetPedidoPendienteAceptar() {
+    return new Observable(observer => {
+      this.socket.on('repartidor-get-pedido-pendiente-aceptar', (res: any) => {
+        observer.next(res);
+      });
+    });
+  }
 
   emit(evento: string, data: any) {
     // verificar estado del socket

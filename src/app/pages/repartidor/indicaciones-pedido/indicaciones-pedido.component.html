@@ -47,8 +47,7 @@
                 <p class="text-secondary fw-600 fs-12">Entregar Pedido:</p>
                 <p class="fw-100"> <span class="fw-600">En: </span> {{ dataPedido.datosDelivery.direccion }}</p>
                 <p class="fw-100" *ngIf="dataPedido.datosDelivery.referencia"> <span class="fw-600">Referencia: </span> {{ dataPedido.datosDelivery.referencia }}</p>
-                <p class="fw-100"> <span class="fw-600">A: </span> {{ dataPedido.datosDelivery.nombre | titlecase }}</p>
-                <p class="fw-100" *ngIf="dataPedido.datosCliente.referencia"> <span class="fw-600">Referencia: </span> {{ dataPedido.datosCliente.referencia }}</p>
+                <p class="fw-100"> <span class="fw-600">A: </span> {{ dataPedido.datosDelivery.nombre | titlecase }}</p>                
                 <div *ngIf="this.dataPedido.datosDelivery.metodoPago.idtipo_pago" class="fw-100">
                     <p><span class="fw-600">Importe a cobrar: </span> S/. {{ importeEfectivoPedido | number: '.2' }}</p>
                     <p><span class="fw-600">Cliente paga con: </span> {{ dataPedido.datosDelivery.paga_con }}</p>

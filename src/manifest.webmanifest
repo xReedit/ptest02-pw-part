@@ -1,8 +1,8 @@
 {
-  "name": "Papaya Restobar",
-  "short_name": "Papaya",
-  "theme_color": "#3f51b5",
-  "background_color": "#3f51b5",
+  "name": "Papaya Repartidor",
+  "short_name": "Papaya Repartidor",
+  "theme_color": "#00b14f",
+  "background_color": "#00b14f",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
