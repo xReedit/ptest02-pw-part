@@ -1,0 +1,27 @@
+<google-map height="100%" width="100%"
+    [zoom]="zoom" [center]="center"
+    [options]="options">
+
+    <!-- mi position desarrollo -->
+    <map-marker #markerElem *ngFor="let marker of markersRepartidorDesarrollo"
+        [position]="marker.position" [label]="marker.label"
+        [title]="marker.title" [options]="markerOptionsRepartidorDesarrollo"
+        (mapDragend)="updateUbicationDesarrollo($event)"
+        >  
+    </map-marker>
+
+    <!-- mi posicion -->
+    <!-- <map-marker #markerElem *ngFor="let marker of markersRepartidores"
+        [position]="marker.position" [label]="marker.label"
+        [title]="marker.title" [options]="markerOptionsRepartidor"
+        (mapClick)="openInfo(markerElem, marker)">  
+    </map-marker> -->
+
+    <!-- pedidos asignados -->
+    <map-marker #markerElem *ngFor="let marker of markersPedidos; let i = index;"
+        [position]="marker.position" [label]="marker.label"
+        [title]="marker.title" [options]="markerOptionsPedido"
+        (mapClick)="openPedido(i)">  
+    </map-marker>
+
+</google-map>

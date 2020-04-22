@@ -73,6 +73,8 @@ export class PedidoRepartidorService {
       .subscribe(res => {
         this.pedidoRepartidor.estado = 1; // asignadp
         this.setPasoVa(1);
+
+        this.setLocal();
       });
   }
 
@@ -302,6 +304,23 @@ export class PedidoRepartidorService {
       // clear local pedido
       this.cleanLocal();
     }
+  }
+
+
+  darFormatoLocalPedidoRepartidorModel(_pedido) {
+    const pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
+    pedido.idpedido = _pedido.idpedido;
+        // pedido.datosItems = res[1].dataItems || res[1].datosItem;
+        // pedido.datosDelivery = res[1].dataDelivery || res[1].datosDelivery;
+    pedido.datosItems = _pedido.json_datos_delivery.p_body;
+    pedido.datosDelivery = _pedido.json_datos_delivery.p_header.arrDatosDelivery;
+    pedido.datosComercio = pedido.datosDelivery.establecimiento;
+    pedido.datosCliente = pedido.datosDelivery.direccionEnvioSelected;
+    pedido.datosSubtotales = pedido.datosDelivery.subTotales;
+    pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales;
+
+    this.pedidoRepartidor = pedido;
+    this.setLocal();
   }
 
 }

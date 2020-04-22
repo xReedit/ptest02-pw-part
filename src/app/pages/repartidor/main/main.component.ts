@@ -6,6 +6,8 @@ import { RepartidorService } from 'src/app/shared/services/repartidor.service';
 import { takeUntil } from 'rxjs/internal/operators/takeUntil';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
 import { Subject } from 'rxjs/internal/Subject';
+import { InfoTockenService } from 'src/app/shared/services/info-token.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -16,29 +18,43 @@ export class MainComponent implements OnInit, OnDestroy {
   private destroy$: Subject<boolean> = new Subject<boolean>();
 
 
+  isRepartidorPropio = false;
+
   constructor(
     private dialog: MatDialog,
     private socketService: SocketService,
     private repartidorService: RepartidorService,
-    private pedidoRepartidorService: PedidoRepartidorService
+    private infoTokeService: InfoTockenService,
+    private pedidoRepartidorService: PedidoRepartidorService,
+    private router: Router
   ) { }
 
   ngOnInit() {
     // conecta a notificaciones
     this.pedidoRepartidorService.init();
+    this.isRepartidorPropio = this.infoTokeService.infoUsToken.usuario.idsede_suscrito;
+    this.infoTokeService.infoUsToken.usuario.isRepartidorPropio = this.isRepartidorPropio;
+    this.infoTokeService.set();
+
     this.socketService.connect();
 
-    // verificar si tenemos pedidos pendientes por aceptar
-    this.socketService.onRepartidorGetPedidoPendienteAceptar()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((res: any) => {
-      const _pedido = res[0].pedido_por_aceptar;
-      console.log('onRepartidorGetPedidoPendienteAceptar', _pedido);
-      if ( _pedido && !this.pedidoRepartidorService.pedidoRepartidor.idpedido) {
-        this.pedidoRepartidorService.setLocal(_pedido);
-        this.pedidoRepartidorService.init();
-      }
-    });
+
+
+    if ( this.isRepartidorPropio ) {
+      this.router.navigate(['/repartidor/mapa-de-pedidos']);
+    } else {
+      // verificar si tenemos pedidos pendientes por aceptar
+      this.socketService.onRepartidorGetPedidoPendienteAceptar()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res: any) => {
+        const _pedido = res[0].pedido_por_aceptar;
+        console.log('onRepartidorGetPedidoPendienteAceptar', _pedido);
+        if ( _pedido && !this.pedidoRepartidorService.pedidoRepartidor.idpedido) {
+          this.pedidoRepartidorService.setLocal(_pedido);
+          this.pedidoRepartidorService.init();
+        }
+      });
+    }
   }
 
 
@@ -56,9 +72,11 @@ export class MainComponent implements OnInit, OnDestroy {
 
       this.dialog.open(DialogEfectivoRepartidorComponent, _dialogConfig);
       this.socketService.connect();
-    } else {
-      this.repartidorService.guardarEfectivo(0, 0);
     }
+    // else {
+    //   // this.repartidorService.guardarEfectivo(0, 0);
+    // }
+
 
   }
 

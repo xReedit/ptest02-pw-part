@@ -283,6 +283,15 @@ export class SocketService {
     });
   }
 
+  // repartidor pripio
+  onRepartidorPropioNuevoPedidoAsignado() {
+    return new Observable(observer => {
+        this.socket.on('repartidor-propio-nuevo-pedido-asignado', (res: any) => {
+        observer.next(res);
+      });
+    });
+  }
+
 
 
   //// cuando se termina el tiempo de aceptar el servidor quita pedido

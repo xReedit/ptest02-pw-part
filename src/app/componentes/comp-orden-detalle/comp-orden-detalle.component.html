@@ -1,0 +1,37 @@
+<div class="animated fadeIn">
+    <!-- encabezado -->
+    <div class="d-flex justify-content-between">
+        <div>
+            <p class="fw-600">Pedido #{{orden.idpedido}}</p>                
+        </div>
+        <div>
+            <!-- boton cerrar -->
+            <button type="button" class="btn btn-secondary" mat-dialog-close>
+                <i class="fa fa-close"></i>                
+            </button>
+        </div>
+    </div>
+    <hr>
+    <div>
+        <div class="fs-13">
+            <span class="fs-13 fw-600 text-secondary">Cliente: </span>
+            <p><i class="fa fa-user"></i>  {{orden.json_datos_delivery.p_header.arrDatosDelivery.nombre}}</p>
+            <p><i class="fa fa-map-marker"></i>  {{orden.json_datos_delivery.p_header.arrDatosDelivery.direccion}}</p>
+            <p><i class="fa fa-phone"></i> {{ orden.json_datos_delivery.p_header.arrDatosDelivery.telefono }}</p>
+        </div>        
+    </div>
+    <hr>
+
+    
+    <!-- detalles del pedido -->
+    <app-comp-pedido-detalle></app-comp-pedido-detalle>
+            
+    <hr>
+
+    <!-- boton accion segun estado -->
+    <div class="text-center">
+        <button class="bg-success btn btn-success"            
+        >
+            <span class="fs-18">Comenzar</span></button>
+    </div>
+</div>

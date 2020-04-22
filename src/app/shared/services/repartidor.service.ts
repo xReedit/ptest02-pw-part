@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CrudHttpService } from './crud-http.service';
 import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root'
@@ -32,5 +33,15 @@ export class RepartidorService {
       .subscribe(res => {
       });
 
+  }
+
+  // repartidor propio pedidos asignados
+  getMisPedidosPropiosAsignados() {
+    return new Observable(observer => {
+    this.crudService.getAll('repartidor', 'get-repartidor-propio-mis-pedidos', false, false, true)
+      .subscribe((res: any) => {
+        observer.next(res.data);
+      });
+    });
   }
 }

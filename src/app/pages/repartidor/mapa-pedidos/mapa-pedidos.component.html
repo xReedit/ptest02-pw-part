@@ -1,0 +1,14 @@
+<div class="animated fadeInDown">
+    <div class="p-3 bg-dark text-white fs-13 d-flex justify-content-between">
+        <div>
+            <span>{{ nomRepartidor | titlecase }}</span>
+        </div>
+        <div>
+            <span>Resumen</span>
+        </div>
+    </div>
+
+    <div class="content-body-mapa">
+        <app-mapa-ordenes [listaPedidos]="listPedidos" (pedidoOpen)="openDialogOrden($event)"></app-mapa-ordenes>        
+    </div>
+</div>

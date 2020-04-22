@@ -26,8 +26,8 @@ export class CompPedidoDetalleComponent implements OnInit {
   }
 
   private loadPedido() {
-    console.log('this.infoPedido', this.infoPedido);
-    console.log('infoPedido componente', this.infoPedido);
+    // console.log('this.infoPedido', this.infoPedido);
+    // console.log('infoPedido componente', this.infoPedido);
     // const _data = {
     //   mesa: 0,
     //   idsede: this.infoPedido.idsede,
@@ -44,6 +44,9 @@ export class CompPedidoDetalleComponent implements OnInit {
     //     console.log('this._arrSubtotales', this._arrSubtotales);
     //     console.log('this.elPedido', this._miPedido);
     //   });
+
+    console.log('ini service pedido');
+    this.pedidoRepartidorService.init();
 
     this._miPedido = this.pedidoRepartidorService.darFormatoPedidoLocal(this.pedidoRepartidorService.pedidoRepartidor.datosItems);
     this._arrSubtotales = this.pedidoRepartidorService.pedidoRepartidor.datosSubtotalesShow;

@@ -32,3 +32,17 @@ border-radius: 0px;
 .rating {
   outline: none;
 }
+
+.my-dialog-scrool{
+  height: auto;
+  overflow: auto;
+}
+
+
+@media (max-width: 676px) { 
+  .my-dialog-orden-detalle {
+    max-width: none !important;
+    width: 100vw;
+    height: 100vh;
+  }
+}

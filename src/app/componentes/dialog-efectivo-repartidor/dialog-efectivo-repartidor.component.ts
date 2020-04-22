@@ -36,7 +36,7 @@ export class DialogEfectivoRepartidorComponent implements OnInit {
 
   guardarEfectivoMano() {
 
-    this.repartidorService.guardarEfectivo(this.importeIndicado);
+    this.repartidorService.guardarEfectivo(this.importeIndicado, 1);
 
     // comienza a registrar posicion actual
     this.geoPositionService.onGeoWatchPosition();

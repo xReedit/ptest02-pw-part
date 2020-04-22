@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { DatosDeliveryComponent } from './datos-delivery/datos-delivery.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../core/material/material.module';
+import { GoogleMapsModule } from '@angular/google-maps';
+
 import { DebounceClickDirective } from '../shared/directivas/debounce-click.directive';
 import { EncuestaOpcionComponent } from './encuesta-opcion/encuesta-opcion.component';
 // import { DialogUbicacionComponent } from './dialog-ubicacion/dialog-ubicacion.component';
@@ -26,6 +28,10 @@ import { CompCalificacionComponent } from './comp-calificacion/comp-calificacion
 import { DialogCalificacionComponent } from './dialog-calificacion/dialog-calificacion.component';
 
 import { StarRatingModule } from 'angular-star-rating';
+import { MapaOrdenesComponent } from './mapa-ordenes/mapa-ordenes.component';
+import { CompOrdenDetalleComponent } from './comp-orden-detalle/comp-orden-detalle.component';
+import { ComResumenPedidoComponent } from './com-resumen-pedido/com-resumen-pedido.component';
+import { DialogOrdenDetalleComponent } from './dialog-orden-detalle/dialog-orden-detalle.component';
 // import { DialogSelectDireccionComponent } from './dialog-select-direccion/dialog-select-direccion.component';
 
 @NgModule({
@@ -50,6 +56,10 @@ import { StarRatingModule } from 'angular-star-rating';
     DialogImgItemComponent,
     CompCalificacionComponent,
     DialogCalificacionComponent,
+    MapaOrdenesComponent,
+    CompOrdenDetalleComponent,
+    ComResumenPedidoComponent,
+    DialogOrdenDetalleComponent,
     // DialogSelectDireccionComponent,
     // DialogUbicacionComponent
   ],
@@ -58,6 +68,7 @@ import { StarRatingModule } from 'angular-star-rating';
     ReactiveFormsModule,
     FormsModule,
     MaterialModule,
+    GoogleMapsModule,
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAknWQFyVH1RpR2OAL0vRTHTapaIpfKSqo',
       libraries: ['places']
@@ -83,6 +94,8 @@ import { StarRatingModule } from 'angular-star-rating';
     DialogImgItemComponent,
     CompCalificacionComponent,
     DialogCalificacionComponent,
+    MapaOrdenesComponent,
+    CompOrdenDetalleComponent,
   ],
 
   // entryComponents: [

@@ -5,6 +5,7 @@ import { PedidosComponent } from './pedidos/pedidos.component';
 import { IndicacionesPedidoComponent } from './indicaciones-pedido/indicaciones-pedido.component';
 import { PedidoDetalleComponent } from './pedido-detalle/pedido-detalle.component';
 import { PedidosAtendidosComponent } from './pedidos-atendidos/pedidos-atendidos.component';
+import { MapaPedidosComponent } from './mapa-pedidos/mapa-pedidos.component';
 
 const routes: Routes = [{
     path: '', component: MainComponent,
@@ -32,6 +33,11 @@ const routes: Routes = [{
             path: 'pedidos-atendidos',
             component: PedidosAtendidosComponent,
             data: { titulo: 'Pedidos Atendidos' }
+        },
+        {
+            path: 'mapa-de-pedidos',
+            component: MapaPedidosComponent,
+            data: { titulo: 'Mapa de pedidos' }
         }
 
     ]
