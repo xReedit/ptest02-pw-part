@@ -18,7 +18,18 @@
             <p><i class="fa fa-user"></i>  {{orden.json_datos_delivery.p_header.arrDatosDelivery.nombre}}</p>
             <p><i class="fa fa-map-marker"></i>  {{orden.json_datos_delivery.p_header.arrDatosDelivery.direccion}}</p>
             <p><i class="fa fa-phone"></i> {{ orden.json_datos_delivery.p_header.arrDatosDelivery.telefono }}</p>
-        </div>        
+            
+            <hr>
+
+            <span class="fs-13 fw-600 text-secondary">Cliente paga con: </span>
+            <p>{{orden.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion}} <span class="pl-2">{{ importeEfectivo }}</span></p>
+
+        </div>      
+        <hr>
+        <div class="row text-center">
+            <div matRipple class="col-6 border-right text-info" (click)="callPhone()"><i class="fa fa-phone" aria-hidden="true"></i> LLamar</div>
+            <div matRipple class="col-6 text-info" (click)="redirectWhatsApp()"><i class="fa fa-commenting-o" aria-hidden="true"></i> Enviar Mensaje</div>
+        </div>  
     </div>
     <hr>
 
@@ -30,8 +41,12 @@
 
     <!-- boton accion segun estado -->
     <div class="text-center">
-        <button class="bg-success btn btn-success"            
-        >
-            <span class="fs-18">Comenzar</span></button>
+        <button class="bg-success btn btn-success" *ngIf="!isLlegoDestino"
+        (click)="goDireccion()"           
+        ><span class="fs-18">Ir a la direccion</span></button>
+
+        <button class="bg-success btn btn-success" *ngIf="isLlegoDestino"
+        (click)="PedidoEntregado()"
+        ><span class="fs-18">Listo, Pedido Entregado</span></button>
     </div>
 </div>

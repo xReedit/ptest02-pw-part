@@ -111,7 +111,8 @@ export class PedidosComponent implements OnInit, OnDestroy {
     this.pedidoRepartidorService.setLocal(pedido);
     this.listPedidos.push(pedido);
 
-    console.log(pedido);
+    // console.log(pedido);
+
     this.pedidoRepartidorService.playAudioNewPedido();
   }
 

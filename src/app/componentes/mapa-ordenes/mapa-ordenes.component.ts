@@ -1,8 +1,13 @@
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { GoogleMap, MapMarker } from '@angular/google-maps';
 import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
 import { SocketService } from 'src/app/shared/services/socket.service';
+import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
+import { RepartidorService } from 'src/app/shared/services/repartidor.service';
+import { Subject } from 'rxjs/internal/Subject';
+import { takeUntil } from 'rxjs/internal/operators/takeUntil';
+import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
 
 @Component({
   selector: 'app-mapa-ordenes',
@@ -12,6 +17,8 @@ import { SocketService } from 'src/app/shared/services/socket.service';
 export class MapaOrdenesComponent implements OnInit {
   @ViewChild(GoogleMap, { static: false }) map: GoogleMap;
   infowindow = new google.maps.InfoWindow();
+
+
 
   @Output() pedidoOpen = new EventEmitter<any>(); // abre el pedido en el dialog
 
@@ -45,7 +52,8 @@ export class MapaOrdenesComponent implements OnInit {
   constructor(
     private geoUbicationService: GpsUbicacionRepartidorService,
     private pedidoRepartidorService: PedidoRepartidorService,
-    private socketService: SocketService
+    private repartidorService: RepartidorService,
+    private listenService: ListenStatusService
   ) { }
 
   ngOnInit(): void {
@@ -54,19 +62,38 @@ export class MapaOrdenesComponent implements OnInit {
 
     // desarrollo
     this.listeDesarrolloUbicacion();
+
+    // notifica cambios en cualquier pedido
+    this.listenService.pedidoModificado$
+      .subscribe(pedido => {
+        if ( !pedido ) { return; }
+
+        console.log('Cambiamos icono entregado');
+        // buscar pedido en los marcadores
+        const p = this.markersPedidos.filter(_p => _p.idpedido === pedido.idpedido)[0];
+        const _options: google.maps.MarkerOptions = {
+          animation: 0,
+          draggable: false,
+          icon: `./assets/images/marker-3.png`
+        };
+
+        p.options = _options;
+      });
   }
 
   private enviarUbicacion(ubicacion: any): void {
-    const _data = {
-      coordenadas : {
-        latitude: ubicacion.lat,
-        longitude: ubicacion.lng,
-      },
-      idcliente: this.pedidoRepartidorService.pedidoRepartidor.datosCliente.idcliente,
-      idsede: this.pedidoRepartidorService.pedidoRepartidor.datosComercio.idsede,
-    };
+    // const _data = {
+    //   coordenadas : {
+    //     latitude: ubicacion.lat,
+    //     longitude: ubicacion.lng,
+    //   },
+    //   idcliente: this.pedidoRepartidorService.pedidoRepartidor.datosCliente.idcliente,
+    //   idsede: this.pedidoRepartidorService.pedidoRepartidor.datosComercio.idsede,
+    // };
 
-    this.socketService.emit('repartidor-notifica-ubicacion', _data);
+    // this.socketService.emit('repartidor-notifica-ubicacion', _data);
+    const _pedidoSend = this.pedidoRepartidorService.pedidoRepartidor || null;
+    this.repartidorService.emitPositionNow(ubicacion, this.pedidoRepartidorService.pedidoRepartidor);
   }
 
   listenUbicaion() {
@@ -76,6 +103,15 @@ export class MapaOrdenesComponent implements OnInit {
       .subscribe(res => {
         console.log('geoposiion', res);
         this.center = { lat: res.latitude, lng: res.longitude };
+
+        const geoposiionNow = new GeoPositionModel;
+        geoposiionNow.latitude = this.center.lat;
+        geoposiionNow.longitude = this.center.lng;
+
+        this.geoUbicationService.geoPosition = geoposiionNow;
+        this.geoUbicationService.set();
+
+        this.enviarUbicacion(this.center);
         this.addMyMarkert();
       });
 
@@ -109,9 +145,20 @@ export class MapaOrdenesComponent implements OnInit {
 
 
     this.markersPedidos = [];
+
+    this.listPedidos[this.listPedidos.length - 1].isLast = true;
+
     this.listPedidos.map((p: any, i: number) => {
+      let iconMarker = 'marker-1.png';
+      let tituloText = 'Pedido ' + (i + 1);
       const dataDelivery = p.json_datos_delivery.p_header.arrDatosDelivery; // .direccionEnvioSelected
+      if ( p.pwa_delivery_status.toString()  === '4' ) {
+        iconMarker = 'marker-3.png';
+        tituloText = '-';
+      }
+
       this.markersPedidos.push({
+        idpedido: p.idpedido,
         position: {
           lat: dataDelivery.direccionEnvioSelected.latitude,
           lng: dataDelivery.direccionEnvioSelected.longitude
@@ -119,12 +166,14 @@ export class MapaOrdenesComponent implements OnInit {
         label: {
           color: '#0d47a1',
           fontWeight: '600',
-          text: 'Pedido ' + (i + 1)
+          text: tituloText
         },
         title: 'Pedido',
         info: p.idpedido,
         options: {
-          animation: google.maps.Animation.BOUNCE
+          draggable: false,
+          animation: p.isLast ? google.maps.Animation.BOUNCE  : 0,
+          icon: `./assets/images/${iconMarker}`
         }
       });
 
@@ -162,6 +211,14 @@ export class MapaOrdenesComponent implements OnInit {
     this.center.lat = $event.latLng.lat();
     this.center.lng = $event.latLng.lng();
 
+    const geoposiionNow = new GeoPositionModel;
+    geoposiionNow.latitude = this.center.lat;
+    geoposiionNow.longitude = this.center.lng;
+
+    this.geoUbicationService.geoPosition = geoposiionNow;
+    this.geoUbicationService.set();
+
     this.enviarUbicacion(this.center);
   }
 }
+

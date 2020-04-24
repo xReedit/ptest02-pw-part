@@ -9,6 +9,8 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Observable } from 'rxjs/internal/Observable';
 import { Router } from '@angular/router';
 import { SocketService } from './socket.service';
+import { InfoTockenService } from './info-token.service';
+import { ListenStatusService } from './listen-status.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +22,8 @@ export class PedidoRepartidorService {
   constructor(
     private crudService: CrudHttpService,
     private router: Router,
+    private infoTokenService: InfoTockenService,
+    private listenService: ListenStatusService,
     private socketService: SocketService
   ) {
     this.init();
@@ -61,7 +65,13 @@ export class PedidoRepartidorService {
 
   getLocal(): PedidoRepartidorModel {
     const rpt = localStorage.getItem(this.keyLocal);
-    return rpt ? JSON.parse(atob(rpt)) : new PedidoRepartidorModel;
+    try {
+      return rpt ? JSON.parse(atob(rpt)) : new PedidoRepartidorModel;
+    } catch (error) {
+      this.cleanLocal();
+      return new PedidoRepartidorModel;
+
+    }
   }
 
   asignarPedido(): void {
@@ -269,6 +279,7 @@ export class PedidoRepartidorService {
       idcliente: this.pedidoRepartidor.datosCliente.idcliente,
       idsede: this.pedidoRepartidor.datosComercio.idsede,
       operacion: {
+        isrepartidor_propio: false,
         metodoPago: this.pedidoRepartidor.datosDelivery.metodoPago,
         importeTotalPedido: parseFloat(this.pedidoRepartidor.importePagaCliente),
         importePagadoRepartidor: this.pedidoRepartidor.importePedido, // (a)(b)
@@ -288,6 +299,45 @@ export class PedidoRepartidorService {
         console.log(res);
         this.cleanLocal();
         this.router.navigate(['./repartidor/pedidos']);
+      });
+  }
+
+  // fin de pedido // guarda datos del pedido
+  finalizarPedidoPropioRepartidor(): void {
+    const _idPedidoRepartidor = this.pedidoRepartidor.datosRepartidor ? this.pedidoRepartidor.datosRepartidor.idrepartidor : this.infoTokenService.infoUsToken.usuario.idrepartidor;
+    const _dataSend = {
+      idrepartidor: _idPedidoRepartidor,
+      idpedido: this.pedidoRepartidor.idpedido,
+      idcliente: this.pedidoRepartidor.datosCliente.idcliente,
+      idsede: this.pedidoRepartidor.datosComercio.idsede,
+      operacion: {
+        isrepartidor_propio: true,
+        metodoPago: this.pedidoRepartidor.datosDelivery.metodoPago,
+        importeTotalPedido: parseFloat(this.pedidoRepartidor.importePagaCliente),
+        importePagadoRepartidor: this.pedidoRepartidor.importePedido, // (a)(b)
+        comisionRepartidor: 0,
+        propinaRepartidor: 0,
+        costoTotalServicio: 0,
+        importeDepositar: 0 // (a)
+        // importePagaRepartidor: parseFloat(this.pedidoRepartidor.datosDelivery.importeTotal),
+      }
+    };
+
+     // notifica cambios en el pedido, para colocar icono entregado en el mapa del repartidor
+     this.pedidoRepartidor.estado = 4;
+     this.pedidoRepartidor.paso_va = 4;
+     this.pedidoRepartidor.pwa_delivery_status = 4;
+
+    this.listenService.setPedidoModificado(this.pedidoRepartidor);
+
+    console.log('repartidor-propio-notifica-fin-pedido');
+    this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
+
+    this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-entregado')
+      .subscribe(res => {
+        console.log(res);
+        // this.cleanLocal();
+        // this.router.navigate(['./repartidor/pedidos']);
       });
   }
 

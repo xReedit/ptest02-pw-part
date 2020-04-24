@@ -313,6 +313,16 @@ export class SocketService {
     });
   }
 
+
+  // nuevo pedido asignado desde el comercio
+  onPedidoAsignadoFromComercio() {
+    return new Observable(observer => {
+      this.socket.on('set-repartidor-pedido-asigna-comercio', (res: any) => {
+        observer.next(res);
+      });
+    });
+  }
+
   emit(evento: string, data: any) {
     // verificar estado del socket
 

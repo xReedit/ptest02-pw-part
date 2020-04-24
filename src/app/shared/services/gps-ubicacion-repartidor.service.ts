@@ -76,7 +76,7 @@ export class GpsUbicacionRepartidorService {
     // }
   }
 
-  private set() {
+  set() {
     localStorage.setItem(this.key, JSON.stringify(this.geoPosition));
   }
 

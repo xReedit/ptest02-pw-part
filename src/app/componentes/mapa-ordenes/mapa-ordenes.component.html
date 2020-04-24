@@ -20,7 +20,7 @@
     <!-- pedidos asignados -->
     <map-marker #markerElem *ngFor="let marker of markersPedidos; let i = index;"
         [position]="marker.position" [label]="marker.label"
-        [title]="marker.title" [options]="markerOptionsPedido"
+        [title]="marker.title" [options]="marker.options"
         (mapClick)="openPedido(i)">  
     </map-marker>
 
