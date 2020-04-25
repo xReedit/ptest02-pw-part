@@ -2,7 +2,11 @@
     <!-- encabezado -->
     <div class="d-flex justify-content-between">
         <div>
-            <p class="fw-600">Pedido #{{orden.idpedido}}</p>                
+            <p class="fw-600">Pedido #{{orden.idpedido}}</p> 
+            <ng-container *ngIf="orden.pwa_delivery_status === '4'">
+                <span class="fw-600 fs-15 text-success">Entregado</span>
+            </ng-container>
+                          
         </div>
         <div>
             <!-- boton cerrar -->
@@ -25,8 +29,8 @@
             <p>{{orden.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion}} <span class="pl-2">{{ importeEfectivo }}</span></p>
 
         </div>      
-        <hr>
-        <div class="row text-center">
+        <div class="row text-center" *ngIf="orden.pwa_delivery_status !== '4'">
+            <hr>
             <div matRipple class="col-6 border-right text-info" (click)="callPhone()"><i class="fa fa-phone" aria-hidden="true"></i> LLamar</div>
             <div matRipple class="col-6 text-info" (click)="redirectWhatsApp()"><i class="fa fa-commenting-o" aria-hidden="true"></i> Enviar Mensaje</div>
         </div>  
@@ -40,7 +44,7 @@
     <hr>
 
     <!-- boton accion segun estado -->
-    <div class="text-center">
+    <div class="text-center" *ngIf="orden.pwa_delivery_status !== '4'">
         <button class="bg-success btn btn-success" *ngIf="!isLlegoDestino"
         (click)="goDireccion()"           
         ><span class="fs-18">Ir a la direccion</span></button>

@@ -330,12 +330,13 @@ export class PedidoRepartidorService {
 
     this.listenService.setPedidoModificado(this.pedidoRepartidor);
 
-    console.log('repartidor-propio-notifica-fin-pedido');
-    this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
-
+    // cuando termina el pedido el repartidor se guarda el tiempo en el pedido
     this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-entregado')
       .subscribe(res => {
         console.log(res);
+
+        console.log('repartidor-propio-notifica-fin-pedido');
+        this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
         // this.cleanLocal();
         // this.router.navigate(['./repartidor/pedidos']);
       });

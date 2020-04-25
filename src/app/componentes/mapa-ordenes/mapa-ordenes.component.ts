@@ -146,12 +146,15 @@ export class MapaOrdenesComponent implements OnInit {
 
     this.markersPedidos = [];
 
-    this.listPedidos[this.listPedidos.length - 1].isLast = true;
+    // this.listPedidos[this.listPedidos.length - 1].isLast = true;
+    const indexLast = this.listPedidos.length - 1;
 
     this.listPedidos.map((p: any, i: number) => {
       let iconMarker = 'marker-1.png';
       let tituloText = 'Pedido ' + (i + 1);
       const dataDelivery = p.json_datos_delivery.p_header.arrDatosDelivery; // .direccionEnvioSelected
+      p.isLast = indexLast === i ? true : false;
+
       if ( p.pwa_delivery_status.toString()  === '4' ) {
         iconMarker = 'marker-3.png';
         tituloText = '-';
