@@ -9,6 +9,8 @@ import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartid
 import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
 import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
 import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
+import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
+import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
 
 @Component({
   selector: 'app-pedidos',
@@ -21,6 +23,8 @@ export class PedidosComponent implements OnInit, OnDestroy {
   listPedidos = [];
   _tabIndex = 0;
 
+  private positionNow: GeoPositionModel;
+
   private destroy$: Subject<boolean> = new Subject<boolean>();
   constructor(
     private infoTokenService: InfoTockenService,
@@ -30,6 +34,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
     private router: Router,
     private listenService: ListenStatusService,
     public timerLimitService: TimerLimitService,
+    private geoPositionService: GpsUbicacionRepartidorService
   ) { }
 
   ngOnInit() {
@@ -117,23 +122,28 @@ export class PedidosComponent implements OnInit, OnDestroy {
   }
 
   aceptaPedido() {
+
+    this.geoPositionService.onGeoPosition();
+    this.positionNow = this.geoPositionService.getGeoPosition();
+
     console.log('pedido acetpado');
     // this.router.navigate(['/', 'indicaciones']);
-    this.router.navigate(['./repartidor/indicaciones']);
-
     // emitir pedido aceptado para comercio
     const _dataPedido = {
       idsede: this.pedidoRepartidorService.pedidoRepartidor.datosComercio.idsede,
       idpedido: this.pedidoRepartidorService.pedidoRepartidor.idpedido,
-      idrepatidor: this.infoTokenService.infoUsToken.usuario.idrepatidor,
+      idrepartidor: this.infoTokenService.infoUsToken.usuario.idrepartidor,
       nombre: this.infoTokenService.infoUsToken.usuario.nombre,
       apellido: this.infoTokenService.infoUsToken.usuario.apellido,
       telefono: this.infoTokenService.infoUsToken.usuario.telefono,
+      position_now: this.positionNow
     };
 
     console.log('repartidor-acepta-pedido', _dataPedido);
 
     this.socketService.emit('repartidor-acepta-pedido', _dataPedido);
+
+    this.router.navigate(['./repartidor/indicaciones']);
   }
 
   clickTab($event: any) {

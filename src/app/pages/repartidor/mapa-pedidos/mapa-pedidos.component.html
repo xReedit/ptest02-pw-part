@@ -3,12 +3,51 @@
         <div>
             <span>{{ nomRepartidor | titlecase }}</span>
         </div>
-        <div>
-            <span>Resumen</span>
+        <div matRipple>
+            <span (click)="resumenInformativo()" class="btn-link-2 xCursor">Resumen</span>
         </div>
     </div>
 
     <div class="content-body-mapa">
-        <app-mapa-ordenes [listaPedidos]="listPedidos" (pedidoOpen)="openDialogOrden($event)"></app-mapa-ordenes>        
+        <ng-container *ngIf="isShowResumen; else elseTemplate">
+            <!-- resuemn de pedidos -->
+            <div class="p-3 animated fadeInRight">
+                <p class="fw-600 fs-18"><i class="fa fa-arrow-left pr-2 xCursor" (click)="isShowResumen = !isShowResumen"></i> Resumen del dia</p>
+                <table class="table w-100">
+                    <thead>
+                        <th>Metodo</th>
+                        <th>Importe</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let metodo of listRepartidoresInformativo.metodoPago">
+                            <td>                            
+                                <span class="fw-600 badge" style="font-size: 13px;" [ngClass]="{'badge-primary': metodo.idtipo_pago === 3, 'badge-info': metodo.idtipo_pago === 2, 'badge-secondary': metodo.idtipo_pago === 1}">
+                                    {{metodo.descripcion | titlecase }} : 
+                                </span> 
+                                <span class="text-secondary pl-1">{{metodo.num_pedidos | number: '2.' }} </span>
+                            </td>
+                            <td>
+                                <span class="text-secondary">{{metodo.importe | number: '.2' }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>Pedidos {{ listRepartidoresInformativo.num_pedidos | number: '2.' }}</span>
+                            </td>
+                            <td>
+                                <span class="fw-600 fs-14">{{ listRepartidoresInformativo.importe | number: '.2' }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </ng-container>
+        <ng-template #elseTemplate> 
+            <app-mapa-ordenes [listaPedidos]="listPedidos" (pedidoOpen)="openDialogOrden($event)"></app-mapa-ordenes>                    
+        </ng-template>
+        
     </div>
+
+    
 </div>

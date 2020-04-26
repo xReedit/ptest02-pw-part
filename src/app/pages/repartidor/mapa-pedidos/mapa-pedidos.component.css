@@ -3,3 +3,9 @@
     height: calc(100vh - 110px);
     overflow: auto;
 }
+
+.btn-link-2:hover {
+	text-decoration: none;
+	color: gold;
+	cursor: pointer;
+}

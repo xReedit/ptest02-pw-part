@@ -13,6 +13,7 @@ import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { DialogCalificacionComponent } from 'src/app/componentes/dialog-calificacion/dialog-calificacion.component';
 import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
+import { RepartidorService } from 'src/app/shared/services/repartidor.service';
 
 @Component({
   selector: 'app-indicaciones-pedido',
@@ -29,10 +30,14 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
   btnIsVisible = true;
   btnTerminarVisible = false; // si el pedido ya fue cerrado pero no llego la notificacion socket
 
+  private idSedeNotifiPos: number;
+  private idClienteNotifyPos: number;
+
   private destroy$: Subject<boolean> = new Subject<boolean>();
 
   constructor(
     private pedidoRepartidorService: PedidoRepartidorService,
+    private repartidorService: RepartidorService,
     private geoPositionService: GpsUbicacionRepartidorService,
     private calcDistanciaService: CalcDistanciaService,
     private router: Router,
@@ -52,6 +57,9 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
         this.pedidoRepartidorService.setLocal();
         this.loadInit();
     });
+
+    this.idClienteNotifyPos = this.dataPedido.datosCliente.idcliente;
+    this.idSedeNotifiPos = this.dataPedido.datosComercio.idsede;
   }
 
   ngOnDestroy(): void {
@@ -68,7 +76,8 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
       this.pedidoRepartidorService.setPasoVa(4);
     }
 
-    // this.dataPedido.paso_va = 2;
+    // solo desarrollo
+    this.dataPedido.paso_va = 2;
 
     switch (this.dataPedido.datosDelivery.metodoPago.idtipo_pago) {
       case 1:
@@ -110,11 +119,13 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
       console.log('distancia listen llego ?', isLLego);
 
       // enviar posicion
-      const _data = {
-        coordenadas : this.geoPositionActual,
-        idcliente: this.pedidoRepartidorService.pedidoRepartidor.datosCliente.idcliente
-      };
-      this.socketService.emit('repartidor-notifica-ubicacion', _data);
+      // const _data = {
+      //   coordenadas : this.geoPositionActual,
+      //   idcliente: this.pedidoRepartidorService.pedidoRepartidor.datosCliente.idcliente
+      // };
+
+      this.repartidorService.emitPositionNow(this.geoPositionActual, this.dataPedido, this.idSedeNotifiPos);
+      // this.socketService.emit('repartidor-notifica-ubicacion', _data);
 
       if ( isLLego && this.dataPedido.paso_va === 1) {
         this.dataPedido.paso_va = 2;

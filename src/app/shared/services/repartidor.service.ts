@@ -60,8 +60,8 @@ export class RepartidorService {
   emitPositionNow(_coordenadas, pedido: PedidoRepartidorModel, idsedeComercio = null) {
     const _dataSend = {
       coordenadas : {
-        latitude: _coordenadas.lat,
-        longitude: _coordenadas.lng,
+        latitude: _coordenadas.lat || _coordenadas.latitude,
+        longitude: _coordenadas.lng || _coordenadas.longitude,
       },
       idrepartidor: this.idRepartidor,
       idcliente: pedido?.datosCliente?.idcliente || null,
@@ -71,5 +71,7 @@ export class RepartidorService {
     console.log('repartidor-notifica-ubicacion', _dataSend);
 
     this.socketService.emit('repartidor-notifica-ubicacion', _dataSend);
+
+
   }
 }

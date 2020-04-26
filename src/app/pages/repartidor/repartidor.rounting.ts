@@ -11,9 +11,9 @@ const routes: Routes = [{
     path: '', component: MainComponent,
     data: { titulo: 'Inicio' },
     children: [
-        {
-            path: '', redirectTo: 'pedidos'
-        },
+        // {
+        //     path: '', redirectTo: 'pedidos'
+        // },
         {
             path: 'pedidos',
             component: PedidosComponent,

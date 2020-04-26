@@ -43,6 +43,7 @@ export class MainComponent implements OnInit, OnDestroy {
     if ( this.isRepartidorPropio ) {
       this.router.navigate(['/repartidor/mapa-de-pedidos']);
     } else {
+      this.router.navigate(['/repartidor/pedidos']);
       // verificar si tenemos pedidos pendientes por aceptar
       this.socketService.onRepartidorGetPedidoPendienteAceptar()
       .pipe(takeUntil(this.destroy$))

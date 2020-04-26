@@ -29,6 +29,7 @@
             <p>{{orden.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion}} <span class="pl-2">{{ importeEfectivo }}</span></p>
 
         </div>      
+        <hr>
         <div class="row text-center" *ngIf="orden.pwa_delivery_status !== '4'">
             <hr>
             <div matRipple class="col-6 border-right text-info" (click)="callPhone()"><i class="fa fa-phone" aria-hidden="true"></i> LLamar</div>

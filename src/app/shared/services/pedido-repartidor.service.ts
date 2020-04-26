@@ -294,6 +294,8 @@ export class PedidoRepartidorService {
     // (a) = cuando el comercio no esta afiliado el importe que el repartidor debe depositar
     // (b) = precios de los productos sin comision
 
+    this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
+
     this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-entregado')
       .subscribe(res => {
         console.log(res);
