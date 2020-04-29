@@ -48,6 +48,9 @@ export class MapaOrdenesComponent implements OnInit {
   markerOptionsRepartidorDesarrollo = {draggable: true, icon: './assets/images/delivery-man.png'};
   markersRepartidorDesarrollo = [];
 
+  markerOptionsRepartidorProduccion = { icon: './assets/images/delivery-man.png'};
+  markersRepartidorProduccion = [];
+
 
   constructor(
     private geoUbicationService: GpsUbicacionRepartidorService,
@@ -58,10 +61,10 @@ export class MapaOrdenesComponent implements OnInit {
 
   ngOnInit(): void {
     // produccioon
-    // this.listenUbicaion();
+    this.listenUbicaion();
 
     // desarrollo
-    this.listeDesarrolloUbicacion();
+    // this.listeDesarrolloUbicacion();
 
     // notifica cambios en cualquier pedido
     this.listenService.pedidoModificado$
@@ -118,7 +121,7 @@ export class MapaOrdenesComponent implements OnInit {
   }
 
   private addMyMarkert(): void {
-    this.markersRepartidorDesarrollo.push({
+    this.markersRepartidorProduccion.push({
       position: this.center,
       label: {
         fontWeight: '600',
@@ -130,9 +133,8 @@ export class MapaOrdenesComponent implements OnInit {
           animation: google.maps.Animation.BOUNCE
         }
     });
-
-    console.log('this.markersRepartidorDesarrollo', this.markersRepartidorDesarrollo);
   }
+
 
 
   // ordenes o pedidos
@@ -200,13 +202,28 @@ export class MapaOrdenesComponent implements OnInit {
 
 
 
+  private addMyMarkertDesarrolllo(): void {
+    this.markersRepartidorDesarrollo.push({
+      position: this.center,
+      label: {
+        fontWeight: '600',
+        text: 'Yo'
+      },
+      title: 'Repartidor',
+      info: 'Repartidor',
+        options: {
+          animation: google.maps.Animation.BOUNCE
+        }
+    });
 
+    console.log('this.markersRepartidorDesarrollo', this.markersRepartidorDesarrollo);
+  }
 
 
   /// desarrollo
   listeDesarrolloUbicacion() {
     this.center = {'lat': -6.029306, 'lng': -76.969725};
-    this.addMyMarkert();
+    this.addMyMarkertDesarrolllo();
   }
 
   updateUbicationDesarrollo($event) {

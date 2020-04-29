@@ -2,13 +2,24 @@
     [zoom]="zoom" [center]="center"
     [options]="options">
 
-    <!-- mi position desarrollo -->
-    <map-marker #markerElem *ngFor="let marker of markersRepartidorDesarrollo"
+    mi position desarrollo
+    <!-- <map-marker #markerElem *ngFor="let marker of markersRepartidorDesarrollo"
         [position]="marker.position" [label]="marker.label"
         [title]="marker.title" [options]="markerOptionsRepartidorDesarrollo"
         (mapDragend)="updateUbicationDesarrollo($event)"
         >  
+    </map-marker> -->
+
+
+    <!-- mi position PRODUCCCION -->
+    <map-marker #markerElem *ngFor="let marker of markersRepartidorProduccion"
+        [position]="marker.position" [label]="marker.label"
+        [title]="marker.title" [options]="markerOptionsRepartidorProduccion"        
+        >  
     </map-marker>
+
+
+
 
     <!-- mi posicion -->
     <!-- <map-marker #markerElem *ngFor="let marker of markersRepartidores"
@@ -16,6 +27,8 @@
         [title]="marker.title" [options]="markerOptionsRepartidor"
         (mapClick)="openInfo(markerElem, marker)">  
     </map-marker> -->
+
+    
 
     <!-- pedidos asignados -->
     <map-marker #markerElem *ngFor="let marker of markersPedidos; let i = index;"

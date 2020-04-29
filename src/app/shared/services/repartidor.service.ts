@@ -68,7 +68,7 @@ export class RepartidorService {
       idsede: idsedeComercio ? idsedeComercio : this.idSedeRepartidor
     };
 
-    console.log('repartidor-notifica-ubicacion', _dataSend);
+    // console.log('repartidor-notifica-ubicacion', _dataSend);
 
     this.socketService.emit('repartidor-notifica-ubicacion', _dataSend);
 
