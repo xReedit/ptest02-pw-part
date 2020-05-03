@@ -133,7 +133,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
 
 
   // resumen de los pedidos
-  private resumenInformativo() {
+  resumenInformativo() {
     let rowAddRepartidor: any = {};
 
     this.listRepartidoresInformativo = [];
