@@ -1,6 +1,48 @@
-<div class="animated fadeInDown w-100 top-0 position-fixed">
-    <app-tool-bar-repartidor (changeTogle)="repartidorOnLine($event)"></app-tool-bar-repartidor>
-    <div class="content-body">
-        <router-outlet></router-outlet>
-    </div>
-</div>
+<mat-drawer-container class="example-container">
+    <mat-drawer #drawerIzq class="example-sidenav" mode="over" [opened]="showPanelLeft" (closedStart)="showPanelLeft=false">
+        <div style="min-width: 250px;">
+            <div class="p-3 border-bottom">
+              <div class="w-100 text-center">
+                <img src="assets/icons/icon-72x72.png">
+                <p class="pt-1 fw-600 fs-12 text-secondary m-0">Papaya Repartidor</p>
+                <p class="pt-1 fw-100 fs-11 text-secondary m-0">papaya.com.pe</p>
+              </div>            
+            </div>                
+            <div class="p-3 border-bottom w-100" (click)="drawerIzq.toggle()">
+              <span class="fw-600 fs-13"><i class="fa fa-arrow-left pr-2"></i>Opciones</span>
+            </div>
+            <div class="fs-13">
+                <!-- <div matRipple class="border-bottom p-3 xCursor" [routerLink]="['ordenes']" (click)="drawerIzq.toggle();">
+                    <i class="fa fa-book pr-2"></i>
+                    Resumen del dia
+                </div>
+                <div matRipple class="border-bottom p-3 xCursor" [routerLink]="['ordenes', 'maps']" (click)="drawerIzq.toggle();">
+                    <i class="fa fa-map pr-2"></i>
+                    Pedidos en el mapa
+                </div>
+
+                <div matRipple class="border-bottom p-3 xCursor" (click)="openServidorPrint(); drawerIzq.toggle();">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Servidor de Impresion
+                </div> -->
+
+                <div matRipple class="border-bottom p-3 xCursor" (click)="cerrarSession();">
+                    <i class="fa fa-close pr-2"></i>
+                    <span> Cerrar Sesion</span><br>
+                    <span class="text-info fs-11">Al cerrar dejara de recibir pedidos.</span> 
+                </div>
+            </div>
+        </div>
+
+      
+
+    </mat-drawer>
+
+        <div class="animated fadeInDown w-100 top-0">
+            <app-tool-bar-repartidor (changeTogle)="repartidorOnLine($event)" (openMenuLateral)="openPanelLeft($event)"></app-tool-bar-repartidor>
+            <div class="content-body">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+
+</mat-drawer-container>

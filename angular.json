@@ -94,9 +94,7 @@
               "src/styles.css",
               "./node_modules/css-star-rating/css/star-rating.css"
             ],
-            "scripts": [
-              "src/assets/js/jquery.js",
-              "src/assets/js/boton-pago.js"
+            "scripts": [              
             ],
             "assets": [
               "src/favicon.ico",

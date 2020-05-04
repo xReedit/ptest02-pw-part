@@ -61,9 +61,29 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
     // si recarga la pagina chequea si existe pedido pendiente
     this.pedidoRepartidor = this.pedidoRepartidorService.pedidoRepartidor;
-    // if ( this.pedidoRepartidor.estado === 0 ) {
-      this.addPedidoToList(this.pedidoRepartidor);
+    // // if ( this.pedidoRepartidor.estado === 0 ) {
+    //   this.addPedidoToList(this.pedidoRepartidor);
     // }
+
+    // verificar si tenemos pedidos pendientes por aceptar
+    this.socketService.onRepartidorGetPedidoPendienteAceptar()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((res: any) => {
+      let _pedido = res[0].pedido_por_aceptar;
+      console.log('onRepartidorGetPedidoPendienteAceptar', _pedido);
+      _pedido = this.pedidoRepartidorService.pedidoRepartidor.idpedido ? this.pedidoRepartidorService.pedidoRepartidor :  _pedido;
+      // if ( _pedido && !this.pedidoRepartidorService.pedidoRepartidor.idpedido) {
+        this.pedidoRepartidorService.darFormatoLocalPedidoRepartidorModel(_pedido);
+        // this.pedidoRepartidorService.setLocal(_pedido);
+        // this.pedidoRepartidorService.init();
+
+        this.pedidoRepartidor = this.pedidoRepartidorService.pedidoRepartidor;
+
+        this.addPedidoToList(this.pedidoRepartidor);
+      // }
+    });
+
+
 
     this.socketService.onRepartidorNuevoPedido()
     .pipe(takeUntil(this.destroy$))

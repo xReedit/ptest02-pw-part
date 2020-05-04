@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 // import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 import { RepartidorService } from 'src/app/shared/services/repartidor.service';
+import { TemplateBindingParseResult } from '@angular/compiler';
 // import { SocketService } from 'src/app/shared/services/socket.service';
 
 @Component({
@@ -11,9 +12,12 @@ import { RepartidorService } from 'src/app/shared/services/repartidor.service';
 })
 export class ToolBarRepartidorComponent implements OnInit {
   @Output() public changeTogle = new EventEmitter<boolean>(false);
+  @Output() public openMenuLateral = new EventEmitter<boolean>(false);
 
   isTogleActive = false;
   isRepartidorPropio = false;
+
+  nomRepatidor = '';
   constructor(
     private infoTokenService: InfoTockenService,
     private repartidorService: RepartidorService
@@ -23,6 +27,9 @@ export class ToolBarRepartidorComponent implements OnInit {
   ngOnInit() {
     this.isTogleActive = this.infoTokenService.infoUsToken.isOnline;
     this.isRepartidorPropio = this.infoTokenService.infoUsToken.usuario.idsede_suscrito;
+
+    // console.log(this.infoTokenService.infoUsToken.usuario);
+    this.nomRepatidor = this.infoTokenService.infoUsToken.usuario.nombre + ' ' + this.infoTokenService.infoUsToken.usuario.apellido;
     // this.changeTogle.emit(this.isTogleActive);
     // if ( this.isTogleActive ) {
     //   this.socketService.connect();
@@ -41,6 +48,11 @@ export class ToolBarRepartidorComponent implements OnInit {
     if ( !this.isTogleActive ) {
       this.repartidorService.guardarEfectivo(0, 0);
     }
+  }
+
+  abrirMenuLateral() {
+    // console.log('this.openMenuLateral', true);
+    this.openMenuLateral.emit(true);
   }
 
   // repartidorOnLine() {

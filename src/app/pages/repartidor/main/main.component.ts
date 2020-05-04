@@ -19,6 +19,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
 
   isRepartidorPropio = false;
+  showPanelLeft = false;
 
   constructor(
     private dialog: MatDialog,
@@ -44,17 +45,6 @@ export class MainComponent implements OnInit, OnDestroy {
       this.router.navigate(['/repartidor/mapa-de-pedidos']);
     } else {
       this.router.navigate(['/repartidor/pedidos']);
-      // verificar si tenemos pedidos pendientes por aceptar
-      this.socketService.onRepartidorGetPedidoPendienteAceptar()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((res: any) => {
-        const _pedido = res[0].pedido_por_aceptar;
-        console.log('onRepartidorGetPedidoPendienteAceptar', _pedido);
-        if ( _pedido && !this.pedidoRepartidorService.pedidoRepartidor.idpedido) {
-          this.pedidoRepartidorService.setLocal(_pedido);
-          this.pedidoRepartidorService.init();
-        }
-      });
     }
   }
 
@@ -79,6 +69,17 @@ export class MainComponent implements OnInit, OnDestroy {
     // }
 
 
+  }
+
+
+  cerrarSession() {
+    this.repartidorService.guardarEfectivo(0, 0);
+    this.socketService.closeConnection();
+    this.router.navigate(['../']);
+  }
+
+  openPanelLeft(val: any) {
+    this.showPanelLeft = true;
   }
 
 

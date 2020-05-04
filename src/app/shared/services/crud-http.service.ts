@@ -72,6 +72,13 @@ export class CrudHttpService {
         return this.httpClient.put<any>(url, datos, { headers: header });
     }
 
+    updateFree(datos: any, controller: string, evento: string = 'update', conToken: boolean = true): Observable<any> {
+        const url = this.setUrl(controller, evento);
+        const header = conToken ? this.getHeaderHttpClientForm() : this.getHeaderHttpClientFormNoToken();
+
+        return this.httpClient.put<any>(url, datos, { headers: header });
+    }
+
     // enviar idorg o idsede o idusuario vacios, el back end los llenara
     postFree(datos: any, controller: string, evento: string = 'update', conToken: boolean = true): Observable<any> {
         const url = this.setUrl(controller, evento);

@@ -5,7 +5,7 @@ import { TipoConsumoModel } from 'src/app/modelos/tipoconsumo.model';
 import { SeccionModel } from 'src/app/modelos/seccion.model';
 import { ItemModel } from 'src/app/modelos/item.model';
 import { PedidoModel } from 'src/app/modelos/pedido.model';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+// import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Observable } from 'rxjs/internal/Observable';
 import { Router } from '@angular/router';
 import { SocketService } from './socket.service';
@@ -82,9 +82,9 @@ export class PedidoRepartidorService {
     this.crudService.postFree(_data, 'repartidor', 'set-asignar-pedido', true)
       .subscribe(res => {
         this.pedidoRepartidor.estado = 1; // asignadp
+        this.setLocal();
         this.setPasoVa(1);
 
-        this.setLocal();
       });
   }
 
@@ -361,16 +361,24 @@ export class PedidoRepartidorService {
 
 
   darFormatoLocalPedidoRepartidorModel(_pedido) {
-    const pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
-    pedido.idpedido = _pedido.idpedido;
-        // pedido.datosItems = res[1].dataItems || res[1].datosItem;
-        // pedido.datosDelivery = res[1].dataDelivery || res[1].datosDelivery;
-    pedido.datosItems = _pedido.json_datos_delivery.p_body;
-    pedido.datosDelivery = _pedido.json_datos_delivery.p_header.arrDatosDelivery;
-    pedido.datosComercio = pedido.datosDelivery.establecimiento;
-    pedido.datosCliente = pedido.datosDelivery.direccionEnvioSelected;
-    pedido.datosSubtotales = pedido.datosDelivery.subTotales;
-    pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales;
+    let pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
+
+    if ( !_pedido ) { return; }
+    if (  _pedido?.conFormato ) {
+      pedido = _pedido;
+    } else {
+      pedido.idpedido = _pedido.idpedido;
+          // pedido.datosItems = res[1].dataItems || res[1].datosItem;
+          // pedido.datosDelivery = res[1].dataDelivery || res[1].datosDelivery;
+      pedido.datosItems = _pedido.json_datos_delivery.p_body;
+      pedido.datosDelivery = _pedido.json_datos_delivery.p_header.arrDatosDelivery;
+      pedido.datosComercio = pedido.datosDelivery.establecimiento;
+      pedido.datosCliente = pedido.datosDelivery.direccionEnvioSelected;
+      pedido.datosSubtotales = pedido.datosDelivery.subTotales;
+      pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales;
+      pedido.conFormato = true;
+    }
+
 
     this.pedidoRepartidor = pedido;
     this.setLocal();

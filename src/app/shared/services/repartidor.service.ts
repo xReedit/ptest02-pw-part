@@ -32,6 +32,7 @@ export class RepartidorService {
 
     this.crudService.postFree(_data, 'repartidor', 'set-efectivo-mano', true)
       .subscribe(res => {
+        console.log('ya esta', res);
       });
   }
 

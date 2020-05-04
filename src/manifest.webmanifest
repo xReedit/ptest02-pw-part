@@ -1,8 +1,8 @@
 {
   "name": "Papaya Repartidor",
   "short_name": "Papaya Repartidor",
-  "theme_color": "#00b14f",
-  "background_color": "#00b14f",
+  "theme_color": "#00B14F",
+  "background_color": "#00B14F",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",

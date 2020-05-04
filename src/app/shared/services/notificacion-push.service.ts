@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { CrudHttpService } from './crud-http.service';
 import { InfoTockenService } from './info-token.service';
+import { VAPID_PUBLIC } from '../config/config.const';
 // import { Observable } from 'rxjs/internal/Observable';
 // import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 // import { DialogDesicionComponent } from 'src/app/componentes/dialog-desicion/dialog-desicion.component';
@@ -11,7 +12,7 @@ import { InfoTockenService } from './info-token.service';
 })
 export class NotificacionPushService {
 
-  private VAPID_PUBLIC = 'BC7ietauZE99Hx9HkPyuGVr8jaYETyEJgH-gLaYIsbORYobppt9dX49_K_wubDqphu1afi7XrM6x1zAp4kJh_wU';
+  // private VAPID_PUBLIC = 'BC7ietauZE99Hx9HkPyuGVr8jaYETyEJgH-gLaYIsbORYobppt9dX49_K_wubDqphu1afi7XrM6x1zAp4kJh_wU';
 
   constructor(
     private swPush: SwPush,
@@ -50,7 +51,7 @@ export class NotificacionPushService {
     console.log('keySuscribtion');
     this.swPush
     .requestSubscription({
-      serverPublicKey: this.VAPID_PUBLIC,
+      serverPublicKey: VAPID_PUBLIC,
     })
     .then(subscription => {
       // send subscription to the server

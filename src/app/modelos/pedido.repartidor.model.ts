@@ -16,4 +16,5 @@ export class PedidoRepartidorModel {
     num_reasignado: number; // numero de veces que se reasigna, para buscar repartidor por el index
     is_reasignado: boolean; // para saber si es reasignado
     pwa_delivery_status: number;
+    conFormato: boolean; // si ya se dio formato
 }
