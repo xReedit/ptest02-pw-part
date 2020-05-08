@@ -61,10 +61,10 @@ export class MapaOrdenesComponent implements OnInit {
 
   ngOnInit(): void {
     // produccioon
-    this.listenUbicaion();
+    // this.listenUbicaion();
 
     // desarrollo
-    // this.listeDesarrolloUbicacion();
+    this.listeDesarrolloUbicacion();
 
     // notifica cambios en cualquier pedido
     this.listenService.pedidoModificado$

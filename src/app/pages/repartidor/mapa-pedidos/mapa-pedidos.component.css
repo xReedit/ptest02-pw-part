@@ -1,6 +1,6 @@
 .content-body-mapa {
     /* margin-top: 56px; */
-    height: calc(100vh - 110px);
+    height: calc(100vh - 109px);
     overflow: auto;
 }
 

@@ -77,7 +77,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
     }
 
     // solo desarrollo
-    // this.dataPedido.paso_va = 2;
+    this.dataPedido.paso_va = 4;
 
     switch (this.dataPedido.datosDelivery.metodoPago.idtipo_pago) {
       case 1:
@@ -102,12 +102,14 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
     // }
 
     this.showPasos();
-    this.listenGeoPosition();
+    setTimeout(() => {
+      this.listenGeoPosition();
+    }, 600);
   }
 
   private listenGeoPosition(): void {
     // iniciamos el gps
-    this.geoPositionService.onGeoWatchPosition();
+    // this.geoPositionService.onGeoWatchPosition();
 
     this.geoPositionActual = this.geoPositionService.geoPosition;
     this.geoPositionService.geoPositionNow$.subscribe((res: GeoPositionModel) => {
@@ -115,7 +117,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
       // verificar en que paso esta
       // si paso 1 verificar si se acerca al coordenadas destino y activar boton accion
       this.geoPositionActual = res;
-      const isLLego = this.calcDistanciaService.calcDistancia(this.geoPositionActual, this.coordenadasDestino);
+      const isLLego = this.coordenadasDestino.latitude ? this.calcDistanciaService.calcDistancia(this.geoPositionActual, this.coordenadasDestino) : false;
       console.log('distancia listen llego ?', isLLego);
 
       // enviar posicion

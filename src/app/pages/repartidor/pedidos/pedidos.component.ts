@@ -45,6 +45,8 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
     // this.listPedidos = new PedidoRepartidorModel[0];
     this.listenPedidos();
+
+    this.geoPositionService.onGeoPosition();
   }
 
   ngOnDestroy(): void {
@@ -143,9 +145,13 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
   aceptaPedido() {
 
-    this.geoPositionService.onGeoPosition();
-    this.positionNow = this.geoPositionService.getGeoPosition();
+    // pedido ya fue aceptado
+    if (this.pedidoRepartidorService.pedidoRepartidor.conFormato ) {
+      this.router.navigate(['./repartidor/indicaciones']);
+      return;
+    }
 
+    this.positionNow = this.geoPositionService.get();
     console.log('pedido acetpado');
     // this.router.navigate(['/', 'indicaciones']);
     // emitir pedido aceptado para comercio
@@ -164,6 +170,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
     this.socketService.emit('repartidor-acepta-pedido', _dataPedido);
 
     this.router.navigate(['./repartidor/indicaciones']);
+
   }
 
   clickTab($event: any) {

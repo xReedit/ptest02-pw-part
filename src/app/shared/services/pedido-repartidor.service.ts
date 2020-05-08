@@ -101,6 +101,10 @@ export class PedidoRepartidorService {
     this.init();
     arrTotales = arrTotales ? arrTotales : this.pedidoRepartidor.datosSubtotales;
     const rowTotal = arrTotales[arrTotales.length - 1];
+
+    // lo que paga el cliente
+    this.pedidoRepartidor.importePagaCliente = rowTotal.importe;
+
     // -2 = servicio deliver -3 = propina
     rowTotal.importe = arrTotales.filter(x => x.id !== -2 && x.id !== -3 && x.descripcion !== 'TOTAL').map(x => parseFloat(x.importe)).reduce((a, b) => a + b, 0);
     this.pedidoRepartidor.importePedido = rowTotal.importe;
@@ -115,7 +119,6 @@ export class PedidoRepartidorService {
     this.pedidoRepartidor.isHayPropina = _isHayPropina;
 
     // cuanto paga el repartidor restando precio_default si el comercio no es afiliado
-
 
 
     this.setLocal();
@@ -266,12 +269,14 @@ export class PedidoRepartidorService {
 
   // fin de pedido // guarda datos del pedido
   finalizarPedido(): void {
-    const comisionRepartidor = this.pedidoRepartidor.c_servicio;
+    const comisionRepartidor = parseFloat(this.pedidoRepartidor.c_servicio); // - parseFloat( this.pedidoRepartidor.datosComercio.pwa_delivery_comision_fija_no_afiliado );
     const propinaRepartidor = this.pedidoRepartidor.datosDelivery.propina.value;
-    const costotalServicio = parseFloat(comisionRepartidor) + parseFloat(propinaRepartidor);
+    const costotalServicio = comisionRepartidor + parseFloat(propinaRepartidor);
+
+    const _importePagaCliente = this.pedidoRepartidor.importePagaCliente ? parseFloat(this.pedidoRepartidor.importePagaCliente) : parseFloat(this.pedidoRepartidor.importePedido) + costotalServicio;
 
     // importeDepositar siempre y cuando el comercio no esta afiliado
-    const importeDepositar = parseFloat(this.pedidoRepartidor.importePagaCliente) - (parseFloat(this.pedidoRepartidor.importePedido) + costotalServicio);
+    // const importeDepositar = _importePagaCliente - (parseFloat(this.pedidoRepartidor.importePedido) + costotalServicio);
 
     const _dataSend = {
       idrepartidor: this.pedidoRepartidor.datosRepartidor.idrepartidor,
@@ -281,17 +286,17 @@ export class PedidoRepartidorService {
       operacion: {
         isrepartidor_propio: false,
         metodoPago: this.pedidoRepartidor.datosDelivery.metodoPago,
-        importeTotalPedido: parseFloat(this.pedidoRepartidor.importePagaCliente),
+        importeTotalPedido: _importePagaCliente,
         importePagadoRepartidor: this.pedidoRepartidor.importePedido, // (a)(b)
-        comisionRepartidor: comisionRepartidor,
+        comisionRepartidor: comisionRepartidor - this.pedidoRepartidor.datosComercio.pwa_delivery_comision_fija_no_afiliado, // menos costo fijo comercio no afiliado,
         propinaRepartidor: propinaRepartidor,
         costoTotalServicio: costotalServicio,
-        importeDepositar: parseFloat(importeDepositar.toFixed()).toFixed(2) // (a)
+        importeDepositar: parseFloat( this.pedidoRepartidor.datosComercio.pwa_delivery_comision_fija_no_afiliado ).toFixed(2) // (a)
         // importePagaRepartidor: parseFloat(this.pedidoRepartidor.datosDelivery.importeTotal),
       }
     };
 
-    // (a) = cuando el comercio no esta afiliado el importe que el repartidor debe depositar
+    // (a) = cuando el comercio no esta afiliado el importe que el repartidor debe depositar, el imnporte fijo de comercio no afiliado
     // (b) = precios de los productos sin comision
 
     this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
@@ -367,18 +372,27 @@ export class PedidoRepartidorService {
     if (  _pedido?.conFormato ) {
       pedido = _pedido;
     } else {
-      pedido.idpedido = _pedido.idpedido;
-          // pedido.datosItems = res[1].dataItems || res[1].datosItem;
-          // pedido.datosDelivery = res[1].dataDelivery || res[1].datosDelivery;
-      pedido.datosItems = _pedido.json_datos_delivery.p_body;
-      pedido.datosDelivery = _pedido.json_datos_delivery.p_header.arrDatosDelivery;
-      pedido.datosComercio = pedido.datosDelivery.establecimiento;
-      pedido.datosCliente = pedido.datosDelivery.direccionEnvioSelected;
-      pedido.datosSubtotales = pedido.datosDelivery.subTotales;
-      pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales;
-      pedido.conFormato = true;
+
+      if ( !_pedido.datosItems ) {
+        pedido.idpedido = _pedido.idpedido;
+        // pedido.datosItems = res[1].dataItems || res[1].datosItem;
+        // pedido.datosDelivery = res[1].dataDelivery || res[1].datosDelivery;
+        pedido.datosItems = _pedido.json_datos_delivery.p_body;
+        pedido.datosDelivery = _pedido.json_datos_delivery.p_header.arrDatosDelivery;
+        pedido.datosComercio = pedido.datosDelivery.establecimiento;
+        pedido.datosCliente = pedido.datosDelivery.direccionEnvioSelected;
+        pedido.datosSubtotales = pedido.datosDelivery.subTotales;
+        pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales;
+        pedido.conFormato = true;
+      } else {
+        pedido = _pedido;
+      }
     }
 
+
+    // coordenadas del comercio si esta en string lo pasa a decimal
+    pedido.datosComercio.latitude = typeof pedido.datosComercio.latitude ===  'string' ? parseFloat(pedido.datosComercio.latitude) : pedido.datosComercio.latitude;
+    pedido.datosComercio.longitude = typeof pedido.datosComercio.longitude ===  'string' ? parseFloat(pedido.datosComercio.longitude) : pedido.datosComercio.longitude;
 
     this.pedidoRepartidor = pedido;
     this.setLocal();

@@ -70,8 +70,8 @@ export class ItemPedidoComponent implements OnInit {
       this.estadoPedido = 1;
       this.infoPedido.estado = 1;
       this.pedidoRepartidorService.asignarPedido();
-      this.aceptaPedido.emit(true);
     }
+    this.aceptaPedido.emit(true);
   }
 
 }
