@@ -35,7 +35,7 @@ export class PedidosAtendidosComponent implements OnInit {
     this.crudService.getAll('repartidor', 'get-pedidos-entregados-dia', false, false, true)
       .subscribe((res: any) => {
         this.listPedidosEntregados = res.data[0];
-        console.log(res);
+        // console.log(res);
       });
   }
 
@@ -47,7 +47,7 @@ export class PedidosAtendidosComponent implements OnInit {
         this.importeNetoDepositar = this.importeNetoDebitar < 1 ? 0 : this.importeNetoDebitar;
         this.importeNetoDebitar = this.importeNetoDebitar < 1 ? this.importeNetoDebitar * -1 : 0;
       this.xLoadPedidosAtendidos();
-      console.log(res);
+      // console.log(res);
     });
   }
 

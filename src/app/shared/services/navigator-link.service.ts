@@ -75,7 +75,7 @@ export class NavigatorLinkService {
             // const _nextUrl = e[1]['url'].substr(1).split(';')[1].split('=')[1];
             if ( _url.length > 0) {
               this.lastUrlHistory = _url; // last url -- de donde viene
-              this.managerGoBack(_url, '');
+              // this.managerGoBack(_url, '');
             }
           }
           // console.log(e[0]);

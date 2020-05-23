@@ -234,7 +234,7 @@ export class LectorCodigoQrComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(
       data => {
         if ( !data ) { isPositionValid = false; }
-        console.log('data dialog', data);
+        // console.log('data dialog', data);
         isPositionValid = data;
         this.resValidQR(isPositionValid);
       }

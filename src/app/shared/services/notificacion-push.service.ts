@@ -23,10 +23,10 @@ export class NotificacionPushService {
 
     // this.showMessages();
 
-    // this.swPush.notificationClicks.subscribe( event => {
-    //   const url = event.notification.data.url;
-    //   window.open(url, '_blank');
-    // });
+    this.swPush.notificationClicks.subscribe( event => {
+      // const url = event.notification.data.url;
+      window.location.reload();
+    });
   }
 
   getIsTienePermiso(): boolean {
@@ -36,7 +36,7 @@ export class NotificacionPushService {
 
   // se suscribe a la notificacion
   suscribirse(): void {
-    console.log('llego a suscribirse estado this.swPush.isEnabled: ', this.swPush.isEnabled);
+    // console.log('llego a suscribirse estado this.swPush.isEnabled: ', this.swPush.isEnabled);
     // if ( this.swPush.isEnabled ) {
       // this.swPush.subscription.subscribe(res => {
         // if (!res) {return; }

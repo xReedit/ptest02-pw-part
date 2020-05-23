@@ -61,10 +61,22 @@ export class MapaOrdenesComponent implements OnInit {
 
   ngOnInit(): void {
     // produccioon
-    // this.listenUbicaion();
+    this.listenUbicaion();
 
     // desarrollo
-    this.listeDesarrolloUbicacion();
+    // this.listeDesarrolloUbicacion();
+
+    // noitifica nuevo pedido para agregar al markert
+    this.listenService.newPedidoRepartoPropio$
+      .subscribe(pedido => {
+        if (pedido) {
+          const isExistePedido = this.listPedidos.filter(p => p.idpedido === pedido.idpedido)[0];
+          if ( !isExistePedido ) {
+            this.listPedidos.push(pedido);
+          }
+          this.addMarkerPedidos();
+        }
+      });
 
     // notifica cambios en cualquier pedido
     this.listenService.pedidoModificado$
@@ -104,7 +116,7 @@ export class MapaOrdenesComponent implements OnInit {
 
     this.geoUbicationService.geoPositionNow$
       .subscribe(res => {
-        console.log('geoposiion', res);
+        // console.log('geoposiion', res);
         this.center = { lat: res.latitude, lng: res.longitude };
 
         const geoposiionNow = new GeoPositionModel;

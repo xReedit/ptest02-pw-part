@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { EstadoPedidoModel } from 'src/app/modelos/estado.pedido.model';
 import { DeliveryDireccionCliente } from 'src/app/modelos/delivery.direccion.cliente.model';
 import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
+import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
 
 @Injectable({
   providedIn: 'root'
@@ -68,6 +69,15 @@ export class ListenStatusService {
   // notifica cambios en el pedido
   private pedidoModificadoSource = new BehaviorSubject<PedidoRepartidorModel>(null);
   public pedidoModificado$ = this.pedidoModificadoSource.asObservable();
+
+  // listen position gps
+  private myPositionSource = new BehaviorSubject<GeoPositionModel>(null);
+  public myPosition$ = this.myPositionSource.asObservable();
+
+  // listen new pedido repartidor propio // llega el pedido
+  private newPedidoRepartoPropioSource = new BehaviorSubject<any>(null);
+  public newPedidoRepartoPropio$ = this.newPedidoRepartoPropioSource.asObservable();
+
 
   constructor() { }
 
@@ -136,6 +146,16 @@ export class ListenStatusService {
   // notifica cambios en el pedido
   setPedidoModificado(pedido: PedidoRepartidorModel) {
     this.pedidoModificadoSource.next(pedido);
+  }
+
+  // notifica posicion repartidor
+  setMyPosition(pos: GeoPositionModel) {
+    this.myPositionSource.next(pos);
+  }
+
+  // listen new pedido repartidor propio
+  setNewPedidoRepartoPropio(pedido: any) {
+    this.newPedidoRepartoPropioSource.next(pedido);
   }
 
 

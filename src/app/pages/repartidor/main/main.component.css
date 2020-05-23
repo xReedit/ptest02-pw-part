@@ -2,4 +2,5 @@
     padding-top: 55px;
     /* height: calc(100vh - 56px); */
     overflow: auto;
+    overscroll-behavior-y: auto;
 }

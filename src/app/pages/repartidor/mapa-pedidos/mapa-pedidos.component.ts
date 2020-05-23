@@ -11,6 +11,8 @@ import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartid
 import { DatosCalificadoModel } from 'src/app/modelos/datos.calificado.model';
 import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
 import { DialogCalificacionComponent } from 'src/app/componentes/dialog-calificacion/dialog-calificacion.component';
+import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
+import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
 
 @Component({
   selector: 'app-mapa-pedidos',
@@ -33,13 +35,19 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     private socketService: SocketService,
     private dialog: MatDialog,
     private repartidorService: RepartidorService,
-    private pedidoRepartidorService: PedidoRepartidorService
+    private pedidoRepartidorService: PedidoRepartidorService,
+    private gpsPositionService: GpsUbicacionRepartidorService,
+    private listeService: ListenStatusService
   ) { }
 
   ngOnInit(): void {
     this.infoToken = this.infoTokenService.getInfoUs();
     this.nomRepartidor = this.infoToken.usuario.nombre + ' ' + this.infoToken.usuario.apellido;
-    console.log('this.infoToken', this.infoToken);
+    // console.log('this.infoToken', this.infoToken);
+
+    // activar gps - obtener ubicacion actual y guardar
+    this.positionInt();
+
 
     this.loadPedidosPropios();
     this.listenNewPedidos();
@@ -51,21 +59,28 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     this.destroy$.unsubscribe();
   }
 
+
+  private positionInt() {
+    this.gpsPositionService.onGeoPosition(true);
+  }
+
   private listenNewPedidos(): void {
     // escuchar pedidos nuevos asignados por el comercio
     this.socketService.onPedidoAsignadoFromComercio()
     // .pipe(takeUntil(this.destroy$))
-    .subscribe(pedido => {
-      console.log('nuevo pedido asignado');
-      this.loadPedidosPropios();
-      this.pedidoRepartidorService.playAudioNewPedido();
-    });
+      .subscribe(pedido => {
+        console.log('nuevo pedido asignado', pedido);
+        // this.loadPedidosPropios();
+        this.listPedidos.push(pedido);
+        this.listeService.setNewPedidoRepartoPropio(pedido);
+        this.pedidoRepartidorService.playAudioNewPedido();
+      });
 
     this.socketService.onDeliveryPedidoFin()
       .pipe(takeUntil(this.destroy$))
       .subscribe((pedidoFin: PedidoRepartidorModel) => {
         // lanzar calificacion al cliente
-        console.log('fin del pedido', pedidoFin);
+        // console.log('fin del pedido', pedidoFin);
         this.openDialogCalificacion(pedidoFin);
       });
   }
@@ -73,7 +88,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
   private loadPedidosPropios(): void {
     this.repartidorService.getMisPedidosPropiosAsignados()
       .subscribe((res: any) => {
-        console.log('propios pedidos', res);
+        // console.log('propios pedidos', res);
         res.map(x => {
           x.json_datos_delivery = JSON.parse(x.json_datos_delivery);
         });

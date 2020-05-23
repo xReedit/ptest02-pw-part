@@ -15,7 +15,11 @@ export class LoginPersonalAutorizadoComponent implements OnInit {
   loading = false;
   msjErr = false;
 
-  constructor(private router: Router, private authService: AuthService, private infoToken: InfoTockenService) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private infoToken: InfoTockenService,
+    ) { }
 
   ngOnInit() {
     this.usuario = new UsuarioAutorizadoModel();
@@ -25,15 +29,21 @@ export class LoginPersonalAutorizadoComponent implements OnInit {
     this.loading = true;
     this.msjErr = false;
 
+    this.usuario.op = 1;
+
     this.authService.setLocalToken('');
     this.authService.getUserLogged(this.usuario).subscribe(res => {
       setTimeout(() => {
         if (res.success) {
-          this.authService.setLocalToken(res.token);
-          this.authService.setLoggedStatus(true);
-          this.authService.setLocalUsuario(this.usuario);
-          this.infoToken.converToJSON();
-          this.router.navigate(['./repartidor']);
+          const _t = res.token;
+          this.authService.setTokenAuth(_t);
+          this.authService.getInfoRepartidor(res.usuario).subscribe((response: any) => {
+            this.authService.setLocalToken(response);
+            this.authService.setLoggedStatus(true);
+            this.authService.setLocalUsuario(this.usuario);
+            this.infoToken.converToJSON();
+            this.router.navigate(['./main']);
+          });
           // this.loading = false;
         } else {
           this.loading = false;

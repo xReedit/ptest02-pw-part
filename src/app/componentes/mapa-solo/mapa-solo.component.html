@@ -11,9 +11,11 @@
         >
     </agm-marker>
     
+
+    <!-- ubicacion del repartidor -->
     <!-- [markerDraggable]="true"
         (dragEnd)="markerDragEnd($event)" -->
-    <agm-marker *ngIf="miPosition"
+    <agm-marker *ngIf="miPosition"        
         [latitude]="miPosition.lat" 
         [longitude]="miPosition.lng"        
         [label]="Repartidor"

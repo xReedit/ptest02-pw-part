@@ -8,7 +8,7 @@ import { IndicacionesPedidoComponent } from './indicaciones-pedido/indicaciones-
 import { MaterialModule } from 'src/app/core/material/material.module';
 import { CoreModule } from 'src/app/core/core.module';
 import { ComponentesModule } from 'src/app/componentes/componentes.module';
-import { DialogEfectivoRepartidorComponent } from 'src/app/componentes/dialog-efectivo-repartidor/dialog-efectivo-repartidor.component';
+// import { DialogEfectivoRepartidorComponent } from 'src/app/componentes/dialog-efectivo-repartidor/dialog-efectivo-repartidor.component';
 import { PedidoDetalleComponent } from './pedido-detalle/pedido-detalle.component';
 import { PedidosAtendidosComponent } from './pedidos-atendidos/pedidos-atendidos.component';
 import { MapaPedidosComponent } from './mapa-pedidos/mapa-pedidos.component';

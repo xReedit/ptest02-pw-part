@@ -7,7 +7,7 @@ import { Auth0Service } from './shared/services/auth0.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  // title = 'pwa-app-pedido';
+  // title = 'pwa-app-repartidor';
 
   constructor(
     private auth: Auth0Service

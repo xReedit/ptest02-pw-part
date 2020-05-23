@@ -5,6 +5,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
 import { SocketService } from './socket.service';
 import { InfoTockenService } from './info-token.service';
+import { ListenStatusService } from './listen-status.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class RepartidorService {
   constructor(
     private crudService: CrudHttpService,
     private socketService: SocketService,
-    private infoToken: InfoTockenService
+    private infoToken: InfoTockenService,
+    private listenService: ListenStatusService
   ) {
 
     this.idSedeRepartidor = this.infoToken.getInfoUs().usuario.idsede_suscrito;
@@ -71,6 +73,11 @@ export class RepartidorService {
 
     // console.log('repartidor-notifica-ubicacion', _dataSend);
 
+    const geoposiionNow = new GeoPositionModel;
+    geoposiionNow.latitude = _coordenadas.latitude;
+    geoposiionNow.longitude = _coordenadas.longitude;
+
+    this.listenService.setMyPosition(geoposiionNow);
     this.socketService.emit('repartidor-notifica-ubicacion', _dataSend);
 
 

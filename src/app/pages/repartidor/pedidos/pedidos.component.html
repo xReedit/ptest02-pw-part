@@ -10,19 +10,30 @@
 </div>
 
 <!-- lista pedidos -->
-<div class="w-100">
+<div class="w-100">    
     <mat-tab-group mat-stretch-tabs (selectedTabChange)="clickTab($event)">
         <mat-tab label="Pendientes"> 
-            
-            <div class="p-3">
-                <div *ngFor="let item of listPedidos">
-                    <app-item-pedido [infoPedido] = "item" (aceptaPedido)="aceptaPedido($event)"></app-item-pedido>
-                </div>
+
+            <div class="p-3 x-h-size">
+                <ng-container *ngIf="listPedidos.length === 0; else elseTemplate">
+                    <div class="text-center">
+                        <button mat-stroked-button (click)="recargarPedido()">Recargar ...</button>
+                    </div>
+                </ng-container>
+                <ng-template #elseTemplate>                                
+                        <div *ngFor="let item of listPedidos">
+                            <app-item-pedido [infoPedido] = "item" (aceptaPedido)="aceptaPedido($event)"></app-item-pedido>
+                        </div>
+                </ng-template>
+                        
             </div>
 
         </mat-tab>
         <mat-tab label="Entregados"> 
-            <app-pedidos-atendidos [tabIndex]="_tabIndex"></app-pedidos-atendidos>
+            <div class="x-h-size">
+
+                <app-pedidos-atendidos [tabIndex]="_tabIndex"></app-pedidos-atendidos>
+            </div>
         </mat-tab>        
     </mat-tab-group>
 </div>

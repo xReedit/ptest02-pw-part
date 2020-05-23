@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pedido-detalle',
@@ -11,7 +12,8 @@ export class PedidoDetalleComponent implements OnInit {
   indicacionesComprobante = '';
 
   constructor(
-    private repartidorPedidoService: PedidoRepartidorService
+    private repartidorPedidoService: PedidoRepartidorService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -28,7 +30,8 @@ export class PedidoDetalleComponent implements OnInit {
   }
 
   goBack() {
-    window.history.back();
+    // window.history.back();
+    this.router.navigate(['/main/indicaciones']);
   }
 
 }

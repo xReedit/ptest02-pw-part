@@ -8,6 +8,7 @@ import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartid
 import { Subject } from 'rxjs/internal/Subject';
 import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 import { Router } from '@angular/router';
+import { NavigatorLinkService } from 'src/app/shared/services/navigator-link.service';
 
 @Component({
   selector: 'app-main',
@@ -27,7 +28,8 @@ export class MainComponent implements OnInit, OnDestroy {
     private repartidorService: RepartidorService,
     private infoTokeService: InfoTockenService,
     private pedidoRepartidorService: PedidoRepartidorService,
-    private router: Router
+    private router: Router,
+    private navigatorService: NavigatorLinkService
   ) { }
 
   ngOnInit() {
@@ -39,12 +41,14 @@ export class MainComponent implements OnInit, OnDestroy {
 
     this.socketService.connect();
 
+    this.navigatorService.disableGoBack();
+
 
 
     if ( this.isRepartidorPropio ) {
-      this.router.navigate(['/repartidor/mapa-de-pedidos']);
+      this.router.navigate(['/main/mapa-de-pedidos']);
     } else {
-      this.router.navigate(['/repartidor/pedidos']);
+      this.router.navigate(['/main/pedidos']);
     }
   }
 

@@ -46,7 +46,7 @@ export class CompPedidoDetalleComponent implements OnInit {
     //   });
 
     console.log('ini service pedido');
-    this.pedidoRepartidorService.init();
+    // this.pedidoRepartidorService.init();
 
     this._miPedido = this.pedidoRepartidorService.darFormatoPedidoLocal(this.pedidoRepartidorService.pedidoRepartidor.datosItems);
     this._arrSubtotales = this.pedidoRepartidorService.pedidoRepartidor.datosSubtotalesShow;

@@ -16,7 +16,7 @@ const routes: Routes = [
       data: { 'tituloModulo': 'Inicio' }
     },
     {
-      path: 'repartidor',
+      path: 'main',
       loadChildren: () => import('./pages/repartidor/repartidor.module').then(m => m.RepartidorModule),
       canActivate: [AuthGuard],
       data: { 'tituloModulo': 'Repartidor' }
@@ -53,7 +53,7 @@ const routes: Routes = [
     routes, {
       useHash: true,
       scrollPositionRestoration: 'enabled',
-      anchorScrolling: 'enabled',
+      // anchorScrolling: 'enabled',
       paramsInheritanceStrategy: 'always'
     }
     )],

@@ -36,11 +36,17 @@ export class MapaSoloComponent implements OnInit {
 
   ngOnInit() {
     this.coordenadas.zoom = 15;
-    console.log('mapa solo', this.coordenadas);
+    // console.log('mapa solo', this.coordenadas);
 
     // si tiene idsede es un repartidor suscrito a una sede entonces notifica alla su posicion
     this.idSedeDesarrollo = this.pedidoRepartidorService.pedidoRepartidor.datosComercio.idsede;
 
+    // solo desarrollo
+    this.geoUbicationService.onGeoPosition();
+    this.miPosition = this.geoUbicationService.geoPosition;
+    this.miPosition = { lat: this.miPosition.latitude, lng: this.miPosition.longitude };
+
+    // quitar si es desarrollo
     this.listenUbicaion();
   }
 
@@ -51,6 +57,13 @@ export class MapaSoloComponent implements OnInit {
       latitude: $event.coords.lat,
       longitude: $event.coords.lng,
     };
+
+    // const geoposiionNow = new GeoPositionModel;
+    // geoposiionNow = <GeoPositionModel>_coordenadasNow;
+    // geoposiionNow.longitude = this.miPosition.lng;
+    this.geoUbicationService.geoPosition = <GeoPositionModel>_coordenadasNow;
+
+    // this.miPosition = { lat: res.latitude, lng: res.longitude };
 
     this.repartidorService.emitPositionNow(_coordenadasNow, this.pedidoRepartidorService.pedidoRepartidor, this.idSedeDesarrollo);
 
@@ -70,7 +83,7 @@ export class MapaSoloComponent implements OnInit {
 
     this.geoUbicationService.geoPositionNow$
       .subscribe(res => {
-        console.log('geoposiion', res);
+        // console.log('geoposiion', res);
         this.miPosition = { lat: res.latitude, lng: res.longitude };
 
         const geoposiionNow = new GeoPositionModel;
@@ -81,6 +94,7 @@ export class MapaSoloComponent implements OnInit {
         this.geoUbicationService.set();
 
         // this.enviarUbicacion(this.center);
+        // console.log('emitPositionNow');
 
         this.repartidorService.emitPositionNow(this.miPosition, this.pedidoRepartidorService.pedidoRepartidor, this.idSedeDesarrollo);
       });

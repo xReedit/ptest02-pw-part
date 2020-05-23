@@ -14,6 +14,7 @@ import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { DialogCalificacionComponent } from 'src/app/componentes/dialog-calificacion/dialog-calificacion.component';
 import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
 import { RepartidorService } from 'src/app/shared/services/repartidor.service';
+import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
 
 @Component({
   selector: 'app-indicaciones-pedido',
@@ -29,6 +30,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
   btnTitlePasos = 'Empezar';
   btnIsVisible = true;
   btnTerminarVisible = false; // si el pedido ya fue cerrado pero no llego la notificacion socket
+  _desAccionComprar = 'RECOGER'; // cuando es comercio afiliado. si no dira comprar.
 
   private idSedeNotifiPos: number;
   private idClienteNotifyPos: number;
@@ -44,7 +46,8 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
     private socketService: SocketService,
     private infoTokenService: InfoTockenService,
     private dialog: MatDialog,
-    private timerService: TimerLimitService
+    private timerService: TimerLimitService,
+    private listenService: ListenStatusService
   ) { }
 
   ngOnInit() {
@@ -60,6 +63,9 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
 
     this.idClienteNotifyPos = this.dataPedido.datosCliente.idcliente;
     this.idSedeNotifiPos = this.dataPedido.datosComercio.idsede;
+
+    this.dataPedido.datosDelivery.paga_con = this.dataPedido.datosDelivery.paga_con.replace('undefined', '');
+    this._desAccionComprar = this.dataPedido.datosComercio.pwa_delivery_comision_fija_no_afiliado === 0 ? 'RECOGER' : 'COMPRAR';
   }
 
   ngOnDestroy(): void {
@@ -77,7 +83,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
     }
 
     // solo desarrollo
-    this.dataPedido.paso_va = 4;
+    // this.dataPedido.paso_va = 4;
 
     switch (this.dataPedido.datosDelivery.metodoPago.idtipo_pago) {
       case 1:
@@ -112,13 +118,15 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
     // this.geoPositionService.onGeoWatchPosition();
 
     this.geoPositionActual = this.geoPositionService.geoPosition;
-    this.geoPositionService.geoPositionNow$.subscribe((res: GeoPositionModel) => {
+    // this.geoPositionService.geoPositionNow$.subscribe((res: GeoPositionModel) => {
+    this.listenService.myPosition$.subscribe((res: GeoPositionModel) => {
+      res = !res?.latitude ? this.geoPositionActual : res;
       if ( !res.latitude ) { return; }
       // verificar en que paso esta
       // si paso 1 verificar si se acerca al coordenadas destino y activar boton accion
       this.geoPositionActual = res;
       const isLLego = this.coordenadasDestino.latitude ? this.calcDistanciaService.calcDistancia(this.geoPositionActual, this.coordenadasDestino) : false;
-      console.log('distancia listen llego ?', isLLego);
+      // console.log('distancia listen llego ?', isLLego);
 
       // enviar posicion
       // const _data = {
@@ -126,7 +134,8 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
       //   idcliente: this.pedidoRepartidorService.pedidoRepartidor.datosCliente.idcliente
       // };
 
-      this.repartidorService.emitPositionNow(this.geoPositionActual, this.dataPedido, this.idSedeNotifiPos);
+      // this.repartidorService.emitPositionNow(this.geoPositionActual, this.dataPedido, this.idSedeNotifiPos);
+
       // this.socketService.emit('repartidor-notifica-ubicacion', _data);
 
       if ( isLLego && this.dataPedido.paso_va === 1) {
@@ -136,19 +145,30 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
         // this.btnIsVisible = true;
         // this.btnTitlePasos = 'Empezar';
       }
+
+      // si ya llego al lugar de entrega
+      if ( isLLego && this.dataPedido.paso_va === 3) {
+        this.dataPedido.paso_va = 4;
+        this.pedidoRepartidorService.setPasoVa(4);
+        this.showPasos();
+      }
+
+
     });
 
     this.socketService.onDeliveryPedidoFin()
       .pipe(takeUntil(this.destroy$))
       .subscribe(res => {
         // lanzar calificacion al cliente
-        console.log('fin del pedido idrepartidor', res);
+        // console.log('fin del pedido idrepartidor', res);
         this.openDialogCalificacion();
       });
   }
 
 
   private openDialogCalificacion() {
+    if ( !this.dataPedido?.idpedido ) {return; } // cuando el cliente termina y ya el pedido ha sido terminiado por el repartidor
+
     const dataCalificado: DatosCalificadoModel = new DatosCalificadoModel;
     dataCalificado.idrepartidor = this.infoTokenService.infoUsToken.usuario.idrepartidor;
     dataCalificado.idcliente = this.dataPedido.datosCliente.idcliente;
@@ -183,7 +203,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
   private showPasos(): void {
     this.dataPedido.paso_va = this.dataPedido.paso_va ? this.dataPedido.paso_va : 1;
 
-    console.log(this.dataPedido);
+    // console.log(this.dataPedido);
     switch (this.dataPedido.paso_va) {
       case 1 || null:
         this.coordenadasDestino.latitude = this.dataPedido.datosComercio.latitude;
@@ -226,7 +246,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
         this.dataPedido.paso_va = 3;
         this.pedidoRepartidorService.setPasoVa(3);
         break;
-      case 4: // terminar pedido / solo si la notificacion socket no llego
+      case 4: // terminar pedido / solo si la notificacion socket no llego // o si el cliente no termino el pedido
         this.openDialogCalificacion();
         break;
     }
@@ -236,7 +256,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
 
   showDetallePedido() {
     if ( this.dataPedido.paso_va >= 2 ) {
-      this.router.navigate(['./repartidor/pedido-detalle']);
+      this.router.navigate(['./main/pedido-detalle']);
     }
   }
 

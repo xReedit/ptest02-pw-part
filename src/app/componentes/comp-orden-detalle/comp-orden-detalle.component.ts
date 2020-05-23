@@ -31,8 +31,9 @@ export class CompOrdenDetalleComponent implements OnInit {
 
   ngOnInit(): void {
     this.pedidoRepartidorService.darFormatoLocalPedidoRepartidorModel(this.orden);
-    // this.pedidoRepartidorService.pedidoRepartidor = this.orden;
+    // // this.pedidoRepartidorService.pedidoRepartidor = this.orden;
     this.pedidoRepartidorService.setLocal();
+
 
     this.geoPositionService.get();
     this.geoPositionActual = this.geoPositionService.getGeoPosition();

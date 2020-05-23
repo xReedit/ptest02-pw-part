@@ -124,6 +124,7 @@ export class CrudHttpService {
 
     // login manda los datos en json
     loginUsuarioAutorizado(datos: any): Observable<any> {
+        // const url = this.setUrl('login-usuario-autorizado-repartidor', '');
         const url = this.setUrl('login-usuario-autorizado-repartidor', '');
         const header = this.getHeaderHttpClientFormNoToken();
 

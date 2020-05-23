@@ -68,6 +68,7 @@ export class PedidoRepartidorService {
     try {
       return rpt ? JSON.parse(atob(rpt)) : new PedidoRepartidorModel;
     } catch (error) {
+      console.log('clean pedido from getlocal');
       this.cleanLocal();
       return new PedidoRepartidorModel;
 
@@ -75,12 +76,14 @@ export class PedidoRepartidorService {
   }
 
   asignarPedido(): void {
+    console.log('set-asignar-pedido');
     const _data = {
       idpedido: this.pedidoRepartidor.idpedido
     };
 
     this.crudService.postFree(_data, 'repartidor', 'set-asignar-pedido', true)
       .subscribe(res => {
+        console.log(res);
         this.pedidoRepartidor.estado = 1; // asignadp
         this.setLocal();
         this.setPasoVa(1);
@@ -99,7 +102,7 @@ export class PedidoRepartidorService {
   // saca el importe total del pedido separando el importe del servicio de entrega
   darFormatoSubTotales(arrTotales: any = null) {
     this.init();
-    arrTotales = arrTotales ? arrTotales : this.pedidoRepartidor.datosSubtotales;
+    arrTotales = arrTotales ? arrTotales : this.pedidoRepartidor.datosSubtotalesShow;
     const rowTotal = arrTotales[arrTotales.length - 1];
 
     // lo que paga el cliente
@@ -304,8 +307,9 @@ export class PedidoRepartidorService {
     this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-entregado')
       .subscribe(res => {
         console.log(res);
+        console.log('clean from finalizarPedido');
         this.cleanLocal();
-        this.router.navigate(['./repartidor/pedidos']);
+        this.router.navigate(['./main/pedidos']);
       });
   }
 
@@ -360,6 +364,7 @@ export class PedidoRepartidorService {
       // this.socketService.emit('repartidor-declina-pedido', this.pedidoRepartidor);
 
       // clear local pedido
+      console.log('clean from pedidoNoAceptadoReasingar');
       this.cleanLocal();
     }
   }

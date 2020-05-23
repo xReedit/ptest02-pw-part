@@ -51,8 +51,9 @@ export class ItemPedidoComponent implements OnInit {
           if ( this.estadoPedido === 0 ) {
             // this.pedidoRepartidorService.pedidoNoAceptadoReasingar();
             this.timerLimitService.stopCountTimerLimit();
-            this.infoPedido = null;
-            this.pedidoRepartidorService.cleanLocal();
+            // this.infoPedido = null;
+            // console.log('clean from showPedido');
+            // this.pedidoRepartidorService.cleanLocal();
           }
           // console.log('termina tiempo reasigna pedido repartidor-declina-pedido', this.infoPedido);
           // const _num_reasignado = this.infoPedido.num_reasignado ? this.infoPedido.num_reasignado + 1 : 0;

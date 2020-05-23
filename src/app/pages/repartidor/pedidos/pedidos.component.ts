@@ -11,6 +11,7 @@ import { ListenStatusService } from 'src/app/shared/services/listen-status.servi
 import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
 import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
 import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
+import { CrudHttpService } from 'src/app/shared/services/crud-http.service';
 
 @Component({
   selector: 'app-pedidos',
@@ -34,7 +35,8 @@ export class PedidosComponent implements OnInit, OnDestroy {
     private router: Router,
     private listenService: ListenStatusService,
     public timerLimitService: TimerLimitService,
-    private geoPositionService: GpsUbicacionRepartidorService
+    private geoPositionService: GpsUbicacionRepartidorService,
+    private crudService: CrudHttpService
   ) { }
 
   ngOnInit() {
@@ -72,7 +74,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
     .pipe(takeUntil(this.destroy$))
     .subscribe((res: any) => {
       let _pedido = res[0].pedido_por_aceptar;
-      console.log('onRepartidorGetPedidoPendienteAceptar', _pedido);
+      // console.log('onRepartidorGetPedidoPendienteAceptar', _pedido);
       _pedido = this.pedidoRepartidorService.pedidoRepartidor.idpedido ? this.pedidoRepartidorService.pedidoRepartidor :  _pedido;
       // if ( _pedido && !this.pedidoRepartidorService.pedidoRepartidor.idpedido) {
         this.pedidoRepartidorService.darFormatoLocalPedidoRepartidorModel(_pedido);
@@ -91,6 +93,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
     .pipe(takeUntil(this.destroy$))
     .subscribe((res: any) => {
       let pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
+      // console.log('nuevo pedidos', res);
       if ( res[1]?.is_reasignado ) { // si es reasignado
         pedido = res[1];
       } else {
@@ -109,8 +112,8 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
       this.pedidoRepartidorService.setLocal(pedido);
 
-      console.log('nuevo pedido resivido', res);
-      console.log('nuevo pedido resivido', pedido);
+      // console.log('nuevo pedido resivido', res);
+      // console.log('nuevo pedido resivido', pedido);
       this.addPedidoToList(pedido);
       // this.listPedidos.push(pedido);
     });
@@ -119,9 +122,10 @@ export class PedidosComponent implements OnInit, OnDestroy {
     this.socketService.onRepartidorServerQuitaPedido()
     .pipe(takeUntil(this.destroy$))
     .subscribe((idpedido_res: any) => {
-      console.log('onRepartidorServerQuitaPedido', idpedido_res);
+      // console.log('onRepartidorServerQuitaPedido', idpedido_res);
       if ( this.pedidoRepartidorService.pedidoRepartidor.idpedido === idpedido_res ) {
         this.listPedidos = [];
+        // console.log('clean from onRepartidorServerQuitaPedido');
         this.pedidoRepartidorService.cleanLocal();
         this.timerLimitService.stopCountTimerLimit();
       }
@@ -130,11 +134,15 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
   private addPedidoToList(pedido: PedidoRepartidorModel): void {
     if ( !pedido.datosDelivery ) { return; }
-    this.pedidoRepartidorService.darFormatoPedidoLocal(pedido.datosItems);
+    if ( !pedido.conFormato ) {
+      this.pedidoRepartidorService.darFormatoPedidoLocal(pedido.datosItems);
 
-    const _arrTotal = this.pedidoRepartidorService.darFormatoSubTotales();
-    pedido = this.pedidoRepartidorService.pedidoRepartidor;
-    pedido.datosSubtotalesShow = _arrTotal;
+      const _arrTotal = this.pedidoRepartidorService.darFormatoSubTotales();
+      pedido = this.pedidoRepartidorService.pedidoRepartidor;
+      pedido.datosSubtotalesShow = _arrTotal;
+      pedido.conFormato  = true; // indica que ya tiene formato
+    }
+
     this.pedidoRepartidorService.setLocal(pedido);
     this.listPedidos.push(pedido);
 
@@ -146,8 +154,8 @@ export class PedidosComponent implements OnInit, OnDestroy {
   aceptaPedido() {
 
     // pedido ya fue aceptado
-    if (this.pedidoRepartidorService.pedidoRepartidor.conFormato ) {
-      this.router.navigate(['./repartidor/indicaciones']);
+    if (this.pedidoRepartidorService.pedidoRepartidor.aceptado ) {
+      this.router.navigate(['./main/indicaciones']);
       return;
     }
 
@@ -169,7 +177,9 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
     this.socketService.emit('repartidor-acepta-pedido', _dataPedido);
 
-    this.router.navigate(['./repartidor/indicaciones']);
+    this.pedidoRepartidorService.pedidoRepartidor.aceptado = true;
+
+    this.router.navigate(['./main/indicaciones']);
 
   }
 
@@ -178,8 +188,39 @@ export class PedidosComponent implements OnInit, OnDestroy {
     this._tabIndex = $event.index;
   }
 
+  recargarPedido() {
+    location.reload();
+  }
+
   // showPedido() {
   //   this.timerLimitService.playCountTimerLimit();
+  // }
+
+
+  // peticion(op: number) {
+  //   this.efectivoMano += 1;
+  //   const putSend = {
+  //     online: 1,
+  //     efectivo: 100,
+  //     estado: 1
+  //   };
+  //   switch (op) {
+  //     case 1: // peticion get sin token
+  //       this.crudService.getFree('https://app.restobar.papaya.com.pe/api.pwa/v3/comercio/get-sin-token').subscribe(res => console.log(res));
+  //       break;
+  //     case 2: // peticion get con token
+  //       this.crudService.getAll('repartidor', 'get-sin-token', false, false, true).subscribe(res => console.log(res));
+  //       break;
+  //     case 3: // peticion put sin token
+  //       // this.crudService.postFree(putSend, 'repartidor', 'set-sin-token', false).subscribe(res => console.log(res));
+  //       this.crudService.getAll('pruebas', 'get-con-select-sin-token', false, false, true).subscribe(res => console.log(res));
+  //       break;
+  //     case 4: // peticion put con token
+  //     this.crudService.postFree(putSend, 'pruebas', 'put-con-token', true).subscribe(res => console.log(res));
+  //       break;
+  //     default:
+  //       break;
+  //   }
   // }
 
 }
