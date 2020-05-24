@@ -83,7 +83,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
     }
 
     // solo desarrollo
-    // this.dataPedido.paso_va = 4;
+    this.dataPedido.paso_va = 2;
 
     switch (this.dataPedido.datosDelivery.metodoPago.idtipo_pago) {
       case 1:

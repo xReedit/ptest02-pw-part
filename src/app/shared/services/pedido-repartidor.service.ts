@@ -108,6 +108,28 @@ export class PedidoRepartidorService {
     // lo que paga el cliente
     this.pedidoRepartidor.importePagaCliente = rowTotal.importe;
 
+
+    // agregar o restar el importe del costo de entrega SI el comercio paga el costo de entrega pwa_delivery_comercio_paga_entrega
+    if ( this.pedidoRepartidor.datosComercio.pwa_delivery_comercio_paga_entrega === 1 ) {
+      const costoEntrega = this.pedidoRepartidor.datosDelivery.costoTotalDelivery;
+      // ingresamos en la penultima postion del arrTotales
+      const postionInsert = arrTotales.length - 1;
+      const _row = {
+        descripcion: 'Costo de Entrega',
+        esImpuesto: 0,
+        id: -4,
+        importe: - costoEntrega,
+        quitar: false,
+        tachado: false,
+        visible: false,
+        visible_cpe: false
+      };
+      arrTotales.splice(postionInsert, 0, _row);
+
+      // console.log('costo de entrega insertado', arrTotales);
+    }
+
+
     // -2 = servicio deliver -3 = propina
     rowTotal.importe = arrTotales.filter(x => x.id !== -2 && x.id !== -3 && x.descripcion !== 'TOTAL').map(x => parseFloat(x.importe)).reduce((a, b) => a + b, 0);
     this.pedidoRepartidor.importePedido = rowTotal.importe;

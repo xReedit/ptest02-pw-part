@@ -134,6 +134,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
   private addPedidoToList(pedido: PedidoRepartidorModel): void {
     if ( !pedido.datosDelivery ) { return; }
+    console.log('pedido', pedido);
     if ( !pedido.conFormato ) {
       this.pedidoRepartidorService.darFormatoPedidoLocal(pedido.datosItems);
 

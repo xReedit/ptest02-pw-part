@@ -3,20 +3,20 @@
     [options]="options">
 
     <!-- mi position desarrollo -->
-    <map-marker #markerElem *ngFor="let marker of markersRepartidorDesarrollo"
+    <!-- <map-marker #markerElem *ngFor="let marker of markersRepartidorDesarrollo"
         [position]="marker.position" [label]="marker.label"
         [title]="marker.title" [options]="markerOptionsRepartidorDesarrollo"
         (mapDragend)="updateUbicationDesarrollo($event)"
         >  
-    </map-marker>
+    </map-marker> -->
 
 
     <!-- mi position PRODUCCCION -->
-    <!-- <map-marker #markerElem *ngFor="let marker of markersRepartidorProduccion"
+    <map-marker #markerElem *ngFor="let marker of markersRepartidorProduccion"
         [position]="marker.position" [label]="marker.label"
         [title]="marker.title" [options]="markerOptionsRepartidorProduccion"        
         >  
-    </map-marker> -->
+    </map-marker>
 
 
 

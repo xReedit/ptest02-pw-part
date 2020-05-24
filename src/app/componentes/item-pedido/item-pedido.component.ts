@@ -37,6 +37,10 @@ export class ItemPedidoComponent implements OnInit {
     }
 
     this.estadoPedido = this.infoPedido.estado;
+
+    if (  parseFloat(this.infoPedido.c_servicio) === 0 && this.infoPedido.datosComercio.pwa_delivery_comercio_paga_entrega === 1 ) {
+      this.infoPedido.c_servicio = this.infoPedido.datosDelivery.costoTotalDelivery;
+    }
     this.showPedido();
   }
 
