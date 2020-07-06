@@ -13,6 +13,8 @@ export class DialogOrdenDetalleComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) data: any,
   ) {
     this.laOrden = data.laOrden;
+
+    console.log('orden desde dialog-orden-detalle', this.laOrden);
   }
 
   ngOnInit(): void {

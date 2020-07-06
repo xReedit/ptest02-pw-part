@@ -16,6 +16,12 @@ const routes: Routes = [
       data: { 'tituloModulo': 'Inicio' }
     },
     {
+      path: 'main-inicio',
+      loadChildren: () => import('./pages/inicio-repartidor/inicio-repartidor.module').then(m => m.InicioRepartidorModule),
+      canActivate: [AuthGuard],
+      data: { 'tituloModulo': 'Inicio Repartidor' }
+    },
+    {
       path: 'main',
       loadChildren: () => import('./pages/repartidor/repartidor.module').then(m => m.RepartidorModule),
       canActivate: [AuthGuard],

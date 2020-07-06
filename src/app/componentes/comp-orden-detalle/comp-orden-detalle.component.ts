@@ -21,6 +21,10 @@ export class CompOrdenDetalleComponent implements OnInit {
   isLlegoDestino = false;
 
   importeEfectivo = '';
+  dataPedido: any;
+
+  indicacionesComprobante = '';
+  comprobanteSolicitar = '';
 
   constructor(
     private pedidoRepartidorService: PedidoRepartidorService,
@@ -38,17 +42,25 @@ export class CompOrdenDetalleComponent implements OnInit {
     this.geoPositionService.get();
     this.geoPositionActual = this.geoPositionService.getGeoPosition();
 
-    const dataPedido = this.pedidoRepartidorService.pedidoRepartidor;
-    this.importeEfectivo = dataPedido.datosDelivery.metodoPago?.importe || '';
+    this.dataPedido = this.pedidoRepartidorService.pedidoRepartidor;
+    // dataPedido.datosDelivery = dataPedido.datosDelivery ? dataPedido.datosDelivery : dataPedido.
+    this.importeEfectivo = this.dataPedido.datosDelivery.metodoPago?.importe || '';
 
     this.coordenadasDestino = {
-      latitude: dataPedido.datosCliente.latitude,
-      longitude: dataPedido.datosCliente.longitude,
+      latitude: this.dataPedido.datosCliente.latitude,
+      longitude: this.dataPedido.datosCliente.longitude,
     };
 
+    const _dni = this.orden.json_datos_delivery.p_header.arrDatosDelivery.tipoComprobante.dni || '';
+    const _dniRuc = _dni === '' ? '' : _dni.length > 8 ? 'RUC ' : 'DNI ';
+    const _otro = this.orden.json_datos_delivery.p_header.arrDatosDelivery.tipoComprobante.otro || '';
+    this.indicacionesComprobante = _dni === '' ? 'Publico en general.' :
+                                    _dniRuc + ' ' + _dni + ' - ' + _otro;
+    this.comprobanteSolicitar = this.orden.json_datos_delivery.p_header.arrDatosDelivery.tipoComprobante.descripcion;
+
     // calcular la distancia con el repartidor si esta cerca activa "recibi conforme" y "llamar a repartidor"
-    this.isLlegoDestino = this.calcDistanciaService.calcDistancia(<GeoPositionModel>this.geoPositionActual, <GeoPositionModel>this.coordenadasDestino, 20);
-    console.log('orden', this.orden);
+    this.isLlegoDestino = this.calcDistanciaService.calcDistancia(<GeoPositionModel>this.geoPositionActual, <GeoPositionModel>this.coordenadasDestino, 120);
+    // console.log('orden', this.orden);
   }
 
   cerrarDetalles(val: boolean) {
@@ -60,19 +72,30 @@ export class CompOrdenDetalleComponent implements OnInit {
   goDireccion() {
     const linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.coordenadasDestino.latitude},${this.coordenadasDestino.longitude}`;
     window.open(linkGPS, '_blank');
+
+    setTimeout(() => {
+      this.cerrarDetalles(true);
+    }, 500);
   }
 
   redirectWhatsApp() {
-    const _link = `https://api.whatsapp.com/send?phone=51${this.orden.datosDelivery.telefono}`;
+    const _link = `https://api.whatsapp.com/send?phone=51${this.dataPedido.datosDelivery.telefono}`;
     window.open(_link, '_blank');
   }
 
   callPhone() {
-    window.open(`tel:${this.orden.datosDelivery.telefono}`);
+    window.open(`tel:${this.dataPedido.datosDelivery.telefono}`);
   }
 
   PedidoEntregado() {
-    this.pedidoRepartidorService.finalizarPedidoPropioRepartidor();
+    if ( this.orden.isRepartidorRed ) {
+
+        // si viene de red repartidore
+        this.pedidoRepartidorService.finalizarPedido(true);
+
+    } else {
+      this.pedidoRepartidorService.finalizarPedidoPropioRepartidor();
+    }
 
     setTimeout(() => {
       this.cerrarDetalles(true);

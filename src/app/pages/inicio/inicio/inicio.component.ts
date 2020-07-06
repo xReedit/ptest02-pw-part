@@ -30,8 +30,12 @@ export class InicioComponent implements OnInit, OnDestroy {
     screen.orientation.unlock();
 
     // setTimeout(() => {
-      this.loadInit();
+      // this.loadInit();
     // }, 800);
+
+
+    // limpiar datos
+    localStorage.clear();
   }
 
   private loadInit(): void {
@@ -57,7 +61,7 @@ export class InicioComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // this.verifyClientService.unsubscribeClient();
-    this.veryfyClient.unsubscribe();
+    // this.veryfyClient.unsubscribe();
   }
 
   // changeLenguage() {

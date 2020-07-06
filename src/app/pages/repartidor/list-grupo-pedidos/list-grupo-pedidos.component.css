@@ -1,0 +1,11 @@
+p {
+    margin: 0px;    
+}
+
+.xfooter {
+    /* position: absolute; */
+    bottom: 0px;
+    text-align: center;
+    width: 100%;
+    padding: 14px;    
+}

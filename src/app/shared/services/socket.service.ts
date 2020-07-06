@@ -459,6 +459,7 @@ export class SocketService {
       console.log('navegador conectado');
     } else {
       console.log('!!! navegador desconectado !!');
+      // this.verificandoConexion = false;
     }
   }
 

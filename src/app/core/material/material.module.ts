@@ -18,6 +18,7 @@ import { MatCardModule } from '@angular/material/card';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatTableModule} from '@angular/material/table';
 
 // import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -41,7 +42,8 @@ import {MatSidenavModule} from '@angular/material/sidenav';
     MatCardModule,
     MatRadioModule,
     MatSlideToggleModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatTableModule
     // MatTooltipModule
   ],
   exports: [
@@ -60,7 +62,8 @@ import {MatSidenavModule} from '@angular/material/sidenav';
     MatCardModule,
     MatRadioModule,
     MatSlideToggleModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatTableModule
     // MatTooltipModule
   ]
 })

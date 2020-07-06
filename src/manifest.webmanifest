@@ -4,6 +4,7 @@
   "theme_color": "#00B14F",
   "background_color": "#00B14F",
   "display": "standalone",
+  "gcm_sender_id": "103953800507",
   "orientation": "portrait",
   "scope": "/",
   "start_url": "/",

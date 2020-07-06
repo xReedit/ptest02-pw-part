@@ -1,0 +1,14 @@
+<div class="animated fadeInDown container-body">
+    <div class="p-3 bg-dark text-white fs-13 d-flex justify-content-between">
+        <div>
+            <span>Pedidos - Ruta mas corta</span>
+        </div>        
+    </div>
+
+    <!-- mapa -->
+
+    <div class="content-body-mapa">
+        <app-mapa-ordenes [trazarRuta]="true" (pedidoOpen)="openDialogOrden($event)"></app-mapa-ordenes>
+    </div>
+
+</div>

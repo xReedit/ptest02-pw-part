@@ -6,6 +6,8 @@ import { IndicacionesPedidoComponent } from './indicaciones-pedido/indicaciones-
 import { PedidoDetalleComponent } from './pedido-detalle/pedido-detalle.component';
 import { PedidosAtendidosComponent } from './pedidos-atendidos/pedidos-atendidos.component';
 import { MapaPedidosComponent } from './mapa-pedidos/mapa-pedidos.component';
+import { ListGrupoPedidosComponent } from './list-grupo-pedidos/list-grupo-pedidos.component';
+import { IndicacionesGrupoMapaComponent } from './indicaciones-grupo-mapa/indicaciones-grupo-mapa.component';
 
 const routes: Routes = [{
     path: '', component: MainComponent,
@@ -38,6 +40,16 @@ const routes: Routes = [{
             path: 'mapa-de-pedidos',
             component: MapaPedidosComponent,
             data: { titulo: 'Mapa de pedidos' }
+        },
+        {
+            path: 'list-grupo-pedidos',
+            component: ListGrupoPedidosComponent,
+            data: { titulo: 'Grupo de pedidos' }
+        },
+        {
+            path: 'indicaciones-mapa-grupo',
+            component: IndicacionesGrupoMapaComponent,
+            data: { titulo: 'Indicaciones en el mapa' }
         }
 
     ]

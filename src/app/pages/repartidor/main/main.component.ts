@@ -24,7 +24,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
   constructor(
     private dialog: MatDialog,
-    private socketService: SocketService,
+    public socketService: SocketService,
     private repartidorService: RepartidorService,
     private infoTokeService: InfoTockenService,
     private pedidoRepartidorService: PedidoRepartidorService,
@@ -34,14 +34,21 @@ export class MainComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // conecta a notificaciones
-    this.pedidoRepartidorService.init();
-    this.isRepartidorPropio = this.infoTokeService.infoUsToken.usuario.idsede_suscrito;
-    this.infoTokeService.infoUsToken.usuario.isRepartidorPropio = this.isRepartidorPropio;
-    this.infoTokeService.set();
+    try {
+      this.pedidoRepartidorService.init();
+      this.socketService.isSocketOpenReconect = false;
+      this.infoTokeService.getInfoUs();
 
-    this.socketService.connect();
+      this.isRepartidorPropio = this.infoTokeService.infoUsToken.usuario.idsede_suscrito;
+      this.infoTokeService.infoUsToken.usuario.isRepartidorPropio = this.isRepartidorPropio;
+      this.infoTokeService.set();
 
-    this.navigatorService.disableGoBack();
+      this.socketService.connect();
+
+      this.navigatorService.disableGoBack();
+    } catch (error) {
+      this.router.navigate(['../']);
+    }
 
 
 

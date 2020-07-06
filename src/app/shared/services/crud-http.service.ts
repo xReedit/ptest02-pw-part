@@ -43,7 +43,7 @@ export class CrudHttpService {
 
 
         const url = this.setUrlFiltros(controller, evento, conOrg, conSede, filter);
-        console.log('url', url);
+        // console.log('url', url);
         const params = new HttpParams({
             fromObject: {
                 pagenumber: pagenumber.toString(),
@@ -128,6 +128,8 @@ export class CrudHttpService {
         const url = this.setUrl('login-usuario-autorizado-repartidor', '');
         const header = this.getHeaderHttpClientFormNoToken();
 
+        console.log('url', url);
+
         return this.httpClient.post<any>(url, datos, { headers: header });
     }
 
@@ -182,7 +184,7 @@ export class CrudHttpService {
         return 'idorg:eq:' + this.infoTockenService.getInfoSedeToken();
     }
 
-    private getHeaderHttpClientForm(): HttpHeaders {
+    getHeaderHttpClientForm(): HttpHeaders {
         const headers = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .set('Authorization', this.infoTockenService.getTokenAuth());
@@ -196,7 +198,7 @@ export class CrudHttpService {
         return headers;
     }
 
-    private getHeaderHttpClientFormNoToken(): HttpHeaders {
+    getHeaderHttpClientFormNoToken(): HttpHeaders {
         const headers = new HttpHeaders()
             .set('Content-Type', 'application/json');
         return headers;

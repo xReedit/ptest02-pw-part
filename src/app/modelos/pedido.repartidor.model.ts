@@ -1,5 +1,6 @@
 export class PedidoRepartidorModel {
     idpedido: number;
+    idsede: number;
     estado: number; // 0 = por aceptar 1 = aceptado
     datosItems: any; // item productos
     datosDelivery: any;
@@ -18,4 +19,6 @@ export class PedidoRepartidorModel {
     pwa_delivery_status: number;
     conFormato: boolean; // si ya se dio formato
     aceptado: boolean; // si ya el pedido ha sido acpetado y notificado
+    sumGananciaTotal: number;
+    pedido_paso_va: number; // 0 = por aceptar, 1 aceptado 2 en el local 3 entregado
 }

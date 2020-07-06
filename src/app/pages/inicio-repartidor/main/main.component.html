@@ -1,0 +1,48 @@
+<div class="animated fadeIn">
+    <div class="p-3 text-center w-100">
+        <span>Hola</span>
+        <h5>{{ nomRepartidor }}</h5>
+        <hr>
+
+        <div>
+            <img src="assets/images/img-ini.png" alt="img-ini" style="max-width: 150px;">
+        </div>
+        <br>
+
+
+        <p class="fs-17" *ngIf="!isValid">Para recibir pedidos es necesario que:</p>      
+        <br>
+        <ng-container *ngIf="!isOnGeoPosition">
+            <div>
+                <div class="fw-100">
+                    Active su ubicación (GPS).
+                </div>
+                <div>
+                    <button mat-flat-button color="primary" (click)="aceptarPosition()">Activar</button>
+                </div>
+            </div>            
+            <hr>
+        </ng-container>
+
+      
+        <ng-container *ngIf="!isOnNotificactionPush">
+            <div>
+                <div>
+                    <div class="fw-100">
+                        Active las notificaciones.
+                    </div>
+                    <div>
+                        <button mat-flat-button color="primary" (click)="aceptarNotificacion()">Activar</button>
+                    </div>
+                </div>            
+            </div>
+            <hr>
+        </ng-container>
+
+        <div *ngIf="isValid">
+            <h6>Validando Permisos.</h6>
+        </div>
+
+       
+    </div>
+</div>

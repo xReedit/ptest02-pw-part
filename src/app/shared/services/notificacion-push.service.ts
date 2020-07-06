@@ -25,7 +25,8 @@ export class NotificacionPushService {
 
     this.swPush.notificationClicks.subscribe( event => {
       // const url = event.notification.data.url;
-      window.location.reload();
+      // window.location.reload();
+      window.open('reparto.papaya.com.pe');
     });
   }
 

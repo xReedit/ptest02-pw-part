@@ -52,7 +52,7 @@ export class SeleccionarUbicacionDeliveryComponent implements OnInit {
   // }
 
   setDireccion($event: DeliveryDireccionCliente) {
-    console.log($event);
+    // console.log($event);
     // guardar en infotoken
     this.verifyClientService.setDireccionDeliverySelected($event);
     // enviar a zona de establecimientos

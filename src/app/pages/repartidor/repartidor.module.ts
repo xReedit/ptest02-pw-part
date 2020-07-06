@@ -12,6 +12,8 @@ import { ComponentesModule } from 'src/app/componentes/componentes.module';
 import { PedidoDetalleComponent } from './pedido-detalle/pedido-detalle.component';
 import { PedidosAtendidosComponent } from './pedidos-atendidos/pedidos-atendidos.component';
 import { MapaPedidosComponent } from './mapa-pedidos/mapa-pedidos.component';
+import { IndicacionesGrupoMapaComponent } from './indicaciones-grupo-mapa/indicaciones-grupo-mapa.component';
+import { ListGrupoPedidosComponent } from './list-grupo-pedidos/list-grupo-pedidos.component';
 
 
 
@@ -22,7 +24,9 @@ import { MapaPedidosComponent } from './mapa-pedidos/mapa-pedidos.component';
     IndicacionesPedidoComponent,
     PedidoDetalleComponent,
     PedidosAtendidosComponent,
-    MapaPedidosComponent],
+    MapaPedidosComponent,
+    IndicacionesGrupoMapaComponent,
+    ListGrupoPedidosComponent],
   imports: [
     CommonModule,
     RepartidorRoutingModule,

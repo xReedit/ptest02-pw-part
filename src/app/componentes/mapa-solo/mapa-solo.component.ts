@@ -36,7 +36,7 @@ export class MapaSoloComponent implements OnInit {
 
   ngOnInit() {
     this.coordenadas.zoom = 15;
-    // console.log('mapa solo', this.coordenadas);
+    console.log('mapa solo', this.coordenadas);
 
     // si tiene idsede es un repartidor suscrito a una sede entonces notifica alla su posicion
     this.idSedeDesarrollo = this.pedidoRepartidorService.pedidoRepartidor.datosComercio.idsede;

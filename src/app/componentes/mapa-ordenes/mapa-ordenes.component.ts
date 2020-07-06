@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, OnDestroy, AfterContentInit, AfterViewInit } from '@angular/core';
 import { GoogleMap, MapMarker } from '@angular/google-maps';
 import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
@@ -14,8 +14,8 @@ import { ListenStatusService } from 'src/app/shared/services/listen-status.servi
   templateUrl: './mapa-ordenes.component.html',
   styleUrls: ['./mapa-ordenes.component.css']
 })
-export class MapaOrdenesComponent implements OnInit {
-  @ViewChild(GoogleMap, { static: false }) map: GoogleMap;
+export class MapaOrdenesComponent implements OnInit, AfterViewInit {
+
   infowindow = new google.maps.InfoWindow();
 
 
@@ -33,10 +33,12 @@ export class MapaOrdenesComponent implements OnInit {
     // mapTypeId: 'hybrid'
   };
 
+
+  @Input() trazarRuta = false;
   @Input()
   public set listaPedidos(list: any) {
     this.listPedidos = list;
-    console.log('listPedidos', list);
+    // console.log('listPedidos', list);
     if ( list ) {
       this.addMarkerPedidos();
     }
@@ -51,6 +53,11 @@ export class MapaOrdenesComponent implements OnInit {
   markerOptionsRepartidorProduccion = { icon: './assets/images/delivery-man.png'};
   markersRepartidorProduccion = [];
 
+  @ViewChild(GoogleMap, { static: false }) map: GoogleMap;
+
+
+  private _isSedeFirtPedido = 0;
+  private _isFirtPedido = 0;
 
   constructor(
     private geoUbicationService: GpsUbicacionRepartidorService,
@@ -60,16 +67,52 @@ export class MapaOrdenesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // produccioon
-    this.listenUbicaion();
+
+  }
+
+  ngAfterViewInit(): void {
+
+
+    if ( this.trazarRuta ) {
+      this.listPedidos = this.pedidoRepartidorService.getLocalItems();
+      this._isSedeFirtPedido = this.listPedidos[0].idsede;
+      this._isFirtPedido = this.listPedidos[0];
+
+      // console.log('antes orden', this.listPedidos);
+
+      // ordernar por distancia para trazar la ruta
+      this.listPedidos = this.listPedidos
+        .sort(( a, b ) => parseFloat(a.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km) - parseFloat(b.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km));
+
+      // console.log('despues orden', this.listPedidos);
+      this.addMarkerPedidos();
+    }
+
+
 
     // desarrollo
     // this.listeDesarrolloUbicacion();
+
+    // produccioon
+    this.listenUbicaion();
+
+
+    // traza la ruta mas corta
+      if ( this.trazarRuta ) {
+        this.directionMap();
+      }
+
+    this.listenPedidos();
+  }
+
+  private listenPedidos() {
+    // console.log('eeeeeeeeeeee');
 
     // noitifica nuevo pedido para agregar al markert
     this.listenService.newPedidoRepartoPropio$
       .subscribe(pedido => {
         if (pedido) {
+          pedido.idpedido = typeof pedido.idpedido === 'string' ? parseInt(pedido.idpedido, 0) : pedido.idpedido;
           const isExistePedido = this.listPedidos.filter(p => p.idpedido === pedido.idpedido)[0];
           if ( !isExistePedido ) {
             this.listPedidos.push(pedido);
@@ -83,7 +126,7 @@ export class MapaOrdenesComponent implements OnInit {
       .subscribe(pedido => {
         if ( !pedido ) { return; }
 
-        console.log('Cambiamos icono entregado');
+        // console.log('Cambiamos icono entregado');
         // buscar pedido en los marcadores
         const p = this.markersPedidos.filter(_p => _p.idpedido === pedido.idpedido)[0];
         const _options: google.maps.MarkerOptions = {
@@ -96,6 +139,7 @@ export class MapaOrdenesComponent implements OnInit {
       });
   }
 
+
   private enviarUbicacion(ubicacion: any): void {
     // const _data = {
     //   coordenadas : {
@@ -107,16 +151,21 @@ export class MapaOrdenesComponent implements OnInit {
     // };
 
     // this.socketService.emit('repartidor-notifica-ubicacion', _data);
-    const _pedidoSend = this.pedidoRepartidorService.pedidoRepartidor || null;
-    this.repartidorService.emitPositionNow(ubicacion, this.pedidoRepartidorService.pedidoRepartidor);
+    const _pedidoSend = this.trazarRuta ? this._isFirtPedido : this.pedidoRepartidorService.pedidoRepartidor || null;
+    const _idsedeComercio = this.trazarRuta ? this._isSedeFirtPedido : this.pedidoRepartidorService.pedidoRepartidor.idsede || null;
+    this.repartidorService.emitPositionNow(ubicacion, this.pedidoRepartidorService.pedidoRepartidor, _idsedeComercio);
   }
 
   listenUbicaion() {
-    this.geoUbicationService.onGeoWatchPosition();
+
+    const _miposticion = this.geoUbicationService.getGeoPosition();
+
+    // console.log('_miposticion', _miposticion);
 
     this.geoUbicationService.geoPositionNow$
       .subscribe(res => {
         // console.log('geoposiion', res);
+        res = res.latitude ? res : _miposticion;
         this.center = { lat: res.latitude, lng: res.longitude };
 
         const geoposiionNow = new GeoPositionModel;
@@ -126,10 +175,12 @@ export class MapaOrdenesComponent implements OnInit {
         this.geoUbicationService.geoPosition = geoposiionNow;
         this.geoUbicationService.set();
 
+        // console.log('mi position', this.center);
         this.enviarUbicacion(this.center);
         this.addMyMarkert();
       });
 
+      this.geoUbicationService.onGeoWatchPosition();
   }
 
   private addMyMarkert(): void {
@@ -153,8 +204,8 @@ export class MapaOrdenesComponent implements OnInit {
 
   private addMarkerPedidos(): void {
     // asigna el primer pedido
-    this.pedidoRepartidorService.pedidoRepartidor = this.listPedidos[0];
-    this.pedidoRepartidorService.setLocal();
+    // this.pedidoRepartidorService.pedidoRepartidor = this.listPedidos[0];
+    // this.pedidoRepartidorService.setLocal();
 
 
 
@@ -199,7 +250,62 @@ export class MapaOrdenesComponent implements OnInit {
 
   openPedido(index: number): void {
     const itemPedido = this.listPedidos[index];
+    // console.log('oreden de mapa-ordenes', itemPedido);
     this.pedidoOpen.emit(itemPedido);
+  }
+
+
+  // trazar ruta
+  directionMap() {
+
+    // const directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
+    const directionsService = new google.maps.DirectionsService();
+
+    // const directionsService = new google.maps.DirectionsService;
+    // const directionsRenderer = new google.maps.DirectionsRenderer;
+
+    const rendererOptions = {
+      preserveViewport: false,
+      suppressMarkers: true
+    };
+
+    const waypoints = [];
+    this.markersPedidos.map(m => {
+      waypoints.push({
+        location: m.position,
+        stopover: true
+    });
+    });
+
+    const _destination = this.markersPedidos[this.markersPedidos.length - 1].position;
+
+    // console.log('waypoints', waypoints);
+    // console.log('_destination', _destination);
+    const request = {
+      origin: this.center,
+      destination: this.markersPedidos[this.markersPedidos.length - 1].position,
+      waypoints: waypoints, // an array of waypoints
+      optimizeWaypoints: true,
+      travelMode: google.maps.TravelMode.DRIVING,
+      unitSystem: google.maps.UnitSystem.IMPERIAL,
+      durationInTraffic: false,
+      avoidHighways: true,
+      avoidTolls: true
+     };
+
+
+     const directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+     directionsDisplay.setMap(this.map._googleMap);
+
+    //  const dmatrix = new google.maps.DistanceMatrixService();
+
+     directionsService.route(request, function(result, status) {
+      // console.log(result);
+
+      if (status === google.maps.DirectionsStatus.OK) {
+        directionsDisplay.setDirections(result);
+        }
+     });
   }
 
 
@@ -228,7 +334,7 @@ export class MapaOrdenesComponent implements OnInit {
         }
     });
 
-    console.log('this.markersRepartidorDesarrollo', this.markersRepartidorDesarrollo);
+    // console.log('this.markersRepartidorDesarrollo', this.markersRepartidorDesarrollo);
   }
 
 

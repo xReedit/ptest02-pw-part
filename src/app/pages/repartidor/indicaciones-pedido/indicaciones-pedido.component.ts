@@ -32,6 +32,8 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
   btnTerminarVisible = false; // si el pedido ya fue cerrado pero no llego la notificacion socket
   _desAccionComprar = 'RECOGER'; // cuando es comercio afiliado. si no dira comprar.
 
+
+  private radioUbicacionActiva = 60; // radio a la redonda // comercio 60 cliente 100
   private idSedeNotifiPos: number;
   private idClienteNotifyPos: number;
 
@@ -83,7 +85,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
     }
 
     // solo desarrollo
-    this.dataPedido.paso_va = 2;
+    // this.dataPedido.paso_va = 2;
 
     switch (this.dataPedido.datosDelivery.metodoPago.idtipo_pago) {
       case 1:
@@ -119,14 +121,17 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
 
     this.geoPositionActual = this.geoPositionService.geoPosition;
     // this.geoPositionService.geoPositionNow$.subscribe((res: GeoPositionModel) => {
-    this.listenService.myPosition$.subscribe((res: GeoPositionModel) => {
+    this.listenService.myPosition$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((res: GeoPositionModel) => {
       res = !res?.latitude ? this.geoPositionActual : res;
       if ( !res.latitude ) { return; }
       // verificar en que paso esta
       // si paso 1 verificar si se acerca al coordenadas destino y activar boton accion
       this.geoPositionActual = res;
-      const isLLego = this.coordenadasDestino.latitude ? this.calcDistanciaService.calcDistancia(this.geoPositionActual, this.coordenadasDestino) : false;
+      const isLLego = this.coordenadasDestino.latitude ? this.calcDistanciaService.calcDistancia(this.geoPositionActual, this.coordenadasDestino, this.radioUbicacionActiva) : false;
       // console.log('distancia listen llego ?', isLLego);
+      // console.log('distancia listen this.radioUbicacionActiva ?', this.radioUbicacionActiva);
 
       // enviar posicion
       // const _data = {
@@ -138,16 +143,24 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
 
       // this.socketService.emit('repartidor-notifica-ubicacion', _data);
 
-      if ( isLLego && this.dataPedido.paso_va === 1) {
-        this.dataPedido.paso_va = 2;
-        this.pedidoRepartidorService.setPasoVa(2);
-        this.showPasos();
-        // this.btnIsVisible = true;
-        // this.btnTitlePasos = 'Empezar';
+      if ( isLLego ) {
+        if ( this.dataPedido.paso_va === 1) {
+          this.dataPedido.paso_va = 2;
+          this.pedidoRepartidorService.setPasoVa(2);
+          this.showPasos();
+          // this.btnIsVisible = true;
+          // this.btnTitlePasos = 'Empezar';
+        }
+
+        // si ya llego al lugar de entrega
+        // if ( this.dataPedido.paso_va === 3) {
+        //   this.dataPedido.paso_va = 4;
+        //   this.pedidoRepartidorService.setPasoVa(4);
+        //   this.showPasos();
+        // }
       }
 
-      // si ya llego al lugar de entrega
-      if ( isLLego && this.dataPedido.paso_va === 3) {
+      if ( this.dataPedido.paso_va === 3) {
         this.dataPedido.paso_va = 4;
         this.pedidoRepartidorService.setPasoVa(4);
         this.showPasos();
@@ -203,28 +216,41 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
   private showPasos(): void {
     this.dataPedido.paso_va = this.dataPedido.paso_va ? this.dataPedido.paso_va : 1;
 
+    // console.log('this.dataPedido.paso_va', this.dataPedido.paso_va);
+
     // console.log(this.dataPedido);
     switch (this.dataPedido.paso_va) {
       case 1 || null:
         this.coordenadasDestino.latitude = this.dataPedido.datosComercio.latitude;
         this.coordenadasDestino.longitude = this.dataPedido.datosComercio.longitude;
         this.btnTitlePasos = 'Empezar';
+        this.radioUbicacionActiva = 350; // radio del cliente
         break;
       case 2: // apuntar a la direccion del cliente
         this.btnIsVisible = true;
         this.coordenadasDestino.latitude = this.dataPedido.datosCliente.latitude;
         this.coordenadasDestino.longitude = this.dataPedido.datosCliente.longitude;
         this.btnTitlePasos = 'Paso 3 Empezar';
+        this.radioUbicacionActiva = 350; // radio del cliente
+        break;
+      case 3: // ir a la direccion // si recarga ya no sale
+        this.btnIsVisible = true;
+        this.coordenadasDestino.latitude = this.dataPedido.datosCliente.latitude;
+        this.coordenadasDestino.longitude = this.dataPedido.datosCliente.longitude;
+        this.btnTitlePasos = 'Paso 3 Empezar';
+        this.radioUbicacionActiva = 350; // radio del cliente
         break;
       case 4: //
         this.btnIsVisible = true;
         this.coordenadasDestino.latitude = this.dataPedido.datosCliente.latitude;
         this.coordenadasDestino.longitude = this.dataPedido.datosCliente.longitude;
+        this.radioUbicacionActiva = 350; // radio del cliente
         this.btnTitlePasos = 'Entregado, terminar.';
-      // default:
-      //   this.coordenadasDestino.latitude = this.dataPedido.datosComercio.latitude;
-      //   this.coordenadasDestino.longitude = this.dataPedido.datosComercio.longitude;
-      //   break;
+        break;
+      default:
+        this.coordenadasDestino.latitude = this.dataPedido.datosCliente.latitude;
+        this.coordenadasDestino.longitude = this.dataPedido.datosCliente.longitude;
+        break;
     }
   }
 
@@ -239,6 +265,14 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
         // this.pedidoRepartidorService.setPasoVa(2);
         break;
       case 2: // apuntar a la direccion del cliente
+        linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.coordenadasDestino.latitude},${this.coordenadasDestino.longitude}`;
+        window.open(linkGPS, '_blank');
+        this.btnIsVisible = false;
+        // this.btnTitlePasos = 'Llegue';
+        this.dataPedido.paso_va = 3;
+        this.pedidoRepartidorService.setPasoVa(3);
+        break;
+      case 3: // apuntar a la direccion del cliente
         linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.coordenadasDestino.latitude},${this.coordenadasDestino.longitude}`;
         window.open(linkGPS, '_blank');
         this.btnIsVisible = false;

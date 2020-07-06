@@ -15,6 +15,8 @@ export class CompPedidoDetalleComponent implements OnInit {
   _miPedido: any;
   _arrSubtotales: any;
 
+  @Input() showAllSubtotal = true;
+
   constructor(
     private crudService: CrudHttpService,
     private pedidoRepartidorService: PedidoRepartidorService,
@@ -47,9 +49,24 @@ export class CompPedidoDetalleComponent implements OnInit {
 
     console.log('ini service pedido');
     // this.pedidoRepartidorService.init();
+    const isPedidoInGroup = this.pedidoRepartidorService.getPedidoSelect() ? true : false;
+    const _getPedidoSelectGroup = this.pedidoRepartidorService.getPedidoSelect() || this.pedidoRepartidorService.pedidoRepartidor;
+    // _getPedidoSelectGroup = _getPedidoSelectGroup ? _getPedidoSelectGroup : this.pedidoRepartidorService.pedidoRepartidor;
+    const datosItems = isPedidoInGroup ? _getPedidoSelectGroup.json_datos_delivery.p_body : this.pedidoRepartidorService.pedidoRepartidor.datosItems;
+    const comercio_paga_entrega = isPedidoInGroup ? _getPedidoSelectGroup.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.pwa_delivery_comercio_paga_entrega : null;
+    const costo_servicio = isPedidoInGroup ? _getPedidoSelectGroup.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery : null;
 
-    this._miPedido = this.pedidoRepartidorService.darFormatoPedidoLocal(this.pedidoRepartidorService.pedidoRepartidor.datosItems);
-    this._arrSubtotales = this.pedidoRepartidorService.pedidoRepartidor.datosSubtotalesShow;
+    // muestra subtotales lo que va a pagar en el comercio
+    const datosSubtotalesComercio = isPedidoInGroup ?
+          this.pedidoRepartidorService.darFormatoSubTotales(_getPedidoSelectGroup.json_datos_delivery.p_header.arrDatosDelivery.subTotales, comercio_paga_entrega, costo_servicio) :
+          this.pedidoRepartidorService.pedidoRepartidor.datosSubtotalesShow;
+
+    this._miPedido = this.pedidoRepartidorService.darFormatoPedidoLocal(datosItems, datosSubtotalesComercio);
+
+    // muestra todos los subtotales
+    const datosSubtotalesShow = isPedidoInGroup ? _getPedidoSelectGroup.json_datos_delivery.p_subtotales  : this.pedidoRepartidorService.pedidoRepartidor.datosSubtotalesShow;
+
+    this._arrSubtotales = this.showAllSubtotal ? datosSubtotalesShow : datosSubtotalesComercio;
   }
 
   showImg(item: any) {

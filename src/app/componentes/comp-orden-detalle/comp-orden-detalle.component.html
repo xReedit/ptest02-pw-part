@@ -26,8 +26,20 @@
             
             <hr>
 
-            <span class="fs-13 fw-600 text-secondary">Cliente paga con: </span>
-            <p>{{orden.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion}} <span class="pl-2">{{ importeEfectivo }}</span></p>
+            <!-- metodo pago y facturacion -->
+            <!-- <div class="d-flex justify-content-between"> -->
+                <div>
+                    <span class="fs-13 fw-600 text-secondary">Cliente paga con: </span>
+                    <p>{{orden.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion}} <span class="pl-2">{{ importeEfectivo }}</span></p>
+                </div>
+
+                <hr>
+
+                <div>
+                    <span class="fs-13 fw-600 text-secondary">Solicitar: </span>                    
+                    <p><span class="fw-600">{{comprobanteSolicitar}}: </span> <span class="fw-100">{{ indicacionesComprobante }}</span></p>    
+                </div>
+            <!-- </div>             -->
 
         </div>      
         <hr>

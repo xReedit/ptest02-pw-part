@@ -15,14 +15,18 @@
         <mat-tab label="Pendientes"> 
 
             <div class="p-3 x-h-size">
-                <ng-container *ngIf="listPedidos.length === 0; else elseTemplate">
+                <ng-container *ngIf="listPedidosGroup.length === 0; else elseTemplate">
                     <div class="text-center">
                         <button mat-stroked-button (click)="recargarPedido()">Recargar ...</button>
                     </div>
                 </ng-container>
                 <ng-template #elseTemplate>                                
-                        <div *ngFor="let item of listPedidos">
+                        <!-- <div *ngFor="let item of listPedidos">
                             <app-item-pedido [infoPedido] = "item" (aceptaPedido)="aceptaPedido($event)"></app-item-pedido>
+                        </div> -->
+
+                        <div>
+                            <app-item-pedido [listPedidos] = "listPedidosGroup" [importeAcumuladoPagar]="sumAcumuladoPagar" (aceptaPedido)="aceptaPedido($event)"></app-item-pedido>
                         </div>
                 </ng-template>
                         

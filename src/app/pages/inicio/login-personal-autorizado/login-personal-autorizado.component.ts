@@ -31,9 +31,12 @@ export class LoginPersonalAutorizadoComponent implements OnInit {
 
     this.usuario.op = 1;
 
+    console.log('this.usuario', this.usuario);
+
     this.authService.setLocalToken('');
     this.authService.getUserLogged(this.usuario).subscribe(res => {
       setTimeout(() => {
+        console.log('res');
         if (res.success) {
           const _t = res.token;
           this.authService.setTokenAuth(_t);
@@ -42,7 +45,7 @@ export class LoginPersonalAutorizadoComponent implements OnInit {
             this.authService.setLoggedStatus(true);
             this.authService.setLocalUsuario(this.usuario);
             this.infoToken.converToJSON();
-            this.router.navigate(['./main']);
+            this.router.navigate(['./main-inicio']);
           });
           // this.loading = false;
         } else {

@@ -52,16 +52,38 @@ export class GpsUbicacionRepartidorService {
     this.set();
 
 
+    // emitimos la position al comercio cliente y central
+    this.repartidorService.emitPositionNow(this.geoPosition);
+
     // guarda en la bd // si el pedido aun no esta aceptado, si pedido esta en proceso de entrega no graba, porque es constante
     // -- no aplica tiene que guardar no mas -- para que el comercio sepa su position inicial
-    if ( this.pedidoRepartidorService.pedidoRepartidor.estado === 0 ) {
-      this.repartidorService.guardarPositionActual(this.geoPosition);
+
+    // ahora va a guardar cada 2 minutos
+    console.log('transmitiendo pos');
+    const _mLastPos = this.getMinLastNotificationPosition();
+    const _mMinNow =  new Date().getMinutes();
+    if ( _mLastPos !== _mMinNow ) {
+      if ( _mMinNow % 2 === 0 ) {
+        console.log('save transmitiendo pos');
+        this.setMinLastNotificationPosition();
+        this.repartidorService.guardarPositionActual(this.geoPosition);
+      }
     }
   }
 
   private errorWatchPosition(err: any) {
     // console.warn('ERROR(' + err.code + '): ' + err.message);
-    console.log(err);
+    console.log('error gps', err);
+  }
+
+  private setMinLastNotificationPosition() {
+    localStorage.setItem('sys::last:m:pos', new Date().getMinutes().toString());
+  }
+
+  private getMinLastNotificationPosition() {
+    const _m = localStorage.getItem('sys::last:m:pos');
+    return _m ? parseInt(_m, 0) : 2;
+    // localStorage.setItem('sys::last:m:pos', new Date().getMinutes().toString());
   }
 
   onGeoWatchPosition() {
@@ -69,7 +91,7 @@ export class GpsUbicacionRepartidorService {
 
     const options = {
       enableHighAccuracy: false,
-      timeout: 5000, // cada 10 segundos notifica position
+      timeout: 7000, // cada 7 segundos notifica position
       maximumAge: 0
     };
     navigator.geolocation.watchPosition(pos => this.susccesWatchPosition(pos), this.errorWatchPosition, options);

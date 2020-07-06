@@ -43,6 +43,7 @@ export class PedidosAtendidosComponent implements OnInit {
     this.crudService.getAll('repartidor', 'get-pedidos-resumen-entregados-dia', false, false, true)
     .subscribe((res: any) => {
       this.listResumen = res.data[0][0];
+      if ( !this.listResumen ) { return; }
       this.importeNetoDebitar = parseFloat(this.listResumen.importeDepositar) - parseFloat(this.listResumen.importeDebitar);
         this.importeNetoDepositar = this.importeNetoDebitar < 1 ? 0 : this.importeNetoDebitar;
         this.importeNetoDebitar = this.importeNetoDebitar < 1 ? this.importeNetoDebitar * -1 : 0;

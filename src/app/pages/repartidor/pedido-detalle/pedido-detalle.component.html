@@ -1,5 +1,5 @@
 <div class="animated fadeInRight">
-    <app-comp-pedido-detalle [infoPedido]="infoPedido"></app-comp-pedido-detalle>
+    <app-comp-pedido-detalle [infoPedido]="infoPedido" [showAllSubtotal]="false"></app-comp-pedido-detalle>
     <hr>    
     
     <br><br><br><br>
@@ -7,7 +7,7 @@
     <div class="xfooter animated fadeInUp delay-0-5s">
         <!-- datos de facturacion -->
         <div class="p-2 div-comprobante">
-            <p><span class="fw-600">Solicitar {{infoPedido.datosDelivery.tipoComprobante.descripcion}}: </span> <span class="fw-100">{{ indicacionesComprobante }}</span></p>    
+            <p><span class="fw-600">Solicitar {{comprobanteSolicitar}}: </span> <span class="fw-100">{{ indicacionesComprobante }}</span></p>    
         </div>
         <div matRipple class="bg-success w-100 fs-20 text-white p-3" (click)="goBack()">
             <span><i class="fa fa-arrow-left"></i> Listo, regresar</span>

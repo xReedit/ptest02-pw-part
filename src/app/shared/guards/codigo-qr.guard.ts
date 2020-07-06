@@ -17,7 +17,7 @@ export class CodigoQrGuard implements CanActivate {
   // }
 
   canActivate() {
-    console.log('canActivate', this.verifyClientService.getIsQrSuccess() || this.verifyClientService.getIsDelivery());
+    // console.log('canActivate', this.verifyClientService.getIsQrSuccess() || this.verifyClientService.getIsDelivery());
     return this.verifyClientService.getIsQrSuccess() || this.verifyClientService.getIsDelivery();
   }
 

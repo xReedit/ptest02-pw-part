@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { NotificacionPushService } from 'src/app/shared/services/notificacion-push.service';
 import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
 import { InfoTockenService } from 'src/app/shared/services/info-token.service';
@@ -10,7 +10,7 @@ import { ListenStatusService } from 'src/app/shared/services/listen-status.servi
   templateUrl: './dialog-efectivo-repartidor.component.html',
   styleUrls: ['./dialog-efectivo-repartidor.component.css']
 })
-export class DialogEfectivoRepartidorComponent implements OnInit {
+export class DialogEfectivoRepartidorComponent implements OnInit, AfterViewInit {
   isOnNotificactionPush = false;
   isOnGeoPosition = false;
   importeIndicado = 0;
@@ -24,14 +24,19 @@ export class DialogEfectivoRepartidorComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
+  }
+
+  ngAfterViewInit(): void {
     this.isOnNotificactionPush = this.pushNotificationService.getIsTienePermiso();
 
-    this.geoPositionService.onGeoPosition();
+    // this.geoPositionService.onGeoPosition();
 
-    setTimeout(() => {
-      this.isOnGeoPosition = this.geoPositionService.getGeoPosition().hasPermition;
-      this.pushNotificationService.suscribirse();
-    }, 1500);
+    // setTimeout(() => {
+    //   this.isOnGeoPosition = this.geoPositionService.getGeoPosition().hasPermition;
+    //   this.pushNotificationService.suscribirse();
+    // }, 1500);
+
   }
 
   guardarEfectivoMano() {
@@ -39,7 +44,7 @@ export class DialogEfectivoRepartidorComponent implements OnInit {
     this.repartidorService.guardarEfectivo(this.importeIndicado, 1);
 
     // comienza a registrar posicion actual
-    this.geoPositionService.onGeoWatchPosition();
+    // this.geoPositionService.onGeoWatchPosition();
 
     this.infoTokenService.setEfectivoMano(this.importeIndicado);
     this.listenService.setEfectivoMano(this.importeIndicado);

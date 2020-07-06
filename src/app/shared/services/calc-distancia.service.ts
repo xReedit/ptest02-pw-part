@@ -73,7 +73,7 @@ export class CalcDistanciaService {
 
 
   // retorna true si esta cerca
-  calcDistancia(coordOrigen: GeoPositionModel, coordDetino: GeoPositionModel, radius: number = 75): boolean {
+  calcDistancia(coordOrigen: GeoPositionModel, coordDetino: GeoPositionModel, radius: number = 100): boolean {
     coordDetino.latitude = typeof coordDetino.latitude === 'string' ? parseFloat(coordDetino.latitude) : coordDetino.latitude;
     coordDetino.longitude = typeof coordDetino.longitude === 'string' ? parseFloat(coordDetino.longitude) : coordDetino.longitude;
     const center = {lat: coordDetino.latitude, lon: coordDetino.longitude };

@@ -27,7 +27,7 @@ export class JsonPrintService {
     // this.socketService.onGetDatosSede().subscribe((res: any) => {
       // this.datosSede = res[0];
       this.datosSede = this.pedidoService.objDatosSede;
-      console.log('datos de la sede', this.datosSede);
+      // console.log('datos de la sede', this.datosSede);
     // });
   }
 

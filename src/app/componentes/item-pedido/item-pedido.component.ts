@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
 import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
+import { DeliveryEstablecimiento } from 'src/app/modelos/delivery.establecimiento';
 
 
 @Component({
@@ -9,43 +10,61 @@ import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartid
   templateUrl: './item-pedido.component.html',
   styleUrls: ['./item-pedido.component.css']
 })
-export class ItemPedidoComponent implements OnInit {
+export class ItemPedidoComponent implements OnInit, OnChanges  {
 
-  @Input() infoPedido: PedidoRepartidorModel;
+  @Input() listPedidos: any;
+  @Input() importeAcumuladoPagar: any;
+  // @Input() infoPedido: PedidoRepartidorModel;
   @Output() aceptaPedido = new EventEmitter<boolean>(false);
 
   estadoPedido = 0;
+  countPedidos = 0;
+  sumGananciaTotal = 0;
+  sumKmRecorrer = 0;
+  isHayPropina = false;
   DesPagarCon: string; // descripcion de pagar con
+  establecimientoOrden: DeliveryEstablecimiento;
+
   constructor(
     public timerLimitService: TimerLimitService,
-    private pedidoRepartidorService: PedidoRepartidorService,
+    public pedidoRepartidorService: PedidoRepartidorService,
   ) { }
 
+  ngOnChanges() {
+    // create header using child_id
+    console.log(this.listPedidos);
+  }
+
   ngOnInit() {
-    // this.DesPagarCon = this.infoPedido.datosDelivery.metodoPago.idtipo_pago === 1 ?  `Pagar con efectivo.` : `El pedido ya esta pagado, solo recoger.`;
+    // console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+    this.leerInfoGroup();
+  }
 
-    switch (this.infoPedido.datosDelivery.metodoPago.idtipo_pago) {
-      case 1:
-        this.DesPagarCon = 'Pagar con efectivo';
-        break;
-      case 2:
-        this.DesPagarCon = 'El pedido ya esta pagado, solo recoger.';
-        break;
-      case 3: // yape
-        this.DesPagarCon = 'El cliente pagara con Yape.';
-        break;
-    }
+  private leerInfoGroup() {
+    this.pedidoRepartidorService.init();
+    console.log('this.pedidoRepartidorService.pedidoRepartidor', this.pedidoRepartidorService.pedidoRepartidor);
 
-    this.estadoPedido = this.infoPedido.estado;
+    this.estadoPedido = this.pedidoRepartidorService.pedidoRepartidor.estado ? this.pedidoRepartidorService.pedidoRepartidor.estado : this.listPedidos[0].estado;
+    this.countPedidos = this.listPedidos.length;
+    this.establecimientoOrden = this.listPedidos[0].json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
 
-    if (  parseFloat(this.infoPedido.c_servicio) === 0 && this.infoPedido.datosComercio.pwa_delivery_comercio_paga_entrega === 1 ) {
-      this.infoPedido.c_servicio = this.infoPedido.datosDelivery.costoTotalDelivery;
-    }
+    this.listPedidos.map((p: any) => {
+      this.sumGananciaTotal += parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value);
+      this.sumKmRecorrer += parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.c_km);
+      if ( !this.isHayPropina ) {
+        this.isHayPropina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value > 0;
+      }
+    });
+
+    this.pedidoRepartidorService.pedidoRepartidor.sumGananciaTotal = this.sumGananciaTotal;
+    this.pedidoRepartidorService.setLocal();
+
     this.showPedido();
   }
 
   showPedido() {
-    if ( this.estadoPedido === 0 ) {
+    // if ( this.estadoPedido === 0 ) {
+    if ( this.pedidoRepartidorService.pedidoRepartidor.pedido_paso_va === 0 ) {
       this.timerLimitService.isPlayTimer = false;
       this.timerLimitService.playCountTimerLimit();
 
@@ -71,11 +90,16 @@ export class ItemPedidoComponent implements OnInit {
 
   // acepta asigna pedido
   aceptarPedido(): void {
-    if  ( this.estadoPedido === 0 ) {
+    // if  ( this.estadoPedido === 0 ) {
+    if ( this.pedidoRepartidorService.pedidoRepartidor.pedido_paso_va === 0 ) {
       this.estadoPedido = 1;
-      this.infoPedido.estado = 1;
-      this.pedidoRepartidorService.asignarPedido();
+      this.pedidoRepartidorService.pedidoRepartidor.pedido_paso_va = 1;
+      this.pedidoRepartidorService.setPedidoPasoVa(1);
+      // this.infoPedido.estado = 1;
     }
+
+    this.pedidoRepartidorService.asignarPedido();
+    this.pedidoRepartidorService.pedidoRepartidor.aceptado = true;
     this.aceptaPedido.emit(true);
   }
 

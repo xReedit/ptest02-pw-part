@@ -6,6 +6,10 @@ import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
 import { SocketService } from './socket.service';
 import { InfoTockenService } from './info-token.service';
 import { ListenStatusService } from './listen-status.service';
+import { Router } from '@angular/router';
+import { SseService } from './sse.service';
+import { PedidoRepartidorService } from './pedido-repartidor.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +17,16 @@ import { ListenStatusService } from './listen-status.service';
 export class RepartidorService {
   private idSedeRepartidor;
   private idRepartidor;
+
+
   constructor(
     private crudService: CrudHttpService,
     private socketService: SocketService,
     private infoToken: InfoTockenService,
-    private listenService: ListenStatusService
+    private listenService: ListenStatusService,
+    private router: Router,
+    private pedidoRepartidorService: PedidoRepartidorService,
+    private sseService: SseService
   ) {
 
     this.idSedeRepartidor = this.infoToken.getInfoUs().usuario.idsede_suscrito;
@@ -36,7 +45,21 @@ export class RepartidorService {
       .subscribe(res => {
         console.log('ya esta', res);
       });
+
+    // if (  _online === 1  ) {
+    //   this.crudService.getAll('repartidor', 'get-view-event-new-pedido', false, false, true)
+    //   .subscribe(res => {
+    //     console.log('get-view-event-new-pedido', res);
+    //   });
+    // }
   }
+
+  // listenPedidosNuevos() {
+  //   const idRepartidor = this.infoToken.infoUsToken.usuario.idrepartidor;
+  //   this.sseService
+  //     .getServerSentEvent('repartidor', 'get-view-event-new-pedido', false, idRepartidor)
+  //     .subscribe(data => console.log(data));
+  // }
 
   guardarPositionActual(_pos: GeoPositionModel) {
     const _data = {
@@ -45,6 +68,19 @@ export class RepartidorService {
 
     this.crudService.postFree(_data, 'repartidor', 'set-position-now', true)
       .subscribe(res => {
+      });
+
+  }
+
+  guardarPasoVa(_paso_va: number) {
+    const _data = {
+      paso_va: _paso_va
+    };
+
+    console.log('set-paso-pedido-va', _paso_va);
+    this.crudService.postFree(_data, 'repartidor', 'set-paso-pedido-va', true)
+      .subscribe(res => {
+        console.log('.');
       });
 
   }
@@ -60,18 +96,23 @@ export class RepartidorService {
   }
 
   // emitir posicion actual (comercio / cliente)
-  emitPositionNow(_coordenadas, pedido: PedidoRepartidorModel, idsedeComercio = null) {
+  emitPositionNow(_coordenadas, pedido: PedidoRepartidorModel = null, idsedeComercio = null) {
+    // emitir a comercio
+    const _idComercio = this.idSedeRepartidor ? this.idSedeRepartidor : this.pedidoRepartidorService.pedidoRepartidor ? this.pedidoRepartidorService.pedidoRepartidor.idsede : null;
+    const _pedido = pedido ? pedido : this.pedidoRepartidorService.pedidoRepartidor;
+
     const _dataSend = {
       coordenadas : {
         latitude: _coordenadas.lat || _coordenadas.latitude,
         longitude: _coordenadas.lng || _coordenadas.longitude,
       },
       idrepartidor: this.idRepartidor,
-      idcliente: pedido?.datosCliente?.idcliente || null,
-      idsede: idsedeComercio ? idsedeComercio : this.idSedeRepartidor
+      idcliente: _pedido?.datosCliente?.idcliente || null,
+      idsede: idsedeComercio ? idsedeComercio : _idComercio,
+      minuto: new Date().getMinutes() // para guadar position cada 2 minutos
     };
 
-    // console.log('repartidor-notifica-ubicacion', _dataSend);
+    console.log('repartidor-notifica-ubicacion', _dataSend);
 
     const geoposiionNow = new GeoPositionModel;
     geoposiionNow.latitude = _coordenadas.latitude;
@@ -81,5 +122,12 @@ export class RepartidorService {
     this.socketService.emit('repartidor-notifica-ubicacion', _dataSend);
 
 
+  }
+
+  cerrarSession() {
+    this.guardarEfectivo(0, 0);
+    this.socketService.closeConnection();
+    localStorage.clear();
+    this.router.navigate(['../']);
   }
 }

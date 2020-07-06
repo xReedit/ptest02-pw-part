@@ -11,30 +11,41 @@ import { Router } from '@angular/router';
 import { SocketService } from './socket.service';
 import { InfoTockenService } from './info-token.service';
 import { ListenStatusService } from './listen-status.service';
+import { EstablecimientoService } from './establecimiento.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PedidoRepartidorService {
   pedidoRepartidor: PedidoRepartidorModel;
+  pedidoSelected: any;
+  grupoPedidoIds: any;
+  grupoPedidoItems: any;
   keyLocal = 'sys::pr';
+  keyLocalIds = 'sys::pr::ids';
+  keyLocalItem = 'sys::pr::it';
+  keyLocalItemSelected = 'sys::pr::selected';
 
   constructor(
     private crudService: CrudHttpService,
     private router: Router,
     private infoTokenService: InfoTockenService,
     private listenService: ListenStatusService,
-    private socketService: SocketService
+    private socketService: SocketService,
   ) {
     this.init();
   }
 
   init() {
     this.pedidoRepartidor = this.getLocal();
+
   }
 
   cleanLocal(): void {
+    localStorage.removeItem(this.keyLocalIds);
+    localStorage.removeItem(this.keyLocalItem);
     localStorage.removeItem(this.keyLocal);
+    localStorage.removeItem(this.keyLocalItemSelected);
     this.pedidoRepartidor = this.getLocal();
   }
 
@@ -43,50 +54,86 @@ export class PedidoRepartidorService {
     this.setLocal(this.pedidoRepartidor);
   }
 
-  setCostoSercicio(val: string) {
-    this.pedidoRepartidor.c_servicio = val;
+  setPedidoPasoVa(val: number) {
+    // console.log('estado cambiado', val);
+    this.pedidoRepartidor.pedido_paso_va = val;
     this.setLocal(this.pedidoRepartidor);
   }
 
-  setImporteTotalPedido(val: string) {
-    this.pedidoRepartidor.importePedido = val;
-    this.setLocal(this.pedidoRepartidor);
-  }
+  // setCostoSercicio(val: string) {
+  //   this.pedidoRepartidor.c_servicio = val;
+  //   this.setLocal(this.pedidoRepartidor);
+  // }
 
-  setIsHayPropina(val: boolean) {
-    this.pedidoRepartidor.isHayPropina = val;
-    this.setLocal(this.pedidoRepartidor);
-  }
+  // setImporteTotalPedido(val: string) {
+  //   this.pedidoRepartidor.importePedido = val;
+  //   this.setLocal(this.pedidoRepartidor);
+  // }
+
+  // setIsHayPropina(val: boolean) {
+  //   this.pedidoRepartidor.isHayPropina = val;
+  //   this.setLocal(this.pedidoRepartidor);
+  // }
 
   setLocal(obj = null) {
     obj = obj ? obj : this.pedidoRepartidor;
     localStorage.setItem(this.keyLocal, btoa(JSON.stringify(obj)));
   }
 
+  setLocalIds(obj) {
+    // obj = obj ? obj : this.pedidoRepartidor;
+    localStorage.setItem(this.keyLocalIds, btoa(JSON.stringify(obj)));
+  }
+
+  setLocalItems(obj) {
+    // obj = obj ? obj : this.pedidoRepartidor;
+    localStorage.setItem(this.keyLocalItem, btoa(JSON.stringify(obj)));
+  }
+
+  setPedidoSelect(obj: any) {
+    localStorage.setItem(this.keyLocalItemSelected, btoa(JSON.stringify(obj)));
+  }
+
+  getPedidoSelect() {
+    const rpt = localStorage.getItem(this.keyLocalItemSelected);
+    return rpt ? JSON.parse(atob(rpt)) : null;
+  }
+
+  getLocalIds(): any {
+    const rpt = localStorage.getItem(this.keyLocalIds);
+    return rpt ? JSON.parse(atob(rpt)) : null;
+  }
+
+  getLocalItems(): any {
+    const rpt = localStorage.getItem(this.keyLocalItem);
+    return rpt ? JSON.parse(atob(rpt)) : null;
+  }
+
   getLocal(): PedidoRepartidorModel {
     const rpt = localStorage.getItem(this.keyLocal);
-    try {
-      return rpt ? JSON.parse(atob(rpt)) : new PedidoRepartidorModel;
-    } catch (error) {
-      console.log('clean pedido from getlocal');
-      this.cleanLocal();
-      return new PedidoRepartidorModel;
+    return rpt ? JSON.parse(atob(rpt)) : new PedidoRepartidorModel;
+    // try {
+    // } catch (error) {
+    //   console.log('clean pedido from getlocal');
+    //   this.cleanLocal();
+    //   return new PedidoRepartidorModel;
 
-    }
+    // }
   }
 
   asignarPedido(): void {
-    console.log('set-asignar-pedido');
+    // console.log('set-asignar-pedido');
+    const ids = this.getLocalIds().pedidos.join(',');
     const _data = {
-      idpedido: this.pedidoRepartidor.idpedido
+      idpedido: ids
     };
 
     this.crudService.postFree(_data, 'repartidor', 'set-asignar-pedido', true)
       .subscribe(res => {
-        console.log(res);
+        // console.log(res);
         this.pedidoRepartidor.estado = 1; // asignadp
         this.setLocal();
-        this.setPasoVa(1);
+        // this.setPasoVa(1);
 
       });
   }
@@ -100,7 +147,7 @@ export class PedidoRepartidorService {
 
   // dar formato subtotales del pedido recibido
   // saca el importe total del pedido separando el importe del servicio de entrega
-  darFormatoSubTotales(arrTotales: any = null) {
+  darFormatoSubTotales(arrTotales: any = null, pwa_delivery_comercio_paga_entrega = null , costoEntrega = null) {
     this.init();
     arrTotales = arrTotales ? arrTotales : this.pedidoRepartidor.datosSubtotalesShow;
     const rowTotal = arrTotales[arrTotales.length - 1];
@@ -108,10 +155,12 @@ export class PedidoRepartidorService {
     // lo que paga el cliente
     this.pedidoRepartidor.importePagaCliente = rowTotal.importe;
 
+    pwa_delivery_comercio_paga_entrega = pwa_delivery_comercio_paga_entrega !== null ? pwa_delivery_comercio_paga_entrega : this.pedidoRepartidor.datosComercio.pwa_delivery_comercio_paga_entrega;
+    costoEntrega = costoEntrega ? costoEntrega : this.pedidoRepartidor.datosDelivery.costoTotalDelivery;
 
     // agregar o restar el importe del costo de entrega SI el comercio paga el costo de entrega pwa_delivery_comercio_paga_entrega
-    if ( this.pedidoRepartidor.datosComercio.pwa_delivery_comercio_paga_entrega === 1 ) {
-      const costoEntrega = this.pedidoRepartidor.datosDelivery.costoTotalDelivery;
+    if ( pwa_delivery_comercio_paga_entrega === 1 ) {
+      // const costoEntrega = this.pedidoRepartidor.datosDelivery.costoTotalDelivery;
       // ingresamos en la penultima postion del arrTotales
       const postionInsert = arrTotales.length - 1;
       const _row = {
@@ -232,7 +281,7 @@ export class PedidoRepartidorService {
       return _miPedidoCuenta;
   }
 
-  darFormatoPedidoLocal(pedidoLocal: PedidoModel): any {
+  darFormatoPedidoLocal(pedidoLocal: PedidoModel, subotales = null): any {
     let subTotalDefault = 0;
 
     pedidoLocal.tipoconsumo.map(tp => {
@@ -249,21 +298,21 @@ export class PedidoRepartidorService {
      });
     });
 
-    this.reCalcularSubTotal(subTotalDefault);
+    this.reCalcularSubTotal(subTotalDefault, subotales);
     return pedidoLocal;
   }
 
   // subTotal = recibido del default
-  reCalcularSubTotal( subTotalDefault: number ) {
+  reCalcularSubTotal( subTotalDefault: number , subotales = null) {
     this.init();
-    const _rowSubTotal = this.pedidoRepartidor.datosSubtotales[0];
+    const _rowSubTotal = subotales ? subotales[0] : this.pedidoRepartidor.datosSubtotales[0];
     // si el tototal es igual quiere decir de que no hay default comercio afiliado
     if ( subTotalDefault === parseFloat(_rowSubTotal.importe) ) { return; }
     const _diffSubTotal  = parseFloat(_rowSubTotal.importe) - subTotalDefault;
     _rowSubTotal.importe = subTotalDefault;
 
     // sumamos los totales
-    const rowTotal = this.pedidoRepartidor.datosSubtotales.filter(x => x.descripcion === 'TOTAL')[0];
+    const rowTotal = subotales.filter(x => x.descripcion === 'TOTAL')[0];
 
     // importe que pagara el cliente
     this.pedidoRepartidor.importePagaCliente = rowTotal.importe;
@@ -272,7 +321,7 @@ export class PedidoRepartidorService {
     rowTotal.importe = parseFloat(rowTotal.importe) - _diffSubTotal;
 
     // this.pedidoRepartidor.datosSubtotales =
-    this.setLocal();
+    // this.setLocal();
   }
 
 
@@ -291,10 +340,25 @@ export class PedidoRepartidorService {
     });
   }
 
+  // load pedidos asignados // grupo de pedidos
+  loadPedidosRecibidos(_ids: string) {
+    return new Observable(observer => {
+      const _dataSend = {
+        ids: _ids
+      };
+      this.crudService.postFree(_dataSend, 'repartidor', 'get-pedidos-recibidos-group')
+        .subscribe(res => {
+          // this.pedidoRepartidor.estado = res.data[0].pwa_delivery_status;
+          observer.next(res.data);
+        });
+    });
+  }
+
 
   // fin de pedido // guarda datos del pedido
-  finalizarPedido(): void {
-    const comisionRepartidor = parseFloat(this.pedidoRepartidor.c_servicio); // - parseFloat( this.pedidoRepartidor.datosComercio.pwa_delivery_comision_fija_no_afiliado );
+  // isGrupoPedidos = si es grupo de pedidos
+  finalizarPedido(isGrupoPedidos = false): void {
+    const comisionRepartidor = parseFloat(this.pedidoRepartidor.datosDelivery.costoTotalDelivery); // - parseFloat( this.pedidoRepartidor.datosComercio.pwa_delivery_comision_fija_no_afiliado );
     const propinaRepartidor = this.pedidoRepartidor.datosDelivery.propina.value;
     const costotalServicio = comisionRepartidor + parseFloat(propinaRepartidor);
 
@@ -302,11 +366,11 @@ export class PedidoRepartidorService {
 
     // importeDepositar siempre y cuando el comercio no esta afiliado
     // const importeDepositar = _importePagaCliente - (parseFloat(this.pedidoRepartidor.importePedido) + costotalServicio);
-
+    const _idRepartidor = this.pedidoRepartidor.datosRepartidor ? this.pedidoRepartidor.datosRepartidor.idrepartidor : this.infoTokenService.infoUsToken.usuario.idrepartidor;
     const _dataSend = {
-      idrepartidor: this.pedidoRepartidor.datosRepartidor.idrepartidor,
+      idrepartidor: _idRepartidor,
       idpedido: this.pedidoRepartidor.idpedido,
-      idcliente: this.pedidoRepartidor.datosCliente.idcliente,
+      idcliente: this.pedidoRepartidor.datosDelivery.idcliente,
       idsede: this.pedidoRepartidor.datosComercio.idsede,
       operacion: {
         isrepartidor_propio: false,
@@ -323,15 +387,40 @@ export class PedidoRepartidorService {
 
     // (a) = cuando el comercio no esta afiliado el importe que el repartidor debe depositar, el imnporte fijo de comercio no afiliado
     // (b) = precios de los productos sin comision
-
-    this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
-
     this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-entregado')
       .subscribe(res => {
-        console.log(res);
-        console.log('clean from finalizarPedido');
-        this.cleanLocal();
-        this.router.navigate(['./main/pedidos']);
+        // console.log(res);
+        // console.log('clean from finalizarPedido');
+        // chequea si todos los pedidos estan finalizados
+        if ( isGrupoPedidos ) {
+          const _pedidoFinalizar = this.getPedidoSelect();
+          this.listenService.setPedidoModificado(_pedidoFinalizar);
+
+          const allPedidos = this.getLocalItems();
+          // save estado pedido
+          const elPedido = allPedidos.filter(p => p.idpedido === _pedidoFinalizar.idpedido)[0];
+          elPedido.estado = 2;
+          this.setLocalItems(allPedidos);
+          this.socketService.emit('repartidor-notifica-fin-one-pedido', _pedidoFinalizar);
+
+          // console.log('repartidor-notifica-fin-one-pedido');
+
+          // chequea si los demas estan ya estan cerrados
+          const numCerrados = allPedidos.filter(p => p.estado === 0).length;
+          if ( numCerrados === 0 ) {
+            this.socketService.emit('repartidor-grupo-pedido-finalizado', _idRepartidor);
+            // console.log('repartidor-grupo-pedido-finalizado');
+            this.cleanLocal();
+            this.router.navigate(['./main/pedidos']);
+          }
+        } else {
+
+          this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
+
+          this.cleanLocal();
+          this.router.navigate(['./main/pedidos']);
+        }
+
       });
   }
 
@@ -366,9 +455,9 @@ export class PedidoRepartidorService {
     // cuando termina el pedido el repartidor se guarda el tiempo en el pedido
     this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-entregado')
       .subscribe(res => {
-        console.log(res);
+        // console.log(res);
 
-        console.log('repartidor-propio-notifica-fin-pedido');
+        // console.log('repartidor-propio-notifica-fin-pedido');
         this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
         // this.cleanLocal();
         // this.router.navigate(['./repartidor/pedidos']);
@@ -379,14 +468,14 @@ export class PedidoRepartidorService {
   pedidoNoAceptadoReasingar() {
     // estado = 1 es aceptado
     if ( this.pedidoRepartidor.estado === 0 ) {
-      console.log('termina tiempo reasigna pedido repartidor-declina-pedido', this.pedidoRepartidor);
+      // console.log('termina tiempo reasigna pedido repartidor-declina-pedido', this.pedidoRepartidor);
       const _num_reasignado = this.pedidoRepartidor.num_reasignado ? this.pedidoRepartidor.num_reasignado + 1 : 0;
       this.pedidoRepartidor.num_reasignado = _num_reasignado === 0 ? 1 : _num_reasignado;
       this.pedidoRepartidor.is_reasignado = true;
       // this.socketService.emit('repartidor-declina-pedido', this.pedidoRepartidor);
 
       // clear local pedido
-      console.log('clean from pedidoNoAceptadoReasingar');
+      // console.log('clean from pedidoNoAceptadoReasingar');
       this.cleanLocal();
     }
   }
@@ -403,7 +492,7 @@ export class PedidoRepartidorService {
       if ( !_pedido.datosItems ) {
         pedido.idpedido = _pedido.idpedido;
         // pedido.datosItems = res[1].dataItems || res[1].datosItem;
-        // pedido.datosDelivery = res[1].dataDelivery || res[1].datosDelivery;
+        pedido.datosDelivery = _pedido.json_datos_delivery; // res[1].dataDelivery || res[1].datosDelivery;
         pedido.datosItems = _pedido.json_datos_delivery.p_body;
         pedido.datosDelivery = _pedido.json_datos_delivery.p_header.arrDatosDelivery;
         pedido.datosComercio = pedido.datosDelivery.establecimiento;
@@ -422,7 +511,7 @@ export class PedidoRepartidorService {
     pedido.datosComercio.longitude = typeof pedido.datosComercio.longitude ===  'string' ? parseFloat(pedido.datosComercio.longitude) : pedido.datosComercio.longitude;
 
     this.pedidoRepartidor = pedido;
-    this.setLocal();
+    // this.setLocal();
   }
 
 }

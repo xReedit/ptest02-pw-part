@@ -17,6 +17,8 @@ export class ToolBarRepartidorComponent implements OnInit {
   isTogleActive = false;
   isRepartidorPropio = false;
 
+  estadoOnline = 'En linea';
+
   nomRepatidor = '';
   constructor(
     private infoTokenService: InfoTockenService,
@@ -27,6 +29,7 @@ export class ToolBarRepartidorComponent implements OnInit {
   ngOnInit() {
     this.isTogleActive = this.infoTokenService.infoUsToken.isOnline;
     this.isRepartidorPropio = this.infoTokenService.infoUsToken.usuario.idsede_suscrito;
+    this.estadoOnline = this.isRepartidorPropio ? 'En linea'  : this.isTogleActive ? 'En linea' : 'Fuera de linea';
 
     // console.log(this.infoTokenService.infoUsToken.usuario);
     this.nomRepatidor = this.infoTokenService.infoUsToken.usuario.nombre + ' ' + this.infoTokenService.infoUsToken.usuario.apellido;
@@ -45,7 +48,10 @@ export class ToolBarRepartidorComponent implements OnInit {
     this.infoTokenService.setisOnline(this.isTogleActive);
     this.changeTogle.emit(this.isTogleActive);
 
+    this.estadoOnline = 'En linea';
+
     if ( !this.isTogleActive ) {
+      this.estadoOnline = 'Fuera de linea';
       this.repartidorService.guardarEfectivo(0, 0);
     }
   }

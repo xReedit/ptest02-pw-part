@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 // import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
@@ -12,21 +12,32 @@ import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
 import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
 import { GpsUbicacionRepartidorService } from 'src/app/shared/services/gps-ubicacion-repartidor.service';
 import { CrudHttpService } from 'src/app/shared/services/crud-http.service';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { RepartidorService } from 'src/app/shared/services/repartidor.service';
 
 @Component({
   selector: 'app-pedidos',
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css']
 })
-export class PedidosComponent implements OnInit, OnDestroy {
+export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
   efectivoMano = 0;
   pedidoRepartidor: PedidoRepartidorModel;
   listPedidos = [];
+  listPedidosGroup = [];
   _tabIndex = 0;
+  sumAcumuladoPagar = 0;
+
+  yaQuitoPedido = 0;
+
+  dataPedidos: any;
 
   private positionNow: GeoPositionModel;
 
   private destroy$: Subject<boolean> = new Subject<boolean>();
+  private unsubscribeSocket = new Subscription();
+  private unsubscribeSocketClearPedido = new Subscription();
+
   constructor(
     private infoTokenService: InfoTockenService,
     // public timerLimitService: TimerLimitService,
@@ -36,25 +47,39 @@ export class PedidosComponent implements OnInit, OnDestroy {
     private listenService: ListenStatusService,
     public timerLimitService: TimerLimitService,
     private geoPositionService: GpsUbicacionRepartidorService,
-    private crudService: CrudHttpService
+    // private crudService: CrudHttpService,
+    private repartidorServcice: RepartidorService
   ) { }
 
   ngOnInit() {
     this.efectivoMano = this.infoTokenService.infoUsToken.efectivoMano;
     this.listenService.setEfectivoMano(this.efectivoMano);
 
-    console.log('this.infoTokenService.infoUsToken', this.infoTokenService.infoUsToken);
+
+    // this.repartidorServcice.listenPedidosNuevos();
+    // console.log('this.infoTokenService.infoUsToken', this.infoTokenService.infoUsToken);
 
     // this.listPedidos = new PedidoRepartidorModel[0];
-    this.listenPedidos();
+  }
 
+  ngAfterViewInit(): void {
     this.geoPositionService.onGeoPosition();
+
+    // iniciar transmitir position
+    this.geoPositionService.onGeoWatchPosition();
+
+
+    this.listenPedidos();
   }
 
   ngOnDestroy(): void {
+    this.unsubscribeSocket.unsubscribe();
+    this.unsubscribeSocketClearPedido.unsubscribe();
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
   }
+
+
 
   listenPedidos() {
 
@@ -65,122 +90,144 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
     // si recarga la pagina chequea si existe pedido pendiente
     this.pedidoRepartidor = this.pedidoRepartidorService.pedidoRepartidor;
+
     // // if ( this.pedidoRepartidor.estado === 0 ) {
     //   this.addPedidoToList(this.pedidoRepartidor);
     // }
 
     // verificar si tenemos pedidos pendientes por aceptar
-    this.socketService.onRepartidorGetPedidoPendienteAceptar()
-    .pipe(takeUntil(this.destroy$))
+    this.unsubscribeSocket = this.socketService.onRepartidorGetPedidoPendienteAceptar()
     .subscribe((res: any) => {
-      let _pedido = res[0].pedido_por_aceptar;
-      // console.log('onRepartidorGetPedidoPendienteAceptar', _pedido);
-      _pedido = this.pedidoRepartidorService.pedidoRepartidor.idpedido ? this.pedidoRepartidorService.pedidoRepartidor :  _pedido;
-      // if ( _pedido && !this.pedidoRepartidorService.pedidoRepartidor.idpedido) {
-        this.pedidoRepartidorService.darFormatoLocalPedidoRepartidorModel(_pedido);
-        // this.pedidoRepartidorService.setLocal(_pedido);
-        // this.pedidoRepartidorService.init();
 
-        this.pedidoRepartidor = this.pedidoRepartidorService.pedidoRepartidor;
+      console.log('repartidor-get-pedido-pendiente-aceptar', res[0]);
+      this.dataPedidos = res[0].pedido_por_aceptar;
 
-        this.addPedidoToList(this.pedidoRepartidor);
-      // }
-    });
+      // this.pedidoRepartidorService.setPedidoPasoVa(res[0].pedido_paso_va);
 
-
-
-    this.socketService.onRepartidorNuevoPedido()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((res: any) => {
-      let pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
-      // console.log('nuevo pedidos', res);
-      if ( res[1]?.is_reasignado ) { // si es reasignado
-        pedido = res[1];
-      } else {
-        pedido.datosRepartidor = res[0];
-        pedido.idpedido = res[1].idpedido;
-        // pedido.datosItems = res[1].dataItems || res[1].datosItem;
-        // pedido.datosDelivery = res[1].dataDelivery || res[1].datosDelivery;
-        pedido.datosItems = res[1].json_datos_delivery.p_body;
-        pedido.datosDelivery = res[1].json_datos_delivery.p_header.arrDatosDelivery;
-        pedido.datosComercio = pedido.datosDelivery.establecimiento;
-        pedido.datosCliente = pedido.datosDelivery.direccionEnvioSelected;
-        pedido.datosSubtotales = pedido.datosDelivery.subTotales;
-        pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales;
-        pedido.estado = 0;
-      }
-
-      this.pedidoRepartidorService.setLocal(pedido);
-
-      // console.log('nuevo pedido resivido', res);
-      // console.log('nuevo pedido resivido', pedido);
-      this.addPedidoToList(pedido);
-      // this.listPedidos.push(pedido);
-    });
-
-
-    this.socketService.onRepartidorServerQuitaPedido()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((idpedido_res: any) => {
-      // console.log('onRepartidorServerQuitaPedido', idpedido_res);
-      if ( this.pedidoRepartidorService.pedidoRepartidor.idpedido === idpedido_res ) {
-        this.listPedidos = [];
-        // console.log('clean from onRepartidorServerQuitaPedido');
+      if ( this.dataPedidos === null || res[0].solicita_liberar_pedido === 1) {
+        // console.log('clear pedidos');
+        this.listPedidosGroup = [];
         this.pedidoRepartidorService.cleanLocal();
         this.timerLimitService.stopCountTimerLimit();
+        return;
       }
+
+
+      if ( this.dataPedidos ) {
+        this.dataPedidos.pedido_paso_va = res[0].pedido_paso_va;
+        this.yaQuitoPedido = 2;
+        this.pedidoRepartidorService.setPedidoPasoVa(this.dataPedidos.pedido_paso_va);
+        this.darFormatoGrupoPedidosRecibidos(this.dataPedidos);
+      }
+
+    });
+
+
+    // opcion 2 // grupo de pedidos
+    this.unsubscribeSocket = this.socketService.onRepartidorNuevoPedido()
+    .subscribe((res: any) => {
+      const pedidos = res[1];
+
+
+      this.yaQuitoPedido = 1;
+      this.pedidoRepartidorService.setPedidoPasoVa(0);
+      // this.pedidoRepartidorService.setPedidoPasoVa(this.dataPedidos.pedido_paso_va);
+      this.darFormatoGrupoPedidosRecibidos(pedidos);
+    });
+
+
+    this.unsubscribeSocketClearPedido = this.socketService.onRepartidorServerQuitaPedido()
+    .subscribe((idpedido_res: any) => {
+        if ( this.yaQuitoPedido === 1 ) {
+          this.pedidoRepartidorService.setPedidoPasoVa(0);
+          this.pedidoRepartidorService.setPasoVa(0);
+          this.listPedidosGroup = [];
+          this.pedidoRepartidorService.cleanLocal();
+          this.timerLimitService.stopCountTimerLimit();
+          this.yaQuitoPedido = 0;
+        }
+      // }
     });
   }
 
-  private addPedidoToList(pedido: PedidoRepartidorModel): void {
-    if ( !pedido.datosDelivery ) { return; }
-    console.log('pedido', pedido);
-    if ( !pedido.conFormato ) {
-      this.pedidoRepartidorService.darFormatoPedidoLocal(pedido.datosItems);
+  private darFormatoGrupoPedidosRecibidos(pedidos: any) {
+    if ( !pedidos ) {return; }
+    this.sumAcumuladoPagar = pedidos.importe_pagar;
+    this.pedidoRepartidorService.loadPedidosRecibidos(pedidos.pedidos.join(','))
+        .subscribe((response: any) => {
+          // console.log('res', response);
 
-      const _arrTotal = this.pedidoRepartidorService.darFormatoSubTotales();
-      pedido = this.pedidoRepartidorService.pedidoRepartidor;
-      pedido.datosSubtotalesShow = _arrTotal;
-      pedido.conFormato  = true; // indica que ya tiene formato
-    }
+          // formateamos el json_}¿datos
+          const _listAsignar = response.map(p => {
+            p.json_datos_delivery = JSON.parse(p.json_datos_delivery);
+            p.importe_pagar_comercio =  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal) -  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
+            p.importe_pagar_comercio = p.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2 ? 0 : p.importe_pagar_comercio;
+            return p;
+          });
 
-    this.pedidoRepartidorService.setLocal(pedido);
-    this.listPedidos.push(pedido);
 
-    // console.log(pedido);
+          this.listPedidosGroup = JSON.parse(JSON.stringify(_listAsignar));
 
-    this.pedidoRepartidorService.playAudioNewPedido();
+          this.pedidoRepartidorService.setLocalIds(pedidos);
+          this.pedidoRepartidorService.setLocalItems( this.listPedidosGroup );
+
+          this.pedidoRepartidorService.playAudioNewPedido();
+
+        });
   }
+
+  // private addPedidoToList(pedido: PedidoRepartidorModel): void {
+  //   if ( !pedido.datosDelivery ) { return; }
+  //   // console.log('pedido', pedido);
+  //   if ( !pedido.conFormato ) {
+  //     this.pedidoRepartidorService.darFormatoPedidoLocal(pedido.datosItems);
+
+  //     const _arrTotal = this.pedidoRepartidorService.darFormatoSubTotales();
+  //     pedido = this.pedidoRepartidorService.pedidoRepartidor;
+  //     pedido.datosSubtotalesShow = _arrTotal;
+  //     pedido.conFormato  = true; // indica que ya tiene formato
+  //   }
+
+  //   // this.pedidoRepartidorService.setLocal(pedido);
+  //   this.listPedidos.push(pedido);
+
+  //   // console.log(pedido);
+
+  //   this.pedidoRepartidorService.playAudioNewPedido();
+  // }
 
   aceptaPedido() {
 
     // pedido ya fue aceptado
     if (this.pedidoRepartidorService.pedidoRepartidor.aceptado ) {
-      this.router.navigate(['./main/indicaciones']);
+      this.router.navigate(['./main/list-grupo-pedidos']);
       return;
     }
 
     this.positionNow = this.geoPositionService.get();
-    console.log('pedido acetpado');
+    // console.log('pedido acetpado');
     // this.router.navigate(['/', 'indicaciones']);
     // emitir pedido aceptado para comercio
-    const _dataPedido = {
-      idsede: this.pedidoRepartidorService.pedidoRepartidor.datosComercio.idsede,
-      idpedido: this.pedidoRepartidorService.pedidoRepartidor.idpedido,
-      idrepartidor: this.infoTokenService.infoUsToken.usuario.idrepartidor,
-      nombre: this.infoTokenService.infoUsToken.usuario.nombre,
-      apellido: this.infoTokenService.infoUsToken.usuario.apellido,
-      telefono: this.infoTokenService.infoUsToken.usuario.telefono,
-      position_now: this.positionNow
-    };
+    // const _dataPedido = {
+      // idsede: this.pedidoRepartidorService.pedidoRepartidor.datosComercio.idsede,
+      // idpedido: this.pedidoRepartidorService.pedidoRepartidor.idpedido,
+      this.dataPedidos.idrepartidor = this.infoTokenService.infoUsToken.usuario.idrepartidor,
+      this.dataPedidos.nombre = this.infoTokenService.infoUsToken.usuario.nombre,
+      this.dataPedidos.apellido = this.infoTokenService.infoUsToken.usuario.apellido,
+      this.dataPedidos.telefono = this.infoTokenService.infoUsToken.usuario.telefono,
+      this.dataPedidos.position_now = this.positionNow;
+    // };
 
-    console.log('repartidor-acepta-pedido', _dataPedido);
+    // console.log('repartidor-acepta-pedido', this.dataPedidos);
 
-    this.socketService.emit('repartidor-acepta-pedido', _dataPedido);
+
+    // notificamos al comercio que estos pedidos ya tienen repartidor
+    this.socketService.emit('repartidor-acepta-pedido', this.dataPedidos);
 
     this.pedidoRepartidorService.pedidoRepartidor.aceptado = true;
+    this.pedidoRepartidorService.setLocal();
 
-    this.router.navigate(['./main/indicaciones']);
+    this.router.navigate(['./main/list-grupo-pedidos']);
 
   }
 

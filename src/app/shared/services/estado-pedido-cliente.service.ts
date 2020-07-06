@@ -83,7 +83,7 @@ export class EstadoPedidoClienteService {
         // notificar pedido pediente por finalizar
         // return;
       // }
-      console.log('cuenta cliente totales', res);
+      // console.log('cuenta cliente totales', res);
 
 
 
@@ -103,7 +103,7 @@ export class EstadoPedidoClienteService {
 
       this.estadoPedido.hayPedidoCliente = true;
       this.calcTimeAprox(); // calcula el tiempo aproximado
-      console.log('cuenta cliente', res);
+      // console.log('cuenta cliente', res);
 
 
       // la cuenta
@@ -184,7 +184,7 @@ export class EstadoPedidoClienteService {
       this.estadoPedido.isTiempoAproxCumplido = false;
       this.notifyChange();
 
-      console.log('this.estadoPedido', this.estadoPedido);
+      // console.log('this.estadoPedido', this.estadoPedido);
       this.getTimeAprox();
     });
   }
