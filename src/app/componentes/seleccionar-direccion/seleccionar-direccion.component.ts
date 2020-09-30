@@ -39,9 +39,9 @@ export class SeleccionarDireccionComponent implements OnInit {
         this.listDirecciones = res.data;
 
         // si solo hay una direccion selecciona
-        if (this.listDirecciones.length === 1 && this.infoClienteLogueado.direccionEnvioSelected === null ) {
+        // if (this.listDirecciones.length === 1 && this.infoClienteLogueado.direccionEnvioSelected === null ) {
           this.direccionSelected.emit(this.listDirecciones[0]);
-        }
+        // }
       });
   }
 

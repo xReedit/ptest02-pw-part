@@ -9,6 +9,7 @@ import { Subject } from 'rxjs/internal/Subject';
 import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 import { Router } from '@angular/router';
 import { NavigatorLinkService } from 'src/app/shared/services/navigator-link.service';
+import { DialogChangePassComponent } from 'src/app/componentes/dialog-change-pass/dialog-change-pass.component';
 
 @Component({
   selector: 'app-main',
@@ -53,6 +54,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
 
     if ( this.isRepartidorPropio ) {
+      this.repartidorService.guardarEfectivo(100);
       this.router.navigate(['/main/mapa-de-pedidos']);
     } else {
       this.router.navigate(['/main/pedidos']);
@@ -91,6 +93,14 @@ export class MainComponent implements OnInit, OnDestroy {
 
   openPanelLeft(val: any) {
     this.showPanelLeft = true;
+  }
+
+  openCambiarClave() {
+    const _dialogConfig = new MatDialogConfig();
+      _dialogConfig.disableClose = true;
+      _dialogConfig.hasBackdrop = true;
+
+      this.dialog.open(DialogChangePassComponent, _dialogConfig);
   }
 
 

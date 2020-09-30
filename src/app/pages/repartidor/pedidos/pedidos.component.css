@@ -1,3 +1,18 @@
 .x-h-size {
     height: calc(100vh - 155px);
 }
+
+.xfooter {
+    /* position: absolute; */
+    bottom: 0px;
+    text-align: center;
+    width: 100%;
+    /* padding: 14px;     */
+}
+
+.btn-footer {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

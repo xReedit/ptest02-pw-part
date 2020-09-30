@@ -1,0 +1,28 @@
+<p>Cmabiar Clave</p>
+<hr>
+
+<mat-form-field class="w-100">
+    <input type="password" matInput 
+    placeholder="Clave actual"                
+    [(ngModel)]="dataCliente.p1" required>
+</mat-form-field>
+
+<mat-form-field class="w-100">
+    <input type="password" matInput 
+    placeholder="Clave nueva"                
+    [(ngModel)]="dataCliente.p2" required>
+</mat-form-field>
+
+<p *ngIf="msj.length > 0" class="text-danger">{{ msj }}</p>
+
+<hr>
+<button class="mr-1 mb-1" mat-flat-button color="primary" (click)="guardarClave()" [disabled]="loading">
+    <ng-container *ngIf="loading; else elseTemplate">
+        <i class="fa fa-spinner fa-spin"></i>
+    </ng-container>
+    <ng-template #elseTemplate>        
+        Guardar
+    </ng-template>
+    
+</button>
+<button mat-stroked-button mat-dialog-close>Cancelar</button>

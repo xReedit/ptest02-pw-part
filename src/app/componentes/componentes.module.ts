@@ -4,6 +4,7 @@ import { DatosDeliveryComponent } from './datos-delivery/datos-delivery.componen
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../core/material/material.module';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
 
 import { DebounceClickDirective } from '../shared/directivas/debounce-click.directive';
 import { EncuestaOpcionComponent } from './encuesta-opcion/encuesta-opcion.component';
@@ -32,6 +33,9 @@ import { MapaOrdenesComponent } from './mapa-ordenes/mapa-ordenes.component';
 import { CompOrdenDetalleComponent } from './comp-orden-detalle/comp-orden-detalle.component';
 import { ComResumenPedidoComponent } from './com-resumen-pedido/com-resumen-pedido.component';
 import { DialogOrdenDetalleComponent } from './dialog-orden-detalle/dialog-orden-detalle.component';
+import { DialogChangePassComponent } from './dialog-change-pass/dialog-change-pass.component';
+import { ScanCodePedidoComponent } from './scan-code-pedido/scan-code-pedido.component';
+import { ItemPedidoExpressComponent } from './item-pedido-express/item-pedido-express.component';
 // import { DialogSelectDireccionComponent } from './dialog-select-direccion/dialog-select-direccion.component';
 
 @NgModule({
@@ -60,6 +64,9 @@ import { DialogOrdenDetalleComponent } from './dialog-orden-detalle/dialog-orden
     CompOrdenDetalleComponent,
     ComResumenPedidoComponent,
     DialogOrdenDetalleComponent,
+    DialogChangePassComponent,
+    ScanCodePedidoComponent,
+    ItemPedidoExpressComponent,
     // DialogSelectDireccionComponent,
     // DialogUbicacionComponent
   ],
@@ -69,6 +76,7 @@ import { DialogOrdenDetalleComponent } from './dialog-orden-detalle/dialog-orden
     FormsModule,
     MaterialModule,
     GoogleMapsModule,
+    ZXingScannerModule,
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAknWQFyVH1RpR2OAL0vRTHTapaIpfKSqo',
       libraries: ['places']
@@ -96,6 +104,8 @@ import { DialogOrdenDetalleComponent } from './dialog-orden-detalle/dialog-orden
     DialogCalificacionComponent,
     MapaOrdenesComponent,
     CompOrdenDetalleComponent,
+    ScanCodePedidoComponent,
+    ItemPedidoExpressComponent
   ],
 
   // entryComponents: [

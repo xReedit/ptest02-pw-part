@@ -28,7 +28,7 @@ export class PedidosAtendidosComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
+    this.xLoadResumenPedidos();
   }
 
   private xLoadPedidosAtendidos() {

@@ -27,10 +27,12 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
   listPedidosGroup = [];
   _tabIndex = 0;
   sumAcumuladoPagar = 0;
+  isExpress = false; // si es pedido express mandado o comercio afiliado
 
   yaQuitoPedido = 0;
 
   dataPedidos: any;
+  pedido_express: any;
 
   private positionNow: GeoPositionModel;
 
@@ -102,6 +104,15 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log('repartidor-get-pedido-pendiente-aceptar', res[0]);
       this.dataPedidos = res[0].pedido_por_aceptar;
 
+      this.isExpress = this.dataPedidos ? this.dataPedidos.isexpress ? this.dataPedidos.isexpress === 1 : false : false;
+
+      this.pedidoRepartidorService.setPedidoPorAceptar(this.dataPedidos);
+
+      if ( this.isExpress ) {
+        this.showPedidoExpress();
+        return;
+      }
+
       // this.pedidoRepartidorService.setPedidoPasoVa(res[0].pedido_paso_va);
 
       if ( this.dataPedidos === null || res[0].solicita_liberar_pedido === 1) {
@@ -131,6 +142,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.yaQuitoPedido = 1;
       this.pedidoRepartidorService.setPedidoPasoVa(0);
+      this.pedidoRepartidorService.setPedidoPorAceptar(pedidos);
       // this.pedidoRepartidorService.setPedidoPasoVa(this.dataPedidos.pedido_paso_va);
       this.darFormatoGrupoPedidosRecibidos(pedidos);
     });
@@ -141,6 +153,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
         if ( this.yaQuitoPedido === 1 ) {
           this.pedidoRepartidorService.setPedidoPasoVa(0);
           this.pedidoRepartidorService.setPasoVa(0);
+          this.pedidoRepartidorService.setPedidoPorAceptar(null);
           this.listPedidosGroup = [];
           this.pedidoRepartidorService.cleanLocal();
           this.timerLimitService.stopCountTimerLimit();
@@ -174,6 +187,11 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
           this.pedidoRepartidorService.playAudioNewPedido();
 
         });
+  }
+
+
+  private showPedidoExpress() {
+    this.pedido_express = this.dataPedidos.pedidos;
   }
 
   // private addPedidoToList(pedido: PedidoRepartidorModel): void {
@@ -238,6 +256,30 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
 
   recargarPedido() {
     location.reload();
+  }
+
+  goScanCodeBar() {
+    this.router.navigate(['./main/mapa-de-pedidos']);
+  }
+
+  pedidoExpressEntregado(pedidoFinalizado: any) {
+    console.log('finaliza el pedido');
+    pedidoFinalizado.quitar = true;
+    this.quitarPedidoExpress(pedidoFinalizado.idpedido_mandado);
+
+    this.pedidoRepartidorService.finalizarPedidoExpress(pedidoFinalizado.idpedido_mandado, this.dataPedidos);
+  }
+
+  quitarPedidoExpress(_idpedido_mandado: number) {
+    this.pedido_express = this.pedido_express.filter(x => x.idpedido_mandado !== _idpedido_mandado);
+    this.dataPedidos.pedidos = this.pedido_express;
+
+    // finaliza todo
+    if ( this.pedido_express.length === 0 ) {
+      this.isExpress = false;
+      this.pedido_express = null;
+      this.pedidoRepartidorService.cleanLocal();
+    }
   }
 
   // showPedido() {

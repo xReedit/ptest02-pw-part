@@ -21,6 +21,9 @@ export class DialogDesicionComponent implements OnInit {
       case 1:
         this.msj = 'Desea saber cuando tenga descuentos y/o ofertas?';
         break;
+      case 2:
+          this.msj = 'Seguro de finalizar el pedido?';
+        break;
     }
   }
 

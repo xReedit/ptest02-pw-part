@@ -17,6 +17,7 @@ export class CompOrdenDetalleComponent implements OnInit {
 
   coordenadasDestino: any = {};
   geoPositionActual: GeoPositionModel;
+  geoPositionComercio: GeoPositionModel = new GeoPositionModel();
 
   isLlegoDestino = false;
 
@@ -83,11 +84,23 @@ export class CompOrdenDetalleComponent implements OnInit {
     window.open(_link, '_blank');
   }
 
+  irAlComercio() {
+    this.geoPositionComercio.latitude = typeof this.dataPedido.datosDelivery.establecimiento.latitude === 'string'  ? parseFloat(this.dataPedido.datosDelivery.establecimiento.latitude) :
+                                        this.dataPedido.datosDelivery.establecimiento.latitude;
+    this.geoPositionComercio.longitude = typeof this.dataPedido.datosDelivery.establecimiento.longitude === 'string'  ? parseFloat(this.dataPedido.datosDelivery.establecimiento.longitude) :
+                                        this.dataPedido.datosDelivery.establecimiento.longitude;
+
+    const linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.geoPositionComercio.latitude},${this.geoPositionComercio.longitude}`;
+    window.open(linkGPS, '_blank');
+  }
+
   callPhone() {
     window.open(`tel:${this.dataPedido.datosDelivery.telefono}`);
   }
 
   PedidoEntregado() {
+    this.orden.pwa_estado = 'E'; // marcar como entregado
+    this.orden.estado = 2; // marcar como entregado
     if ( this.orden.isRepartidorRed ) {
 
         // si viene de red repartidore
@@ -98,7 +111,7 @@ export class CompOrdenDetalleComponent implements OnInit {
     }
 
     setTimeout(() => {
-      this.cerrarDetalles(true);
+      this.cerrarDetalles(this.orden);
     }, 500);
   }
 

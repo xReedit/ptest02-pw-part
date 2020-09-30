@@ -12,9 +12,18 @@
         <!-- paso uno -->
         <div class="p-4">
             <p class="fw-600 text-secondary">Diríjase hacia el comercio:</p>
-            <p class="fw-100 fs-13">  {{ comercioPedido.nombre }} </p>
-            <p class="fw-100 fs-12 text-secondary">  {{ comercioPedido.direccion }} </p>
-            <p class="fw-100 fs-13 text-secondary">  Pedidos Asignados: </p>
+            <div class="row">
+                <div class="col-6">
+                    <p class="fw-100 fs-13">  {{ comercioPedido.nombre }} </p>
+                    <p class="fw-100 fs-12 text-secondary">  {{ comercioPedido.direccion }} </p>
+                    <p class="fw-100 fs-13 text-secondary">  Pedidos Asignados: </p>
+                </div>
+                <div class="col-6">
+                    <div class="w-100 d-flex justify-content-end">
+                        <button class="btn btn-sm btn-secondary" (click)="irAlComercio()">Ir al comercio</button>
+                    </div>
+                </div>                
+            </div>
         </div>
         <hr class="m-0">
 
@@ -41,6 +50,9 @@
                     <span class="fw-600 badge" [ngClass]="{'badge-primary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 3, 'badge-info': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2, 'badge-secondary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 1}">
                         {{element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion | titlecase }} 
                     </span> 
+                    <span class="text-secondary fs-10 ml-1">
+                        {{ element.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km }} Km
+                    </span>
                     </p>
               </td>              
             </ng-container>
@@ -51,13 +63,14 @@
                     <p class="fw-600 fs-12"> {{ element.importe_pagar_comercio | number : '.2' }}  </p>
                     <p *ngIf="element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2" class="badge badge-info">
                         pagado con tarjeta
+
                     </p>
                 </td>              
               </ng-container>
           
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetallePedido(row)"></tr>            
-          </table>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetallePedido(row)" [ngClass]="{'color-checked': row.pwa_estado === 'E'}"></tr>            
+        </table>
 
           <div class="w-100 pt-3">
               <div class="text-right pr-4">
@@ -81,8 +94,23 @@
 
 
     <!-- footer boton -->
-    <div matRipple class="xfooter bg-success w-100 fs-20 text-white animated fadeInUp delay-0-5s" (click)="btnEjecutar()">
+    <div *ngIf="listPedidos" class="xfooter p-2">
+        <ng-container *ngIf="isEntregadoAll; else elseTemplate">
+            <div  matRipple class="btn btn-secondary w-75 p-2 fs-20 text-white animated fadeInUp delay-0-5s" (click)="entregaTodo()">
+                <span>Listo, pedidos entregados.</span>                
+            </div> 
+        </ng-container>
+        <ng-template #elseTemplate>    
+            <div  matRipple class="btn btn-success w-75 p-2 fs-20 text-white animated fadeInUp delay-0-5s" (click)="goRuta()">
+                <span>Ver Ruta</span>
+                <p class="fs-11 fw-100">Ruta mas corta.</p>
+            </div> 
+        </ng-template>     
+        
+    </div>
+    
+    <!-- <div *ngIf="btnShow" matRipple class="xfooter bg-success w-100 fs-20 text-white animated fadeInUp delay-0-5s" (click)="btnEjecutar()">
         <span>{{btnTitlePasos}}</span>
         <p class="fs-11 fw-100" *ngIf="btnTitlePasos === 'Ir a Entregar'">Muestrame la ruta mas corta.</p>
-    </div> 
+    </div>  -->
 </div>

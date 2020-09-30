@@ -17,6 +17,21 @@
     </div>
     <hr>
     <div>
+        <span class="fs-13 fw-600 text-secondary">Comercio: </span>
+        <div class="row">
+            <div class="fs-13 col-6">
+                <p><i class="fa fa-user"></i>  {{orden.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.nombre}}</p>
+                <p><i class="fa fa-map-marker"></i>  {{orden.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.direccion}}</p>
+            </div>
+            <div class="col-6 w-100">
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-sm btn-secondary" (click)="irAlComercio()">Ir al comercio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div>
         <div class="fs-13">
             <span class="fs-13 fw-600 text-secondary">Cliente: </span>
             <p><i class="fa fa-user"></i>  {{orden.json_datos_delivery.p_header.arrDatosDelivery.nombre}}</p>
@@ -57,14 +72,16 @@
             
     <hr>
 
-    <!-- boton accion segun estado -->
-    <div class="text-center" *ngIf="orden.pwa_delivery_status !== '4'">
-        <button class="bg-success btn btn-success" *ngIf="!isLlegoDestino"
-        (click)="goDireccion()"           
-        ><span class="fs-18">Ir a la direccion</span></button>
-
-        <button class="bg-success btn btn-success" *ngIf="isLlegoDestino"
+    <!-- boton accion segun estado  *ngIf="orden.pwa_delivery_status !== '4'" -->
+    <div class="text-center">
+        <div *ngIf="!isLlegoDestino">
+            <button class="btn btn-info" style="width: 85%;"
+            (click)="goDireccion()"           
+            ><span class="fs-18"><i class="fa fa-map-marker"></i>  Ir a la direccion</span></button>
+            <hr>
+        </div>
+        <button class="btn btn-success" style="width: 85%;"
         (click)="PedidoEntregado()"
-        ><span class="fs-18">Listo, Pedido Entregado</span></button>
+        ><span class="fs-18"> <i class="fa fa-thumbs-up"></i> Listo, Pedido Entregado</span></button>
     </div>
 </div>

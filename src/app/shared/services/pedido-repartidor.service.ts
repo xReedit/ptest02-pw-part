@@ -46,6 +46,7 @@ export class PedidoRepartidorService {
     localStorage.removeItem(this.keyLocalItem);
     localStorage.removeItem(this.keyLocal);
     localStorage.removeItem(this.keyLocalItemSelected);
+    localStorage.removeItem('sys::pXa');
     this.pedidoRepartidor = this.getLocal();
   }
 
@@ -92,6 +93,15 @@ export class PedidoRepartidorService {
 
   setPedidoSelect(obj: any) {
     localStorage.setItem(this.keyLocalItemSelected, btoa(JSON.stringify(obj)));
+  }
+
+  setPedidoPorAceptar(obj: any) {
+    localStorage.setItem('sys::pXa', btoa(JSON.stringify(obj)));
+  }
+
+  getPedidoPorAceptar() {
+    const rpt = localStorage.getItem('sys::pXa');
+    return rpt ? JSON.parse(atob(rpt)) : null;
   }
 
   getPedidoSelect() {
@@ -407,18 +417,20 @@ export class PedidoRepartidorService {
 
           // chequea si los demas estan ya estan cerrados
           const numCerrados = allPedidos.filter(p => p.estado === 0).length;
-          if ( numCerrados === 0 ) {
-            this.socketService.emit('repartidor-grupo-pedido-finalizado', _idRepartidor);
-            // console.log('repartidor-grupo-pedido-finalizado');
-            this.cleanLocal();
-            this.router.navigate(['./main/pedidos']);
-          }
+
+          // if ( numCerrados === 0 ) {
+          //   this.socketService.emit('repartidor-grupo-pedido-finalizado', _idRepartidor);
+          //   // console.log('repartidor-grupo-pedido-finalizado');
+          //   this.cleanLocal();
+          //   this.router.navigate(['./main/pedidos']);
+          // }
+
         } else {
 
           this.socketService.emit('repartidor-propio-notifica-fin-pedido', this.pedidoRepartidor);
 
           this.cleanLocal();
-          this.router.navigate(['./main/pedidos']);
+          // this.router.navigate(['./main/pedidos']);
         }
 
       });
@@ -462,6 +474,23 @@ export class PedidoRepartidorService {
         // this.cleanLocal();
         // this.router.navigate(['./repartidor/pedidos']);
       });
+  }
+
+  finalizarPedidoExpress(idpedido: number, _listPedidos: any) {
+    const _dataSend = {
+      idpedido_mandado: idpedido,
+      pedidos_quedan: _listPedidos,
+      num_quedan: _listPedidos.pedidos.length
+    };
+
+    this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-express-entregado', true)
+    .subscribe(res => console.log(res));
+  }
+
+  listaPedidosEntregados() {
+    const _repartidor = this.infoTokenService.getInfoUs().usuario;
+    this.socketService.emit('repartidor-grupo-pedido-finalizado', _repartidor.idrepartidor);
+    this.cleanLocal();
   }
 
   // // fin timer // busca otro repartidor
@@ -512,6 +541,158 @@ export class PedidoRepartidorService {
 
     this.pedidoRepartidor = pedido;
     // this.setLocal();
+  }
+
+  // asignacion por barcode o por idpedido
+  confirmarAsignacionReadBarCode(idpedidoLector: number) {
+    return new Observable(observer => {
+      let orden: any;
+      let response = {};
+      const _reparitdor = this.infoTokenService.getInfoUs().usuario;
+      const _dataSendPedido = {
+        idpedido: idpedidoLector
+      };
+      // get pedido
+      this.crudService.postFree(_dataSendPedido, 'comercio', 'get-pedido-by-id', true)
+      .subscribe((res: any) => {
+
+        orden  = res.data[0];
+        response = this.addPedidoInListPedidosPendientes(orden);
+        observer.next(response);
+        // const _importePedido = parseFloat(orden.total_r);
+        // let pedidos_repartidor = this.getPedidoPorAceptar();
+
+        // orden.json_datos_delivery = JSON.parse(orden.json_datos_delivery);
+
+
+        // if ( pedidos_repartidor ) {
+        //   // buscar si el pedido ya fue agregado
+        //   const isHayPedido = pedidos_repartidor.pedidos.filter(x => x.toString() === idpedidoLector.toString())[0];
+        //   if ( isHayPedido ) {
+        //     response = {
+        //       elPedido: orden,
+        //       pedidos_repartidor: pedidos_repartidor
+        //     };
+        //     observer.next(response);
+        //     return;
+        //   }
+
+        //   pedidos_repartidor.pedidos.push(orden.idpedido);
+        //   pedidos_repartidor.importe_acumula = parseFloat( pedidos_repartidor.importe_acumula ) + _importePedido;
+        //   pedidos_repartidor.importe_pagar = parseFloat( pedidos_repartidor.importe_pagar ) + _importePedido;
+        //   pedidos_repartidor.pedido_asignado_manual = orden.idpedido; // para reset a los demas repartidores
+        //   pedidos_repartidor.idrepartidor = _reparitdor.idrepartidor;
+        //   pedidos_repartidor.inSede = true; // no necesita coordenadas de la sede porque se supone que esta en la sede
+        // } else {
+        //   const _listPedido = [];
+        //   _listPedido.push(orden.idpedido);
+
+        //   pedidos_repartidor = {
+        //     pedidos: _listPedido,
+        //     importe_acumula: _importePedido.toFixed(2),
+        //     importe_pagar: _importePedido.toFixed(2),
+        //     idsede: orden.idsede,
+        //     idrepartidor: _reparitdor.idrepartidor,
+        //     pedido_asignado_manual: orden.idpedido,
+        //     inSede: true
+        //   };
+        // }
+
+        // // guardar pedido escaneado
+        // this.setPedidoPorAceptar(pedidos_repartidor);
+
+        // const _dataSend = {
+        //   pedido : pedidos_repartidor
+        // };
+
+        // this.crudService.postFree(_dataSend, 'monitor', 'set-asignar-pedido-manual', true)
+        // .subscribe( resp => {
+        //   console.log(resp);
+        //   // orden.nom_repartidor = _reparitdor.nombre;
+        //   // orden.idrepartidor = _reparitdor.idrepartidor;
+        //   // orden.telefono_repartidor = _reparitdor.telefono_repartidor;
+        // });
+
+        // // return orden;
+        // response = {
+        //   elPedido: orden,
+        //   pedidos_repartidor: pedidos_repartidor
+        // };
+        // observer.next(response);
+
+      });
+
+    });
+
+  }
+
+  addPedidoInListPedidosPendientes(orden: any): any {
+    let response = {};
+    const _reparitdor = this.infoTokenService.getInfoUs().usuario;
+    const idpedidoLector = orden.idpedido;
+
+    const _importePedido = parseFloat(orden.total_r);
+    let pedidos_repartidor = this.getPedidoPorAceptar();
+
+    orden.json_datos_delivery = typeof orden.json_datos_delivery !== 'object' ? JSON.parse(orden.json_datos_delivery) : orden.json_datos_delivery;
+
+
+    if ( pedidos_repartidor ) {
+      // buscar si el pedido ya fue agregado
+      const isHayPedido = pedidos_repartidor.pedidos.filter(x => x.toString() === idpedidoLector.toString())[0];
+      if ( isHayPedido ) {
+        response = {
+          elPedido: orden,
+          pedidos_repartidor: pedidos_repartidor
+        };
+
+        return response;
+      }
+
+      pedidos_repartidor.pedidos.push(orden.idpedido);
+      pedidos_repartidor.importe_acumula = parseFloat( pedidos_repartidor.importe_acumula ) + _importePedido;
+      pedidos_repartidor.importe_pagar = parseFloat( pedidos_repartidor.importe_pagar ) + _importePedido;
+      pedidos_repartidor.pedido_asignado_manual = orden.idpedido; // para reset a los demas repartidores
+      pedidos_repartidor.idrepartidor = _reparitdor.idrepartidor;
+      pedidos_repartidor.inSede = true; // no necesita coordenadas de la sede porque se supone que esta en la sede
+    } else {
+      const _listPedido = [];
+      _listPedido.push(orden.idpedido);
+
+      pedidos_repartidor = {
+        pedidos: _listPedido,
+        importe_acumula: _importePedido.toFixed(2),
+        importe_pagar: _importePedido.toFixed(2),
+        idsede: orden.idsede,
+        idrepartidor: _reparitdor.idrepartidor,
+        pedido_asignado_manual: orden.idpedido,
+        inSede: true
+      };
+    }
+
+    // guardar pedido escaneado
+    this.setPedidoPorAceptar(pedidos_repartidor);
+
+    const _dataSend = {
+      pedido : pedidos_repartidor
+    };
+
+    this.crudService.postFree(_dataSend, 'monitor', 'set-asignar-pedido-manual', true)
+    .subscribe( resp => {
+      console.log(resp);
+      // orden.nom_repartidor = _reparitdor.nombre;
+      // orden.idrepartidor = _reparitdor.idrepartidor;
+      // orden.telefono_repartidor = _reparitdor.telefono_repartidor;
+    });
+
+    // return orden;
+    response = {
+      elPedido: orden,
+      pedidos_repartidor: pedidos_repartidor
+    };
+
+    return response;
+    // observer.next(response);
   }
 
 }

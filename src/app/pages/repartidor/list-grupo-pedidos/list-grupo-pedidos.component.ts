@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
 import { UtilitariosService } from 'src/app/shared/services/utilitarios.service';
 import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
@@ -13,6 +13,9 @@ import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { DialogOrdenDetalleComponent } from 'src/app/componentes/dialog-orden-detalle/dialog-orden-detalle.component';
 import { RepartidorService } from 'src/app/shared/services/repartidor.service';
 import { SocketService } from 'src/app/shared/services/socket.service';
+import { DatosCalificadoModel } from 'src/app/modelos/datos.calificado.model';
+import { InfoTockenService } from 'src/app/shared/services/info-token.service';
+import { DialogCalificacionComponent } from 'src/app/componentes/dialog-calificacion/dialog-calificacion.component';
 
 @Component({
   selector: 'app-list-grupo-pedidos',
@@ -20,12 +23,12 @@ import { SocketService } from 'src/app/shared/services/socket.service';
   styleUrls: ['./list-grupo-pedidos.component.css']
 })
 export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
-
   timerRun: any;
   listPedidos: any;
   sumListPedidos = 0;
   sumGananciaTotal = 0;
   comercioPedido: any;
+  btnShow = true; // cuando llega al local ya no figura este - ya no envia al mapa mostrando la ruta mas corta
 
   btnTitlePasos = 'Vamos, vamos!!';
   dataPedido: PedidoRepartidorModel;
@@ -37,7 +40,10 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
 
   private destroy$: Subject<boolean> = new Subject<boolean>();
 
+  isEntregadoAll = false;
+
   constructor(
+    private infoTokenService: InfoTockenService,
     private pedidoRepartidorService: PedidoRepartidorService,
     private utilService: UtilitariosService,
     private geoPositionService: GpsUbicacionRepartidorService,
@@ -87,6 +93,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
     // escuchar pedidos asignados
     this.socketService.onRepartidorGetPedidoPendienteAceptar()
     .subscribe((res: any) => {
+      this.pedidoRepartidorService.setPedidoPorAceptar(res[0].pedido_por_aceptar);
       this.darFormatoGrupoPedidosRecibidos(res[0].pedido_por_aceptar);
     });
 
@@ -115,6 +122,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
         .sort(( a, b ) => parseFloat(a.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km) - parseFloat(b.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km));
 
     //
+    this.checkIsEntregaALL();
 
     this.comercioPedido = this.listPedidos[0].json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
     this.dataPedido.idsede  = this.listPedidos[0].idsede; // idsede del grupo de pedidos
@@ -256,19 +264,50 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
         this.btnTitlePasos = 'Empezar';
         break;
       default: // apuntar a la direccion del cliente
+        this.btnShow = false;
         this.btnTitlePasos = 'Ir a Entregar';
         break;
     }
   }
 
+  goRuta() {
+    let _addDir = '';
+    this.listPedidos.map(p => {
+      _addDir += `${p.json_datos_delivery.p_header.arrDatosDelivery.direccionEnvioSelected.latitude},${p.json_datos_delivery.p_header.arrDatosDelivery.direccionEnvioSelected.longitude}+to:`;
+    });
+
+    _addDir = _addDir.slice(0, -4);
+    // const linkGPS = `http://maps.google.com/maps/dir/?api=1&origin=-6.028458-76.971177&waypoints=${_addDir}`;
+    const linkGPS = `http://maps.google.com/maps?f=d&source=s_d&saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${_addDir}`;
+    window.open(linkGPS, '_blank');
+  }
+
+  entregaTodo() {
+    this.pedidoRepartidorService.listaPedidosEntregados();
+    this.listPedidos = null;
+    this.sumListPedidos = 0;
+    this.sumGananciaTotal = 0;
+    this.router.navigate(['./main/pedidos']);
+  }
+
   btnEjecutar() {
-      let linkGPS = '';
+      // let linkGPS = '';
       // this.dataPedido.paso_va = this.dataPedido.paso_va ? this.dataPedido.paso_va : 1;
       // this.pedidoRepartidorService.setPasoVa(this.dataPedido.paso_va);
       switch (this.dataPedido.pedido_paso_va) {
         case 1:
-          linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.geoPositionComercio.latitude},${this.geoPositionComercio.longitude}`;
+          let _addDir = '';
+          this.listPedidos.map(p => {
+            _addDir += `${p.json_datos_delivery.p_header.arrDatosDelivery.direccionEnvioSelected.latitude},${p.json_datos_delivery.p_header.arrDatosDelivery.direccionEnvioSelected.longitude}+to:`;
+          });
+
+          _addDir = _addDir.slice(0, -4);
+          // const linkGPS = `http://maps.google.com/maps/dir/?api=1&origin=-6.028458-76.971177&waypoints=${_addDir}`;
+          const linkGPS = `http://maps.google.com/maps?f=d&source=s_d&saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${_addDir}`;
           window.open(linkGPS, '_blank');
+
+          // linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.geoPositionComercio.latitude},${this.geoPositionComercio.longitude}`;
+          // window.open(linkGPS, '_blank');
           // this.btnTitlePasos = 'Llegue';
           // this.pedidoRepartidorService.setPasoVa(2);
           break;
@@ -279,6 +318,11 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
           this.router.navigate(['/main/indicaciones-mapa-grupo']);
           break;
       }
+  }
+
+  irAlComercio() {
+    const linkGPS = `http://maps.google.com/maps?saddr=${this.geoPositionActual.latitude},${this.geoPositionActual.longitude}&daddr=${this.geoPositionComercio.latitude},${this.geoPositionComercio.longitude}`;
+    window.open(linkGPS, '_blank');
   }
 
   // showDetallePedido(row: any) {
@@ -306,6 +350,54 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
     // console.log('orden openDialogOrden', orden);
     this.pedidoRepartidorService.setPedidoSelect(orden);
     const dialogRef = this.dialog.open(DialogOrdenDetalleComponent, _dialogConfig);
+    dialogRef.afterClosed().subscribe(
+      pedido => {
+        console.log('el pedido', pedido);
+        this.checkIsEntregaALL();
+
+        if ( pedido.pwa_estado === 'E' ) {
+          this.openDialogCalificacion(pedido);
+        }
+      }
+    );
+  }
+
+  private checkIsEntregaALL() {
+    const _res = this.listPedidos.filter(p => p.pwa_estado !== 'E');
+    this.isEntregadoAll = _res.length === 0;
+  }
+
+  private openDialogCalificacion(_pedido: PedidoRepartidorModel = null) {
+    this.dataPedido = this.pedidoRepartidorService.pedidoRepartidor;
+    const dataCalificado: DatosCalificadoModel = new DatosCalificadoModel;
+    dataCalificado.idrepartidor = this.infoTokenService.infoUsToken.usuario.idrepartidor;
+    dataCalificado.idcliente = this.dataPedido.datosCliente.idcliente;
+    dataCalificado.idpedido = this.dataPedido.idpedido;
+    dataCalificado.tipo = 2;
+    dataCalificado.showNombre = true;
+    dataCalificado.nombre = this.dataPedido.datosDelivery.nombre;
+    dataCalificado.titulo = 'Como calificas al cliente?';
+    dataCalificado.showTitulo = true;
+    dataCalificado.showMsjTankyou = true;
+
+
+    const _dialogConfig = new MatDialogConfig();
+    _dialogConfig.disableClose = true;
+    _dialogConfig.hasBackdrop = true;
+
+    _dialogConfig.data = {
+      dataCalificado: dataCalificado
+    };
+
+    const dialogRef =  this.dialog.open(DialogCalificacionComponent, _dialogConfig);
+    dialogRef.afterClosed().subscribe(
+      data => {
+        // notificar al repartidor fin del pedido
+        // this.timerService.stopCountTimerLimit();
+        this.pedidoRepartidorService.finalizarPedidoPropioRepartidor();
+        // this.router.navigate(['./repartidor/pedidos']);
+      }
+    );
   }
 
 }

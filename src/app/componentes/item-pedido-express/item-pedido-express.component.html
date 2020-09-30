@@ -1,0 +1,59 @@
+<div class="animated fadeInUp card-pedido">
+    <div class="card-pedido-head border-bottom pb-2 d-flex justify-content-between align-items-center">
+        <span>Pedidos Express #{{ numPedido }}</span>        
+        <span class="fs-11 fw-600 text-secondary">Paga con:  {{ metodoPago }}</span>  
+    </div>
+    <div class="card-pedido-body">
+        <div class="pt-3 fs-13">
+            <p class="fs-11 fw-600 text-secondary">Cliente: </p>
+            <p class="fw-100">
+                {{ nomCliente }}
+            </p>
+            <p>Telefono: <span class="fw-600">  {{ telCliente }} </span></p>
+            <div class="d-flex justify-content-between mt-2">
+                <div matRipple class="col-6 border-right text-info" (click)="callPhone()"><i class="fa fa-phone" aria-hidden="true"></i> LLamar</div>
+                <div matRipple class="col-6 text-info" (click)="redirectWhatsApp()"><i class="fa fa-commenting-o" aria-hidden="true"></i> Enviar Mensaje</div>
+            </div>
+            <hr>
+
+            <p class="fs-11 fw-600 text-secondary">Pedido: </p>
+            <p class="fw-100">
+                {{ descripcion_pedido }}
+            </p>
+            <hr>
+
+            <div matRipple (click)="irRuta(1)">
+                <p class="fs-11 fw-600 text-secondary">De donde: 
+                    <span class="pl-2" *ngIf="goRutaDesde"> <i class="fa fa-arrow-right text-success"></i></span>
+                </p>
+                <p class="fw-100">{{ desde }}</p>
+                <p class="fw-100 text-secondary" *ngIf="desde_referencia">{{ desde_referencia }}</p>
+            </div>
+            <hr>
+
+            <div matRipple (click)="irRuta(1)">
+                <p class="fs-11 fw-600 text-secondary">A donde lo llevamos: 
+                    <span class="pl-2" *ngIf="goRutaHasta"> <i class="fa fa-arrow-right text-success"></i></span>            
+                </p>            
+                <p class="fw-100">{{ hasta }}</p>
+                <p class="fw-100 text-secondary" *ngIf="hasta_referencia">{{ hasta_referencia }}</p>
+            </div>
+            <hr>
+
+            <div class="d-flex justify-content-between fs-13 text-center">
+                <div>
+                    <p class="fw-100">Distancia</p>
+                    <span class="fs-15 fw-600">{{ sumKmRecorrer }} Km</span>
+                </div>
+                <div>
+                    <p class="fw-100">Costo de entrega</p>
+                    <span class="fs-15 fw-600">S/. {{ importe | number: '.2' }}</span>
+                </div>                
+            </div>
+        </div>
+        <hr>
+        <div class="w-100 text-center">
+            <button class="btn btn-success" (click)=finalizarPedidoExpress()> Listo, pedido entregado.</button>
+        </div>
+    </div>
+</div>

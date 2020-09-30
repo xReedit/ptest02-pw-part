@@ -1,0 +1,19 @@
+.card-pedido {
+    border: 1px solid #bdbdbd;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #eeeeee;
+}
+
+.card-pedido-head {
+    margin-bottom: 3px;
+}
+
+.card-pedido-body p {
+    margin: 0px;    
+}
+
+.img-propina {
+    width: 20px;
+    padding-right: 5px; 
+}

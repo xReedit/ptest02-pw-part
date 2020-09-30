@@ -16,8 +16,13 @@
 
             <div class="p-3 x-h-size">
                 <ng-container *ngIf="listPedidosGroup.length === 0; else elseTemplate">
-                    <div class="text-center">
+                    <div class="text-center" *ngIf="!isExpress">
                         <button mat-stroked-button (click)="recargarPedido()">Recargar ...</button>
+
+                        <br><br>
+                        <button class="btn btn-secondary" (click)="goScanCodeBar()">
+                            <i class="fa fa-barcode pr-"></i>
+                            Escanear codigo barras</button>
                     </div>
                 </ng-container>
                 <ng-template #elseTemplate>                                
@@ -27,8 +32,15 @@
 
                         <div>
                             <app-item-pedido [listPedidos] = "listPedidosGroup" [importeAcumuladoPagar]="sumAcumuladoPagar" (aceptaPedido)="aceptaPedido($event)"></app-item-pedido>
-                        </div>
+                        </div>                        
                 </ng-template>
+
+                <!-- si es pedido express -->
+                <div *ngIf="isExpress">
+                    <div *ngFor="let item of pedido_express" class="mb-3 animated fadeInDown">
+                        <app-item-pedido-express [elpedido]="item" (pedidoEntregado)="pedidoExpressEntregado($event)"></app-item-pedido-express>
+                    </div>
+                </div>
                         
             </div>
 
@@ -41,3 +53,10 @@
         </mat-tab>        
     </mat-tab-group>
 </div>
+
+<!-- <div class="xfooter" matRipple>
+    <div class="btn-footer">
+        <i class="fa fa-qrcode fa-2x pr-2" aria-hidden="true"></i>
+        <span>Scanear Qr pedido</span>
+    </div>
+</div> -->

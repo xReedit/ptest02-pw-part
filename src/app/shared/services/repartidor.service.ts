@@ -37,11 +37,12 @@ export class RepartidorService {
   // guarda efectivo inicial
   guardarEfectivo(importe: number, _online = 1) {
     const _data = {
+      idrepartidor: this.idRepartidor,
       efectivo: importe,
       online: _online
     };
 
-    this.crudService.postFree(_data, 'repartidor', 'set-efectivo-mano', true)
+    this.crudService.postFree(_data, 'repartidor', 'set-efectivo-mano', false)
       .subscribe(res => {
         console.log('ya esta', res);
       });
@@ -83,6 +84,11 @@ export class RepartidorService {
         console.log('.');
       });
 
+  }
+
+  guardarCamnioClave(_data: any) {
+    _data.idrepartidor = this.idRepartidor;
+    this.crudService.postFree(_data, 'repartidor', 'set-cambio-pass-repartidor', true);
   }
 
   // repartidor propio pedidos asignados

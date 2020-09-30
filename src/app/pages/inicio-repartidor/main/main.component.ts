@@ -35,7 +35,8 @@ export class MainComponent implements OnInit {
   }
 
   aceptarNotificacion() {
-    this.isOnNotificactionPush = this.pushNotificationService.getIsTienePermiso();
+    this.pushNotificationService.getIsTienePermiso();
+    this.isOnNotificactionPush = true;
     this.validConf();
   }
 

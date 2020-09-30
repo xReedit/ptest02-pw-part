@@ -32,12 +32,12 @@
                 <div matRipple class="border-bottom p-3 xCursor" [routerLink]="['ordenes', 'maps']" (click)="drawerIzq.toggle();">
                     <i class="fa fa-map pr-2"></i>
                     Pedidos en el mapa
-                </div>
-
-                <div matRipple class="border-bottom p-3 xCursor" (click)="openServidorPrint(); drawerIzq.toggle();">
-                    <i class="fa fa-print" aria-hidden="true"></i>
-                    Servidor de Impresion
                 </div> -->
+
+                <div matRipple class="border-bottom p-3 xCursor" (click)="openCambiarClave(); drawerIzq.toggle();">
+                    <i class="fa fa-key" aria-hidden="true"></i>
+                    Cambiar clave
+                </div> 
 
                 <div matRipple class="border-bottom p-3 xCursor" (click)="cerrarSession();">
                     <i class="fa fa-close pr-2"></i>

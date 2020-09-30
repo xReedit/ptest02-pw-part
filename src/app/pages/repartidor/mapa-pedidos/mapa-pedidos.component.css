@@ -9,3 +9,28 @@
 	color: gold;
 	cursor: pointer;
 }
+
+.center-div-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+    overflow: hidden;
+}
+
+p {
+    margin: 0px;    
+}
+
+
+.xfooter {
+    /* position: absolute; */
+    bottom: 0px;
+    text-align: center;
+    width: 100%;
+    /* padding: 14px;     */
+}
+
+.color-checked {
+    background-color: #e8f5e9;
+  }
