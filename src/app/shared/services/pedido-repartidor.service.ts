@@ -159,7 +159,7 @@ export class PedidoRepartidorService {
   // saca el importe total del pedido separando el importe del servicio de entrega
   darFormatoSubTotales(arrTotales: any = null, pwa_delivery_comercio_paga_entrega = null , costoEntrega = null) {
     this.init();
-    arrTotales = arrTotales ? arrTotales : this.pedidoRepartidor.datosSubtotalesShow;
+    arrTotales = arrTotales && arrTotales.length > 0 ? arrTotales : this.pedidoRepartidor.datosSubtotalesShow;
     const rowTotal = arrTotales[arrTotales.length - 1];
 
     // lo que paga el cliente
@@ -476,11 +476,13 @@ export class PedidoRepartidorService {
       });
   }
 
-  finalizarPedidoExpress(idpedido: number, _listPedidos: any) {
+  finalizarPedidoExpress(pedido: any, _listPedidos: any) {
+    const _tipo_pedido = pedido.isretiroatm ? 'express' : 'retiro_atm';
     const _dataSend = {
-      idpedido_mandado: idpedido,
+      idpedido_mandado: pedido.idpedido_mandado,
       pedidos_quedan: _listPedidos,
-      num_quedan: _listPedidos.pedidos.length
+      num_quedan: _listPedidos.pedidos.length,
+      tipo_pedido: _tipo_pedido
     };
 
     this.crudService.postFree(_dataSend, 'repartidor', 'set-fin-pedido-express-entregado', true)
@@ -511,7 +513,9 @@ export class PedidoRepartidorService {
 
 
   darFormatoLocalPedidoRepartidorModel(_pedido) {
+    console.log('dar formato pedido');
     let pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
+
 
     if ( !_pedido ) { return; }
     if (  _pedido?.conFormato ) {
@@ -520,14 +524,15 @@ export class PedidoRepartidorService {
 
       if ( !_pedido.datosItems ) {
         pedido.idpedido = _pedido.idpedido;
+        const subTotalesPedid = _pedido.json_datos_delivery.p_header.arrDatosDelivery.subTotales.length > 0 ? _pedido.json_datos_delivery.p_header.arrDatosDelivery.subTotales : _pedido.json_datos_delivery.p_subtotales;
         // pedido.datosItems = res[1].dataItems || res[1].datosItem;
         pedido.datosDelivery = _pedido.json_datos_delivery; // res[1].dataDelivery || res[1].datosDelivery;
         pedido.datosItems = _pedido.json_datos_delivery.p_body;
         pedido.datosDelivery = _pedido.json_datos_delivery.p_header.arrDatosDelivery;
         pedido.datosComercio = pedido.datosDelivery.establecimiento;
         pedido.datosCliente = pedido.datosDelivery.direccionEnvioSelected;
-        pedido.datosSubtotales = pedido.datosDelivery.subTotales;
-        pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales;
+        pedido.datosSubtotales = subTotalesPedid;
+        pedido.datosSubtotalesShow = pedido.datosDelivery.subTotales.length === 0 ? subTotalesPedid : pedido.datosDelivery.subTotales.length;
         pedido.conFormato = true;
       } else {
         pedido = _pedido;
@@ -545,6 +550,7 @@ export class PedidoRepartidorService {
 
   // asignacion por barcode o por idpedido
   confirmarAsignacionReadBarCode(idpedidoLector: number) {
+    console.log('aaaaaaaaa');
     return new Observable(observer => {
       let orden: any;
       let response = {};

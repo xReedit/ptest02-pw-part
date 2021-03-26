@@ -138,11 +138,18 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
           console.log('res', response);
 
           // formateamos el json_}¿datos
+          let importeTotalPedido;
           const _listAsignar = response.map(p => {
             p.json_datos_delivery = JSON.parse(p.json_datos_delivery);
-            p.importe_pagar_comercio =  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal) -  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
+            // extraemos el importe total, sino de los subtotales -> venta rapida
+            importeTotalPedido  = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal);
+            importeTotalPedido = importeTotalPedido === 0 ? parseFloat(p.json_datos_delivery.p_subtotales[p.json_datos_delivery.p_subtotales.length - 1 ].importe ) : importeTotalPedido;
+
+            p.importe_pagar_comercio =  parseFloat(importeTotalPedido) -  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
             p.importe_pagar_comercio = p.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2 ? 0 : p.importe_pagar_comercio;
-            p.comsion_entrea_total = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value);
+
+            const propina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value ? parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value) : 0;
+            p.comsion_entrea_total = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + propina;
             return p;
           });
 

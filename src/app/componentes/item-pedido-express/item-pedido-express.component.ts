@@ -26,6 +26,7 @@ export class ItemPedidoExpressComponent implements OnInit {
   telCliente = '';
   isPagoYape = false;
   isPedidoExpress = false;
+  isRetiroAtm = false;
 
   goRutaHasta = false;
   goRutaDesde = false;
@@ -42,7 +43,32 @@ export class ItemPedidoExpressComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.isPedidoExpress = this.elpedido.pedido_json.is_express === 1; // sino es mandado
+    this.isPedidoExpress = this.elpedido.pedido_json?.is_express === 1; // sino es mandado
+    this.isRetiroAtm = this.elpedido?.isretiroatm === 1 || !!this.elpedido?.idatm_retiros;
+    if ( this.elpedido?.isretiroatm ) {
+      this.elpedido.idpedido_mandado = this.elpedido.idatm_retiros;
+    }
+
+    if ( this.isRetiroAtm ) {
+      this.metodoPago = 'Tarjeta';
+      this.descripcion_pedido = 'Solicita retiro de dinero en efectivo S/.' + parseFloat(this.elpedido.importe_solicita).toFixed(2);
+      this.nomCliente = this.elpedido.json_entrega.cliente.nombres;
+      this.telCliente = this.elpedido.json_entrega.cliente.telefono;
+      this.numPedido = this.elpedido.idatm_retiros;
+
+      this.desde = '';
+
+      this.dirHasta = this.elpedido.json_entrega.direccion;
+      this.hasta = this.elpedido.json_entrega.direccion.direccion;
+      this.hasta_referencia = this.elpedido.json_entrega.direccion.referencia;
+      this.goRutaHasta = true;
+
+      this.importe = this.elpedido.c_entrega; // costo de entrega
+
+      this.sumKmRecorrer = '';
+      return;
+    }
+
     this.isPagoYape = this.elpedido.pedido_json.metodoPago.idtipo_pago === 3;
     this.metodoPago = this.isPagoYape ? 'Yape' :  `Efectivo ${this.elpedido.pedido_json.metodoPago.importe}`;
     this.descripcion_pedido = this.isPedidoExpress ? this.elpedido.pedido_json.descripcion_paquete : this.elpedido.pedido_json.que_compramos;
@@ -103,6 +129,10 @@ export class ItemPedidoExpressComponent implements OnInit {
     const dialogReset = this.dialog.open(DialogDesicionComponent, _dialogConfig);
     dialogReset.afterClosed().subscribe(result => {
       if (result ) {
+        console.log('aaaaaaaaaaaaaaaaaaaaaaaaa');
+        if ( this.isRetiroAtm ) {
+          this.elpedido.idpedido_mandado = this.elpedido.idatm_retiros;
+        }
         this.pedidoEntregado.emit(this.elpedido);
       }
     });

@@ -35,6 +35,7 @@ export class CompOrdenDetalleComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('la orden', this.orden);
     this.pedidoRepartidorService.darFormatoLocalPedidoRepartidorModel(this.orden);
     // // this.pedidoRepartidorService.pedidoRepartidor = this.orden;
     this.pedidoRepartidorService.setLocal();

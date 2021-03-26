@@ -17,26 +17,31 @@
             <hr>
 
             <p class="fs-11 fw-600 text-secondary">Pedido: </p>
-            <p class="fw-100">
+            <p class="fw-100 fw-600 fs-15">
                 {{ descripcion_pedido }}
             </p>
             <hr>
 
-            <div matRipple (click)="irRuta(1)">
+            <div matRipple (click)="irRuta(1)" *ngIf="desde !== ''">
                 <p class="fs-11 fw-600 text-secondary">De donde: 
                     <span class="pl-2" *ngIf="goRutaDesde"> <i class="fa fa-arrow-right text-success"></i></span>
                 </p>
                 <p class="fw-100">{{ desde }}</p>
                 <p class="fw-100 text-secondary" *ngIf="desde_referencia">{{ desde_referencia }}</p>
+
+                <button class="btn btn-sm btn-info" (click)="irRuta(1)"> Ver ruta </button>
             </div>
             <hr>
 
-            <div matRipple (click)="irRuta(1)">
-                <p class="fs-11 fw-600 text-secondary">A donde lo llevamos: 
-                    <span class="pl-2" *ngIf="goRutaHasta"> <i class="fa fa-arrow-right text-success"></i></span>            
-                </p>            
-                <p class="fw-100">{{ hasta }}</p>
-                <p class="fw-100 text-secondary" *ngIf="hasta_referencia">{{ hasta_referencia }}</p>
+            <div matRipple (click)="irRuta(1)" class="d-flex justify-content-between">
+                <div>
+                    <p class="fs-11 fw-600 text-secondary">A donde lo llevamos: 
+                        <span class="pl-2" *ngIf="goRutaHasta"> <i class="fa fa-arrow-right text-success"></i></span>            
+                    </p>            
+                    <p class="fw-100">{{ hasta }}</p>
+                    <p class="fw-100 text-secondary" *ngIf="hasta_referencia">{{ hasta_referencia }}</p>
+                </div>
+                <button class="btn btn-sm btn-info" (click)="irRuta(1)"> Ver ruta </button>
             </div>
             <hr>
 

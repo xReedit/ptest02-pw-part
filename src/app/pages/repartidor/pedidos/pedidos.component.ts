@@ -104,7 +104,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log('repartidor-get-pedido-pendiente-aceptar', res[0]);
       this.dataPedidos = res[0].pedido_por_aceptar;
 
-      this.isExpress = this.dataPedidos ? this.dataPedidos.isexpress ? this.dataPedidos.isexpress === 1 : false : false;
+      this.isExpress = this.dataPedidos ? this.dataPedidos.isexpress || this.dataPedidos.isretiroatm ? this.dataPedidos.isexpress === 1 || this.dataPedidos.isretiroatm === 1 : false : false;
 
       this.pedidoRepartidorService.setPedidoPorAceptar(this.dataPedidos);
 
@@ -171,8 +171,13 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
           // console.log('res', response);
 
           // formateamos el json_}¿datos
+          let importeTotalPedido;
           const _listAsignar = response.map(p => {
             p.json_datos_delivery = JSON.parse(p.json_datos_delivery);
+
+            importeTotalPedido  = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal);
+            importeTotalPedido = importeTotalPedido === 0 ? parseFloat(p.json_datos_delivery.p_subtotales[p.json_datos_delivery.p_subtotales.length - 1 ].importe ) : importeTotalPedido;
+
             p.importe_pagar_comercio =  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal) -  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
             p.importe_pagar_comercio = p.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2 ? 0 : p.importe_pagar_comercio;
             return p;
@@ -216,6 +221,10 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
 
   aceptaPedido() {
 
+
+    // notificamos al comercio que estos pedidos ya tienen repartidor
+    this.socketService.emit('repartidor-acepta-pedido', this.dataPedidos);
+
     // pedido ya fue aceptado
     if (this.pedidoRepartidorService.pedidoRepartidor.aceptado ) {
       this.router.navigate(['./main/list-grupo-pedidos']);
@@ -237,10 +246,6 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
     // };
 
     // console.log('repartidor-acepta-pedido', this.dataPedidos);
-
-
-    // notificamos al comercio que estos pedidos ya tienen repartidor
-    this.socketService.emit('repartidor-acepta-pedido', this.dataPedidos);
 
     this.pedidoRepartidorService.pedidoRepartidor.aceptado = true;
     this.pedidoRepartidorService.setLocal();
@@ -267,7 +272,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
     pedidoFinalizado.quitar = true;
     this.quitarPedidoExpress(pedidoFinalizado.idpedido_mandado);
 
-    this.pedidoRepartidorService.finalizarPedidoExpress(pedidoFinalizado.idpedido_mandado, this.dataPedidos);
+    this.pedidoRepartidorService.finalizarPedidoExpress(pedidoFinalizado, this.dataPedidos);
   }
 
   quitarPedidoExpress(_idpedido_mandado: number) {

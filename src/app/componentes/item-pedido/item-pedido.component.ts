@@ -42,14 +42,15 @@ export class ItemPedidoComponent implements OnInit, OnChanges  {
 
   private leerInfoGroup() {
     this.pedidoRepartidorService.init();
-    console.log('this.pedidoRepartidorService.pedidoRepartidor', this.pedidoRepartidorService.pedidoRepartidor);
+    // console.log('this.pedidoRepartidorService.pedidoRepartidor', this.pedidoRepartidorService.pedidoRepartidor);
 
     this.estadoPedido = this.pedidoRepartidorService.pedidoRepartidor.estado ? this.pedidoRepartidorService.pedidoRepartidor.estado : this.listPedidos[0].estado;
     this.countPedidos = this.listPedidos.length;
     this.establecimientoOrden = this.listPedidos[0].json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
 
     this.listPedidos.map((p: any) => {
-      this.sumGananciaTotal += parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value);
+      const propina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value ? parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value) : 0;
+      this.sumGananciaTotal += parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + propina;
       this.sumKmRecorrer += parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.c_km);
       if ( !this.isHayPropina ) {
         this.isHayPropina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value > 0;
