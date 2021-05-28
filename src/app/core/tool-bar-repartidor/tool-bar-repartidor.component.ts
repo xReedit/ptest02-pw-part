@@ -3,7 +3,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 import { RepartidorService } from 'src/app/shared/services/repartidor.service';
 import { TemplateBindingParseResult } from '@angular/compiler';
-// import { SocketService } from 'src/app/shared/services/socket.service';
+import { SocketService } from 'src/app/shared/services/socket.service';
 
 @Component({
   selector: 'app-tool-bar-repartidor',
@@ -22,8 +22,8 @@ export class ToolBarRepartidorComponent implements OnInit {
   nomRepatidor = '';
   constructor(
     private infoTokenService: InfoTockenService,
-    private repartidorService: RepartidorService
-    // private socketService: SocketService
+    private repartidorService: RepartidorService,
+    private socketService: SocketService
   ) { }
 
   ngOnInit() {
@@ -35,7 +35,7 @@ export class ToolBarRepartidorComponent implements OnInit {
     this.nomRepatidor = this.infoTokenService.infoUsToken.usuario.nombre + ' ' + this.infoTokenService.infoUsToken.usuario.apellido;
     // this.changeTogle.emit(this.isTogleActive);
     // if ( this.isTogleActive ) {
-    //   this.socketService.connect();
+    this.socketService.connect();
     // }
 
     if ( this.isRepartidorPropio ) {
@@ -53,6 +53,11 @@ export class ToolBarRepartidorComponent implements OnInit {
     if ( !this.isTogleActive ) {
       this.estadoOnline = 'Fuera de linea';
       this.repartidorService.guardarEfectivo(0, 0);
+
+      this.socketService.emit('notifica-repartidor-ofline', '');
+    } else {
+
+      this.socketService.emit('notifica-repartidor-online', '');
     }
   }
 
