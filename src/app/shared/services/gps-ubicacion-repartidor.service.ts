@@ -4,6 +4,8 @@ import { RepartidorService } from './repartidor.service';
 import { PedidoRepartidorService } from './pedido-repartidor.service';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
+import { Geolocation } from '@capacitor/geolocation';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,11 +17,15 @@ export class GpsUbicacionRepartidorService {
   private geoPositionNowSource = new BehaviorSubject<GeoPositionModel>(this.geoPosition);
   public geoPositionNow$ = this.geoPositionNowSource.asObservable();
 
+  private geoPositionCapacitorNowSource = new BehaviorSubject<any>(this.geoPosition);
+  public geoPositionCapacitorNow$ = this.geoPositionCapacitorNowSource.asObservable();
+
 
   constructor(
     private repartidorService: RepartidorService,
-    private pedidoRepartidorService: PedidoRepartidorService
-  ) {   }
+    private pedidoRepartidorService: PedidoRepartidorService,
+    // private geolocatioC: Geolocation
+  ) { }
 
   // activar geoposition
   onGeoPosition(saveBdPositionInit: boolean = false) {
@@ -49,6 +55,7 @@ export class GpsUbicacionRepartidorService {
     if ( this.geoPosition.latitude ===  pos.coords.latitude && this.geoPosition.longitude === pos.coords.longitude) {return; }
     this.geoPosition.latitude = pos.coords.latitude;
     this.geoPosition.longitude = pos.coords.longitude;
+    console.log('this.geoPosition', this.geoPosition);
     this.set();
 
 
@@ -95,6 +102,58 @@ export class GpsUbicacionRepartidorService {
       maximumAge: 0
     };
     navigator.geolocation.watchPosition(pos => this.susccesWatchPosition(pos), this.errorWatchPosition, options);
+  }
+
+  async onGeoWatchPositionCapacitor() {
+    const options = {
+      enableHighAccuracy: false,
+      timeout: 7000, // cada 7 segundos notifica position
+      maximumAge: 0
+    }
+
+    const coordinates = await Geolocation.getCurrentPosition();
+    this.geoPositionCapacitorNowSource.next(<any>coordinates); 
+    console.log('Current position:', coordinates);
+
+    await Geolocation.watchPosition(options,
+      (data) => {
+        try {
+          // do something with data
+          const _returnValue:GeoPositionModel = new GeoPositionModel()
+          _returnValue.latitude = data.coords.latitude
+          _returnValue.longitude = data.coords.longitude
+          _returnValue.hasPermition = true
+          this.geoPosition = _returnValue;
+          this.set();
+          this.geoPositionCapacitorNowSource.next(_returnValue); 
+          // console.log('Current position:', _returnValue);
+        } catch (e){
+          // do something with error
+        }
+        
+      }
+    );
+  };
+  
+  aonGeoWatchPositionCapacitor() {
+
+
+    // Solicita permiso al usuario para acceder a su ubicación
+    // this.geolocation.requestPermissions()
+    //   .then(() => {
+        // Obtiene la ubicación del usuario cada vez que cambia
+        // const options = {
+        //   enableHighAccuracy: true,
+        //   timeout: 7000, // cada 7 segundos notifica position
+        //   maximumAge: 0
+        // };
+        // this.geolocatioC.watchPosition(
+        //   position => {
+        //     // Almacena la latitud y la longitud en las variables correspondientes
+        //     return this.geoPositionNowSource.next(position);            
+        //   }
+        // ).subscribe();
+      // });  
   }
 
   getGeoPosition(): GeoPositionModel {

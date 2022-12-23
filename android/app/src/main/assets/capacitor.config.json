@@ -1,0 +1,21 @@
+{
+	"appId": "papaya.com.pe",
+	"appName": "Papaya Repartidor",
+	"bundledWebRuntime": false,
+	"npmClient": "npm",
+	"webDir": "dist/pwa-app-repartidor",
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 0
+		},
+		"Preferences": {},
+		"PushNotifications": {
+			"presentationOptions": [
+				"badge",
+				"sound",
+				"alert"
+			]
+		}
+	},
+	"cordova": {}
+}

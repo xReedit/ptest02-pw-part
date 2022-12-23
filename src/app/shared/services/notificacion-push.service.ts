@@ -26,7 +26,7 @@ export class NotificacionPushService {
     this.swPush.notificationClicks.subscribe( event => {
       // const url = event.notification.data.url;
       // window.location.reload();
-      window.open('reparto.papaya.com.pe');
+      // window.open('reparto.papaya.com.pe');
     });
   }
 
@@ -57,12 +57,12 @@ export class NotificacionPushService {
     .then(subscription => {
       // send subscription to the server
       console.log('suscrito a notificaciones push', subscription);
-      this.saveSuscripcion(subscription);
+      // this.saveSuscripcion(subscription);
     })
     .catch(console.error);
   }
 
-  private saveSuscripcion(_subscription: any): void {
+  saveSuscripcion(_subscription: any): void {
     const _data = {
       suscripcion: _subscription,
       idcliente: this.infoTokenService.infoUsToken.idcliente

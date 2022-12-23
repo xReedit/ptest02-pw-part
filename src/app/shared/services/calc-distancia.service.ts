@@ -3,7 +3,8 @@ import { DeliveryDireccionCliente } from 'src/app/modelos/delivery.direccion.cli
 import { DeliveryEstablecimiento } from 'src/app/modelos/delivery.establecimiento';
 import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
 import {
-  insideCircle
+  insideCircle,
+  distanceTo
 } from 'geolocation-utils';
 
 
@@ -79,6 +80,42 @@ export class CalcDistanciaService {
     const center = {lat: coordDetino.latitude, lon: coordDetino.longitude };
     // const radius = 75; // meters
     return insideCircle({lat: coordOrigen.latitude, lon: coordOrigen.longitude}, center, radius);  // false
+  }
+
+  calcDistanciaEnMetros(coordOrigen: GeoPositionModel, coordDetino: GeoPositionModel): Number {
+    coordDetino.latitude = typeof coordDetino.latitude === 'string' ? parseFloat(coordDetino.latitude) : coordDetino.latitude;
+    coordDetino.longitude = typeof coordDetino.longitude === 'string' ? parseFloat(coordDetino.longitude) : coordDetino.longitude;
+    const _from = {lat: coordOrigen.latitude, lon: coordOrigen.longitude };
+    const _to = {lat: coordDetino.latitude, lon: coordDetino.longitude };
+    // const radius = 75; // meters
+    return distanceTo(_from, _to);  // false
+  }
+
+  //radio metros
+  isUbicationIntroRadio(coords1, coords2, radio = 10) {
+    const _rptDistance = this.calculateDistanceInMt(coords1, coords2);
+    return _rptDistance <= radio ? true : false;
+  }
+
+  calculateDistanceInMt(coords1, coords2) {
+    const lat1 = coords1.latitude;
+    const lng1 = coords1.longitude;
+    const lat2 = coords2.latitude;
+    const lng2 = coords2.longitude;
+
+    // Calcular la distancia utilizando la fórmula de distancia entre dos puntos en un plano cartesiano
+    const distance = Math.atan2(
+      Math.sqrt(
+        Math.pow(Math.cos(lat2) * Math.sin(lng2 - lng1), 2) +
+        Math.pow(Math.cos(lat1) * Math.sin(lat2) -
+                Math.sin(lat1) * Math.cos(lat2) * Math.cos(lng2 - lng1), 2)
+      ),
+      Math.sin(lat1) * Math.sin(lat2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.cos(lng2 - lng1)
+    ) * 6371;
+
+    // Devolver la distancia en metros
+    return distance * 1000;
   }
 
   // regla x km adicional

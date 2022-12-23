@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Preferences } from '@capacitor/preferences';
+import { UsuarioAutorizadoModel } from 'src/app/modelos/usuario-autorizado.model';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +32,22 @@ export class StorageService {
 
   clear(key: string) {
     localStorage.removeItem(key);
+  }
+
+  async setLoginUser(user: UsuarioAutorizadoModel) {
+    await Preferences.set({
+      key: 'sessionTokenUser',
+      value: JSON.stringify(user)
+    });
+  }
+
+  async getLoginUser() {    
+    const { value } = await Preferences.get({ key: 'sessionTokenUser' });
+    return value ? JSON.parse(value) : false;
+  }
+
+  async clearLoginUser() {    
+    Preferences.remove({ key: 'sessionTokenUser' });
   }
 
 

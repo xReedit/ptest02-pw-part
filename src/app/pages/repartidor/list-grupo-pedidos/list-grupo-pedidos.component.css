@@ -7,6 +7,7 @@ p {
     bottom: 0px;
     text-align: center;
     width: 100%;
+    position: relative !important;
     /* padding: 14px;     */
 }
 

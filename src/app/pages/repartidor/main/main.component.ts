@@ -10,6 +10,7 @@ import { InfoTockenService } from 'src/app/shared/services/info-token.service';
 import { Router } from '@angular/router';
 import { NavigatorLinkService } from 'src/app/shared/services/navigator-link.service';
 import { DialogChangePassComponent } from 'src/app/componentes/dialog-change-pass/dialog-change-pass.component';
+import { StorageService } from 'src/app/shared/services/storage.service';
 
 @Component({
   selector: 'app-main',
@@ -30,7 +31,8 @@ export class MainComponent implements OnInit, OnDestroy {
     private infoTokeService: InfoTockenService,
     private pedidoRepartidorService: PedidoRepartidorService,
     private router: Router,
-    private navigatorService: NavigatorLinkService
+    private navigatorService: NavigatorLinkService,
+    private storageService: StorageService
   ) { }
 
   ngOnInit() {
@@ -88,6 +90,7 @@ export class MainComponent implements OnInit, OnDestroy {
   cerrarSession() {
     this.repartidorService.guardarEfectivo(0, 0);
     this.socketService.closeConnection();
+    this.storageService.clearLoginUser();
     this.router.navigate(['../']);
   }
 

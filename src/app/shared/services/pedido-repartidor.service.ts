@@ -12,6 +12,10 @@ import { SocketService } from './socket.service';
 import { InfoTockenService } from './info-token.service';
 import { ListenStatusService } from './listen-status.service';
 import { EstablecimientoService } from './establecimiento.service';
+import { GeoPositionModel } from 'src/app/modelos/geoposition.model';
+import { CalcDistanciaService } from './calc-distancia.service';
+import { TimeLinePedido } from 'src/app/modelos/time.line.pedido';
+import { SendMsjService } from './send-msj.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,12 +30,16 @@ export class PedidoRepartidorService {
   keyLocalItem = 'sys::pr::it';
   keyLocalItemSelected = 'sys::pr::selected';
 
+  private _repartidor;
+
   constructor(
     private crudService: CrudHttpService,
     private router: Router,
     private infoTokenService: InfoTockenService,
     private listenService: ListenStatusService,
     private socketService: SocketService,
+    private calcDistanciaService: CalcDistanciaService,
+    private sendMsjService: SendMsjService
   ) {
     this.init();
   }
@@ -132,11 +140,13 @@ export class PedidoRepartidorService {
   }
 
   asignarPedido(): void {
-    // console.log('set-asignar-pedido');
     const ids = this.getLocalIds().pedidos.join(',');
     const _data = {
-      idpedido: ids
+      idpedido: ids,
+      repartidor: !this._repartidor ? this.infoTokenService.getInfoUs().usuario : this._repartidor
     };
+
+    console.log('set-asignar-pedido', _data);
 
     this.crudService.postFree(_data, 'repartidor', 'set-asignar-pedido', true)
       .subscribe(res => {
@@ -367,7 +377,8 @@ export class PedidoRepartidorService {
 
   // fin de pedido // guarda datos del pedido
   // isGrupoPedidos = si es grupo de pedidos
-  finalizarPedido(isGrupoPedidos = false): void {
+  // time_line_pedido guarda la hora de entrega
+  finalizarPedido(isGrupoPedidos = false, time_line_pedido = null): void {
     const comisionRepartidor = parseFloat(this.pedidoRepartidor.datosDelivery.costoTotalDelivery); // - parseFloat( this.pedidoRepartidor.datosComercio.pwa_delivery_comision_fija_no_afiliado );
     const propinaRepartidor = this.pedidoRepartidor.datosDelivery.propina.value;
     const costotalServicio = comisionRepartidor + parseFloat(propinaRepartidor);
@@ -380,6 +391,7 @@ export class PedidoRepartidorService {
     const _dataSend = {
       idrepartidor: _idRepartidor,
       idpedido: this.pedidoRepartidor.idpedido,
+      time_line: time_line_pedido ? time_line_pedido : 0,
       idcliente: this.pedidoRepartidor.datosDelivery.idcliente,
       idsede: this.pedidoRepartidor.datosComercio.idsede,
       operacion: {
@@ -437,11 +449,12 @@ export class PedidoRepartidorService {
   }
 
   // fin de pedido // guarda datos del pedido
-  finalizarPedidoPropioRepartidor(): void {
+  finalizarPedidoPropioRepartidor(time_line_pedido = null): void {
     const _idPedidoRepartidor = this.pedidoRepartidor.datosRepartidor ? this.pedidoRepartidor.datosRepartidor.idrepartidor : this.infoTokenService.infoUsToken.usuario.idrepartidor;
     const _dataSend = {
       idrepartidor: _idPedidoRepartidor,
       idpedido: this.pedidoRepartidor.idpedido,
+      time_line: time_line_pedido ? time_line_pedido : 0,
       idcliente: this.pedidoRepartidor.datosCliente.idcliente,
       idsede: this.pedidoRepartidor.datosComercio.idsede,
       operacion: {
@@ -490,8 +503,8 @@ export class PedidoRepartidorService {
   }
 
   listaPedidosEntregados() {
-    const _repartidor = this.infoTokenService.getInfoUs().usuario;
-    this.socketService.emit('repartidor-grupo-pedido-finalizado', _repartidor.idrepartidor);
+    this._repartidor = this.infoTokenService.getInfoUs().usuario;
+    this.socketService.emit('repartidor-grupo-pedido-finalizado', this._repartidor.idrepartidor);
     this.cleanLocal();
   }
 
@@ -680,7 +693,8 @@ export class PedidoRepartidorService {
     this.setPedidoPorAceptar(pedidos_repartidor);
 
     const _dataSend = {
-      pedido : pedidos_repartidor
+      pedido : pedidos_repartidor,
+      repartidor: this._repartidor
     };
 
     this.crudService.postFree(_dataSend, 'monitor', 'set-asignar-pedido-manual', true)
@@ -700,5 +714,50 @@ export class PedidoRepartidorService {
     return response;
     // observer.next(response);
   }
+
+
+  // chequea si ya llego al comercio
+  checkLLegoComercio(listPedidos: [], geoPositionActual: GeoPositionModel) {
+    let geoPositionComercio: GeoPositionModel = new GeoPositionModel();
+    let _newTimeLinePedido = new TimeLinePedido()
+    listPedidos.map((p: any) => {      
+      const comercioPedido = p.json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
+      _newTimeLinePedido = p.time_line || _newTimeLinePedido      
+
+      geoPositionComercio.latitude = typeof comercioPedido.latitude === 'string'  ? parseFloat(comercioPedido.latitude) : comercioPedido.latitude;
+      geoPositionComercio.longitude = typeof comercioPedido.longitude === 'string'  ? parseFloat(comercioPedido.longitude) : comercioPedido.longitude;
+
+      // const _distanciaMt = this.calcDistanciaService.calcDistanciaEnMetros(geoPositionActual, geoPositionComercio);
+
+      // 100mtr a la redonda
+      const isLLego = geoPositionComercio.latitude ? 
+                      this.calcDistanciaService.calcDistancia(geoPositionComercio, geoPositionActual, 100)
+                      : false
+
+      // p.llego_comercio = isLLego;
+      // p.distanciaMtr = _distanciaMt;      
+      
+      
+      // _newTimeLinePedido.llego_al_comercio = !_newTimeLinePedido.llego_al_comercio ? isLLego : false;
+      
+      if ( isLLego ) { // envia mensaje
+        // _newTimeLinePedido.mensaje_enviado.llego_al_comercio = true;
+        _newTimeLinePedido.llego_al_comercio = true;
+        _newTimeLinePedido.paso = 1;
+        this.sendMsjService.msjClienteTimeLine(p, _newTimeLinePedido);
+      } else {
+        // si sale del comercio con el pedido camino al cliente
+        if ( _newTimeLinePedido.paso === 1 ) {
+          // _newTimeLinePedido.mensaje_enviado.en_camino_al_cliente = true;
+          _newTimeLinePedido.en_camino_al_cliente = true;
+          _newTimeLinePedido.paso = 2
+          this.sendMsjService.msjClienteTimeLine(p, _newTimeLinePedido);
+        }
+      }      
+
+      
+    })
+  }
+
 
 }

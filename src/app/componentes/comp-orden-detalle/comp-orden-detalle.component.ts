@@ -6,6 +6,10 @@ import { CalcDistanciaService } from 'src/app/shared/services/calc-distancia.ser
 import { SocketService } from 'src/app/shared/services/socket.service';
 import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
 
+import { Plugins } from '@capacitor/core';
+import { TimeLinePedido } from 'src/app/modelos/time.line.pedido';
+const { Browser } = Plugins;
+
 @Component({
   selector: 'app-comp-orden-detalle',
   templateUrl: './comp-orden-detalle.component.html',
@@ -95,20 +99,30 @@ export class CompOrdenDetalleComponent implements OnInit {
     window.open(linkGPS, '_blank');
   }
 
-  callPhone() {
+  async callPhone() {
     window.open(`tel:${this.dataPedido.datosDelivery.telefono}`);
+    try { // para ios
+      await Browser.open({ url: `tel:${this.dataPedido.datosDelivery.telefono}` });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   PedidoEntregado() {
     this.orden.pwa_estado = 'E'; // marcar como entregado
     this.orden.estado = 2; // marcar como entregado
-    if ( this.orden.isRepartidorRed ) {
 
+    // hora que termina entrega
+    let _time_line = this.orden.time_line || new TimeLinePedido()
+    _time_line.hora_pedido_entregado = new Date().getTime()
+
+    if ( this.orden.isRepartidorRed ) {
         // si viene de red repartidore
-        this.pedidoRepartidorService.finalizarPedido(true);
+        
+        this.pedidoRepartidorService.finalizarPedido(true, _time_line);
 
     } else {
-      this.pedidoRepartidorService.finalizarPedidoPropioRepartidor();
+      this.pedidoRepartidorService.finalizarPedidoPropioRepartidor(_time_line);
     }
 
     setTimeout(() => {

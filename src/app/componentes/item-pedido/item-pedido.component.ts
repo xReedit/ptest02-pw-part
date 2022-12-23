@@ -3,6 +3,10 @@ import { TimerLimitService } from 'src/app/shared/services/timer-limit.service';
 import { PedidoRepartidorModel } from 'src/app/modelos/pedido.repartidor.model';
 import { PedidoRepartidorService } from 'src/app/shared/services/pedido-repartidor.service';
 import { DeliveryEstablecimiento } from 'src/app/modelos/delivery.establecimiento';
+import { RepartidorService } from 'src/app/shared/services/repartidor.service';
+import { InfoTockenService } from 'src/app/shared/services/info-token.service';
+import { SocketService } from 'src/app/shared/services/socket.service';
+import { TimeLinePedido } from 'src/app/modelos/time.line.pedido';
 
 
 @Component({
@@ -15,7 +19,8 @@ export class ItemPedidoComponent implements OnInit, OnChanges  {
   @Input() listPedidos: any;
   @Input() importeAcumuladoPagar: any;
   // @Input() infoPedido: PedidoRepartidorModel;
-  @Output() aceptaPedido = new EventEmitter<boolean>(false);
+  // @Output() aceptaPedido = new EventEmitter<boolean>(false);
+  @Output() aceptaPedido = new EventEmitter<any>();
 
   estadoPedido = 0;
   countPedidos = 0;
@@ -24,19 +29,26 @@ export class ItemPedidoComponent implements OnInit, OnChanges  {
   isHayPropina = false;
   DesPagarCon: string; // descripcion de pagar con
   establecimientoOrden: DeliveryEstablecimiento;
+  elRepartidor: any;
 
   constructor(
     public timerLimitService: TimerLimitService,
     public pedidoRepartidorService: PedidoRepartidorService,
+    public infoToken: InfoTockenService,
+    public socketService: SocketService
   ) { }
 
   ngOnChanges() {
     // create header using child_id
+    this.elRepartidor = this.infoToken.getInfoUs().usuario;
     console.log(this.listPedidos);
+    // this.extraerListaClientePedido();
   }
 
   ngOnInit() {
     // console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+    this.elRepartidor = this.infoToken.getInfoUs().usuario;
+    console.log('this.elRepartidor', this.elRepartidor);
     this.leerInfoGroup();
   }
 
@@ -52,6 +64,8 @@ export class ItemPedidoComponent implements OnInit, OnChanges  {
       const propina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value ? parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value) : 0;
       this.sumGananciaTotal += parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + propina;
       this.sumKmRecorrer += parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.c_km);
+      this.sumKmRecorrer = isNaN(this.sumKmRecorrer) ? 0 : this.sumKmRecorrer;
+      
       if ( !this.isHayPropina ) {
         this.isHayPropina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value > 0;
       }
@@ -101,7 +115,41 @@ export class ItemPedidoComponent implements OnInit, OnChanges  {
 
     this.pedidoRepartidorService.asignarPedido();
     this.pedidoRepartidorService.pedidoRepartidor.aceptado = true;
-    this.aceptaPedido.emit(true);
+    this.aceptaPedido.emit(this.establecimientoOrden);
+
+    this.extraerListaClientePedido();
+  }
+
+  private extraerListaClientePedido() {
+    const listClienteNotificar = [];
+    this.listPedidos.filter(p => !p.idrepartidor ).map(p => {
+      const rowDatos = p?.json_datos_delivery?.p_header?.arrDatosDelivery;
+      // hora que acepta el pedido
+      let _time_line = p.time_line || new TimeLinePedido()
+      _time_line.hora_acepta_pedido = new Date().getTime()
+
+      if ( rowDatos ) {
+        const rowCliente = {
+          nombre: rowDatos.nombre.split(' ')[0],
+          telefono: rowDatos.telefono,
+          establecimiento: rowDatos.establecimiento.nombre,
+          idpedido: p.idpedido,
+          repartidor_nom: this.elRepartidor.nombre.split(' ')[0],
+          repartidor_telefono: this.elRepartidor.telefono,
+          idsede: rowDatos.establecimiento.idsede,
+          idorg: rowDatos.establecimiento.idorg,
+          time_line: _time_line
+        };
+
+        listClienteNotificar.push(rowCliente);
+      }
+    });
+
+    console.log('listClienteNotificar', listClienteNotificar);
+
+    if ( listClienteNotificar.length > 0 ) {
+      this.socketService.emit('repartidor-notifica-cliente-acepto-pedido', listClienteNotificar);
+    }
   }
 
 }

@@ -8,9 +8,19 @@
 
     <!-- lista -->
     <div>
+        <!-- test -->
+        <!-- <div>
+            position navigator
+            <p>{{geoPositionActual | json}}</p>
+            <br>
+            <hr>
+            position capacitor 
+            <p>{{ geoPositionComercioCapacitor | json}}</p>
+            <hr>
+        </div> -->
 
         <!-- paso uno -->
-        <div class="p-4">
+        <!-- <div class="p-4">
             <p class="fw-600 text-secondary">Diríjase hacia el comercio:</p>
             <div class="row">
                 <div class="col-6">
@@ -24,20 +34,35 @@
                     </div>
                 </div>                
             </div>
-        </div>
+        </div> -->
+
+        <!-- <div class="p-4">
+            <p class="fw-600 text-secondary">Lista de pedidos Asignados</p>
+        </div> -->
+
         <hr class="m-0">
 
         <table mat-table class="w-100" [dataSource]="listPedidos">
             <!-- Item Column -->
-            <ng-container matColumnDef="Pedido">
-              <th mat-header-cell *matHeaderCellDef> Pedido </th>
+            <ng-container matColumnDef="Comercio">
+              <th mat-header-cell *matHeaderCellDef> Comercio </th>
               <td mat-cell *matCellDef="let element">
-                  <p class="fw-600 fs-12">{{ element.idpedido }}</p>
-                  <p class="fw-100 text-secondary fs-12">
-                      <span class="text-success fs-10" [ngClass]="{'text-danger': element.hora_show > 30}">
-                          {{ element.hora_show }} min
-                      </span>
-                    </p>
+                    <p class="fw-600 fs-11" style="max-width: 80px;">{{ element.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.nombre | titlecase }}</p>
+                    <p class="fw-100 fs-10" style="max-width: 80px;">{{ element.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.direccion | lowercase }}</p>
+                                        
+                    
+                    <ng-container *ngIf="element.time_line.llego_al_comercio; else elseTemplateNollega">
+                        <p class="text-success fs-10"><i class="fa fa-check"></i> Llegaste</p>
+                    </ng-container>
+                    <ng-template #elseTemplateNollega>
+                        <p class="text-danger fs-10"> Aún no llegas</p>
+                    </ng-template>
+
+                    <!-- test -->
+                    <!-- <button (click)="testLlege(element)">llegue</button> -->
+                    
+                    <!-- <p>d1: {{ element.distanciaMtr }}</p>
+                    <p>d2: {{ element.distanciaMtr2 }}</p> -->
               </td>              
             </ng-container>
           
@@ -45,15 +70,27 @@
             <ng-container matColumnDef="Cliente">
               <th mat-header-cell *matHeaderCellDef class="text-left"> Cliente </th>
               <td mat-cell *matCellDef="let element" class="text-left"> 
-                  <p class="fw-600 fs-12"> {{ element.json_datos_delivery.p_header.arrDatosDelivery.nombre | titlecase }}  </p>
-                  <p class="fw-100 fs-12">
-                    <span class="fw-600 badge" [ngClass]="{'badge-primary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 3, 'badge-info': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2, 'badge-secondary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 1}">
-                        {{element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion | titlecase }} 
-                    </span> 
-                    <span class="text-secondary fs-10 ml-1">
-                        {{ element.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km }} Km
-                    </span>
+                    <p class="fw-600 fs-12"> {{ element.json_datos_delivery.p_header.arrDatosDelivery.nombre | titlecase }}  </p>
+                    <p class="fw-100 fs-12">
+                        <span class="fw-600 badge badge-success mr-1" *ngIf="element.json_datos_delivery.p_header.isCliente === 1">
+                            APP
+                        </span> 
+                        <span class="fw-600 badge" [ngClass]="{'badge-primary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 3, 'badge-info': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2, 'badge-secondary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 1}">
+                            {{element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion | titlecase }} 
+                        </span>
+                        <span class="text-secondary fs-10 ml-1">
+                            {{ element.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km }} Km
+                        </span>
                     </p>
+                    <div class="d-flex">                        
+                        <p class="fw-600 text-success fs-10" [ngClass]="{'text-danger': element.hora_show > 25}">
+                            {{ element.hora_show }} min                            
+                        </p>
+                        <p *ngIf="element.time_line.en_camino_al_cliente" class="text-success fs-10 ml-2"><i class="fa fa-check"></i> En Camino</p>
+                    </div>
+
+                    <!-- test -->
+                    <!-- <button (click)="testEnCamino(element)">en camino</button> -->
               </td>              
             </ng-container>
 

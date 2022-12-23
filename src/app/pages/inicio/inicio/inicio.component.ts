@@ -4,6 +4,7 @@ import { VerifyAuthClientService } from 'src/app/shared/services/verify-auth-cli
 import { SocketClientModel } from 'src/app/modelos/socket.client.model';
 import { Router } from '@angular/router';
 import { NotificacionPushService } from 'src/app/shared/services/notificacion-push.service';
+import { StorageService } from 'src/app/shared/services/storage.service';
 // import { take } from 'rxjs/internal/operators/take';
 // import { ListenStatusService } from 'src/app/shared/services/listen-status.service';
 
@@ -22,6 +23,7 @@ export class InicioComponent implements OnInit, OnDestroy {
   constructor(
     private verifyClientService: VerifyAuthClientService,
     private router: Router,
+    private storageService: StorageService
     // private webSocketService: WebsocketService
     ) { }
 
@@ -32,10 +34,21 @@ export class InicioComponent implements OnInit, OnDestroy {
     // setTimeout(() => {
       // this.loadInit();
     // }, 800);
+    this.checkUserLogin()
+    
 
+    
+  }
 
-    // limpiar datos
-    localStorage.clear();
+  private async checkUserLogin() {
+    const userLogin = await this.storageService.getLoginUser();
+    if ( userLogin ) {
+      alert( `User ${JSON.stringify(userLogin)}`)
+      this.router.navigate(['/login-personal-autorizado']);
+    } else {
+      // limpiar datos
+      localStorage.clear();
+    }
   }
 
   private loadInit(): void {

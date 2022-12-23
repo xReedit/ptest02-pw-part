@@ -15,6 +15,9 @@ import { CrudHttpService } from 'src/app/shared/services/crud-http.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { RepartidorService } from 'src/app/shared/services/repartidor.service';
 
+
+
+
 @Component({
   selector: 'app-pedidos',
   templateUrl: './pedidos.component.html',
@@ -65,10 +68,10 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.geoPositionService.onGeoPosition();
+    // this.geoPositionService.onGeoPosition();
 
     // iniciar transmitir position
-    this.geoPositionService.onGeoWatchPosition();
+    // this.geoPositionService.onGeoWatchPosition();
 
 
     this.listenPedidos();
@@ -163,7 +166,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  private darFormatoGrupoPedidosRecibidos(pedidos: any) {
+  private darFormatoGrupoPedidosRecibidos(pedidos: any) {    
     if ( !pedidos ) {return; }
     this.sumAcumuladoPagar = pedidos.importe_pagar;
     this.pedidoRepartidorService.loadPedidosRecibidos(pedidos.pedidos.join(','))
@@ -219,11 +222,11 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
   //   this.pedidoRepartidorService.playAudioNewPedido();
   // }
 
-  aceptaPedido() {
+  aceptaPedido(_establecimiento: any) {
 
-
+    console.log('this.dataPedidos', _establecimiento);
     // notificamos al comercio que estos pedidos ya tienen repartidor
-    this.socketService.emit('repartidor-acepta-pedido', this.dataPedidos);
+    this.socketService.emit('repartidor-acepta-pedido', _establecimiento);
 
     // pedido ya fue aceptado
     if (this.pedidoRepartidorService.pedidoRepartidor.aceptado ) {
@@ -286,6 +289,12 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
       this.pedidoRepartidorService.cleanLocal();
     }
   }
+
+  // // hora_acepta_pedido
+  // // hora_entrega_pedido
+  // updateTimeLinePedido(pedido: any) {
+
+  // }
 
   // showPedido() {
   //   this.timerLimitService.playCountTimerLimit();

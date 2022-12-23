@@ -66,9 +66,7 @@ import { ItemPedidoExpressComponent } from './item-pedido-express/item-pedido-ex
     DialogOrdenDetalleComponent,
     DialogChangePassComponent,
     ScanCodePedidoComponent,
-    ItemPedidoExpressComponent,
-    // DialogSelectDireccionComponent,
-    // DialogUbicacionComponent
+    ItemPedidoExpressComponent    
   ],
   imports: [
     CommonModule,
@@ -105,7 +103,7 @@ import { ItemPedidoExpressComponent } from './item-pedido-express/item-pedido-ex
     MapaOrdenesComponent,
     CompOrdenDetalleComponent,
     ScanCodePedidoComponent,
-    ItemPedidoExpressComponent
+    ItemPedidoExpressComponent    
   ],
 
   // entryComponents: [

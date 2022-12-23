@@ -130,7 +130,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     });
   }
 
-  private darFormatoGrupoPedidosRecibidos(pedidos: any) {
+  private darFormatoGrupoPedidosRecibidos(pedidos: any) {    
     if ( !pedidos ) {return; }
     const sumAcumuladoPagar = pedidos.importe_pagar;
     this.pedidoRepartidorService.loadPedidosRecibidos(pedidos.pedidos.join(','))

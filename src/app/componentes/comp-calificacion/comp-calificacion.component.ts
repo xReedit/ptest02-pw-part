@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { DatosCalificadoModel } from 'src/app/modelos/datos.calificado.model';
 import { CrudHttpService } from 'src/app/shared/services/crud-http.service';
 
@@ -13,7 +14,8 @@ export class CompCalificacionComponent implements OnInit {
   @Input() dataCalificado: DatosCalificadoModel;
 
   constructor(
-    private crudService: CrudHttpService
+    private crudService: CrudHttpService,
+    private dialogRef: MatDialogRef<DatosCalificadoModel>,
   ) { }
 
   ngOnInit() {
@@ -33,6 +35,7 @@ export class CompCalificacionComponent implements OnInit {
     if ( this.countFin <= 0 ) {
       this.intervalConteo = null;
       this.guardarCalificacion();
+      this.dialogRef.close();
     } else {
       this.conteoFinEncuesta();
     }
