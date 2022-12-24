@@ -430,4 +430,8 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
     }
   }
 
+  recargarPedido() {
+    location.reload();
+  }
+
 }
