@@ -28,7 +28,7 @@ import { DialogImgItemComponent } from './dialog-img-item/dialog-img-item.compon
 import { CompCalificacionComponent } from './comp-calificacion/comp-calificacion.component';
 import { DialogCalificacionComponent } from './dialog-calificacion/dialog-calificacion.component';
 
-import { StarRatingModule } from 'angular-star-rating';
+// import { StarRatingModule } from 'angular-star-rating';
 import { MapaOrdenesComponent } from './mapa-ordenes/mapa-ordenes.component';
 import { CompOrdenDetalleComponent } from './comp-orden-detalle/comp-orden-detalle.component';
 import { ComResumenPedidoComponent } from './com-resumen-pedido/com-resumen-pedido.component';
@@ -78,8 +78,8 @@ import { ItemPedidoExpressComponent } from './item-pedido-express/item-pedido-ex
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyAknWQFyVH1RpR2OAL0vRTHTapaIpfKSqo',
       libraries: ['places']
-    }),
-    StarRatingModule.forRoot()
+    })
+    // StarRatingModule.forRoot()
   ],
   exports: [
     DatosDeliveryComponent,
