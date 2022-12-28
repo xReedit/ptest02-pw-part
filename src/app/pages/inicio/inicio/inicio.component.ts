@@ -43,7 +43,7 @@ export class InicioComponent implements OnInit, OnDestroy {
   private async checkUserLogin() {
     const userLogin = await this.storageService.getLoginUser();
     if ( userLogin ) {
-      alert( `User ${JSON.stringify(userLogin)}`)
+      // alert( `User ${JSON.stringify(userLogin)}`)
       this.router.navigate(['/login-personal-autorizado']);
     } else {
       // limpiar datos
