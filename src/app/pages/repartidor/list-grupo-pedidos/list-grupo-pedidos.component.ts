@@ -69,7 +69,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {    
       this.geoPositionService.onGeoWatchPosition();
-      // this.geoPositionService.onGeoWatchPositionCapacitor();
+      this.geoPositionService.onGeoWatchPositionCapacitor();
       this.listenGeoPosition();    
     }, 1000);
 
