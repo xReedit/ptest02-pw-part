@@ -2,12 +2,13 @@ p {
     margin: 0px;    
 }
 
-.xfooter {
+.xfooterx {
     /* position: absolute; */
     bottom: 0px;
     text-align: center;
     width: 100%;
     position: relative !important;
+    background: #e0e0e0;
     /* padding: 14px;     */
 }
 
