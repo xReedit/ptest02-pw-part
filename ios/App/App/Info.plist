@@ -28,12 +28,6 @@
 	<string>Se necesita acceso a la ubicación del dispositivo.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Se necesita acceso a la ubicación del dispositivo.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-		<string>processing</string>
-		<string>remote-notification</string>
-	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
