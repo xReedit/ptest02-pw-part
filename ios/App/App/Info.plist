@@ -4,7 +4,7 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<string>papaya.com.pe.repartidor</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
