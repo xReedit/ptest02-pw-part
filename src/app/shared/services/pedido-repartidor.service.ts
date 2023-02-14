@@ -159,6 +159,7 @@ export class PedidoRepartidorService {
   }
 
   playAudioNewPedido() {
+    console.trace();
     const audio = new Audio();
     audio.src = './assets/audio/Alarm04.wav';
     audio.load();
@@ -726,34 +727,47 @@ export class PedidoRepartidorService {
 
       geoPositionComercio.latitude = typeof comercioPedido.latitude === 'string'  ? parseFloat(comercioPedido.latitude) : comercioPedido.latitude;
       geoPositionComercio.longitude = typeof comercioPedido.longitude === 'string'  ? parseFloat(comercioPedido.longitude) : comercioPedido.longitude;
+      
 
-      // const _distanciaMt = this.calcDistanciaService.calcDistanciaEnMetros(geoPositionActual, geoPositionComercio);
+      if (!geoPositionComercio.latitude) {return; }
+      const _distanciaMt = this.calcDistanciaService.calcDistanciaEnMetros(geoPositionActual, geoPositionComercio);
 
       // 100mtr a la redonda
-      const isLLego = geoPositionComercio.latitude ? 
-                      this.calcDistanciaService.calcDistancia(geoPositionComercio, geoPositionActual, 100)
-                      : false
+      // const isLLego = geoPositionComercio.latitude ? 
+      //                 this.calcDistanciaService.calcDistancia(geoPositionComercio, geoPositionActual, 100)
+      //                 : false
+
+      const isLLego = this.calcDistanciaService.calcDistancia(geoPositionActual, geoPositionComercio, 100);
 
       // p.llego_comercio = isLLego;
-      // p.distanciaMtr = _distanciaMt;      
+      p.distanciaMtr = _distanciaMt;
+      // _newTimeLinePedido.llego_al_comercio = isLLego;
       
       
       // _newTimeLinePedido.llego_al_comercio = !_newTimeLinePedido.llego_al_comercio ? isLLego : false;
       
-      if ( isLLego ) { // envia mensaje
-        // _newTimeLinePedido.mensaje_enviado.llego_al_comercio = true;
-        _newTimeLinePedido.llego_al_comercio = true;
-        _newTimeLinePedido.paso = 1;
-        this.sendMsjService.msjClienteTimeLine(p, _newTimeLinePedido);
+      if (isLLego ) { // envia mensaje
+        // if (_newTimeLinePedido.paso === 0) {
+          // _newTimeLinePedido.mensaje_enviado.llego_al_comercio = true;
+        if (_newTimeLinePedido.llego_al_comercio !== true) {
+          _newTimeLinePedido.llego_al_comercio = true;
+          _newTimeLinePedido.paso = 1;
+          p.msj_log += `paso 1  ${new Date().toLocaleTimeString()}`
+          this.sendMsjService.msjClienteTimeLine(p, _newTimeLinePedido);          
+        }
+        // }
       } else {
         // si sale del comercio con el pedido camino al cliente
-        if ( _newTimeLinePedido.paso === 1 ) {
+        if (_newTimeLinePedido.paso === 1) {
           // _newTimeLinePedido.mensaje_enviado.en_camino_al_cliente = true;
           _newTimeLinePedido.en_camino_al_cliente = true;
           _newTimeLinePedido.paso = 2
+          p.msj_log += `paso 2  ${new Date().toLocaleTimeString()}`          
           this.sendMsjService.msjClienteTimeLine(p, _newTimeLinePedido);
         }
-      }      
+      }   
+      
+      p.time_line = _newTimeLinePedido;
 
       
     })

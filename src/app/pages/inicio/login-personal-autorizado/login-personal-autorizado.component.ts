@@ -13,7 +13,7 @@ import { StorageService } from 'src/app/shared/services/storage.service';
 })
 export class LoginPersonalAutorizadoComponent implements OnInit {
 
-  usuario: UsuarioAutorizadoModel;
+  usuario = new UsuarioAutorizadoModel();
   loading = false;
   msjErr = false;
 
@@ -34,8 +34,10 @@ export class LoginPersonalAutorizadoComponent implements OnInit {
   private async checkUserLogin() {
     const userLogin = await this.storageService.getLoginUser();
     if ( userLogin ) {
-      this.usuario = userLogin;
-      this.logear(true);
+      if (userLogin.recordar) {
+        this.usuario = userLogin;
+        this.logear(true);
+      }
     }
   }
 

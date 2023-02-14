@@ -37,7 +37,7 @@ export class RepartidorService {
   // guarda efectivo inicial
   guardarEfectivo(importe: number, _online = 1) {
     const _data = {
-      idrepartidor: this.idRepartidor,
+      idrepartidor: this.infoToken.getInfoUs().usuario.idrepartidor,
       efectivo: importe,
       online: _online
     };

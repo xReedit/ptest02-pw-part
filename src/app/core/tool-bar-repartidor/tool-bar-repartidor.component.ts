@@ -45,14 +45,20 @@ export class ToolBarRepartidorComponent implements OnInit {
 
   repartidorOnLine($event: any) {
     this.isTogleActive = $event.checked;
-    this.infoTokenService.setisOnline(this.isTogleActive);
-    this.changeTogle.emit(this.isTogleActive);
+    // this.infoTokenService.setisOnline(this.isTogleActive);
+    // this.changeTogle.emit(this.isTogleActive);
 
-    this.estadoOnline = 'En linea';
+    // this.estadoOnline = 'En linea';
 
     if ( !this.isTogleActive ) {
       this.estadoOnline = 'Fuera de linea';
       this.repartidorService.guardarEfectivo(0, 0);
+    } else {
+      // this.isTogleActive = $event.checked;
+      this.infoTokenService.setisOnline(this.isTogleActive);
+      this.changeTogle.emit(this.isTogleActive);
+
+      this.estadoOnline = 'En linea';
     }
   }
 

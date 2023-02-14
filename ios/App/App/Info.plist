@@ -32,9 +32,9 @@
 	<string>Copyright © 2022 Papaya.com.pe. All rights reserved.
 </string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Se necesita acceso a la ubicación del dispositivo.</string>
+	<string>Se necesita acceso a la ubicación del dispositivo. Utilizamos la ubicación del usuario para determinar la ruta más eficiente para un repartidor a la hora de entregar un pedido y para notificar al usuario cuando su pedido esté en camino.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Se necesita acceso a la ubicación del dispositivo.</string>
+	<string>Se necesita acceso a la ubicación del dispositivo. Utilizamos la ubicación del usuario para determinar la ruta más eficiente para un repartidor a la hora de entregar un pedido y para notificar al usuario cuando su pedido esté en camino.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>Main.storyboard</string>
 	<key>UIMainStoryboardFile</key>

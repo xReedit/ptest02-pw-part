@@ -27,8 +27,8 @@ export class DialogEfectivoRepartidorComponent implements OnInit, AfterViewInit 
 
   }
 
-  ngAfterViewInit(): void {
-    this.isOnNotificactionPush = this.pushNotificationService.getIsTienePermiso();
+  async ngAfterViewInit() {
+    this.isOnNotificactionPush = await this.pushNotificationService.getIsTienePermiso();
 
     // this.geoPositionService.onGeoPosition();
 

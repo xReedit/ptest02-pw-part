@@ -97,18 +97,18 @@ export class GpsUbicacionRepartidorService {
     this.get();
 
     const options = {
-      enableHighAccuracy: false,
+      enableHighAccuracy: true,
       timeout: 7000, // cada 7 segundos notifica position
-      maximumAge: 0
+      maximumAge: 3000
     };
     navigator.geolocation.watchPosition(pos => this.susccesWatchPosition(pos), this.errorWatchPosition, options);
   }
 
   async onGeoWatchPositionCapacitor() {
     const options = {
-      enableHighAccuracy: false,
+      enableHighAccuracy: true,
       timeout: 7000, // cada 7 segundos notifica position
-      maximumAge: 0
+      maximumAge: 3000
     }
 
     const coordinates = await Geolocation.getCurrentPosition();

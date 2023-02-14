@@ -77,7 +77,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
     // escuchar pedidos asignados
     this.socketService.onRepartidorGetPedidoPendienteAceptar()
     .subscribe((res: any) => {
-      console.log('pedndientes', res);
+      // console.log('escuchar pedidos asignados', res);
       this.pedidoRepartidorService.setPedidoPorAceptar(res[0].pedido_por_aceptar);
       this.darFormatoGrupoPedidosRecibidos(res[0].pedido_por_aceptar);
     });
@@ -99,7 +99,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
 
     // load dlista
     this.listPedidos = this.pedidoRepartidorService.getLocalItems();
-    console.log('this.listPedidos', this.listPedidos);
+    // console.log('this.listPedidos', this.listPedidos);
     this.listPedidos = this.listPedidos.map(p => {
       p.time_line = p.time_line || new TimeLinePedido()
       return p;
@@ -145,12 +145,12 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
     const sumAcumuladoPagar = pedidos.importe_pagar;
     this.pedidoRepartidorService.loadPedidosRecibidos(pedidos.pedidos.join(','))
         .subscribe((response: any) => {
-          console.log('res', response);
+          // console.log('res', response);
 
           // formateamos el json_}¿datos
           const _listAsignar = response.map(p => {
             p.json_datos_delivery = JSON.parse(p.json_datos_delivery); 
-            console.log('p.json_datos_delivery', p.json_datos_delivery);           
+            // console.log('p.json_datos_delivery', p.json_datos_delivery);           
             p.importe_pagar_comercio =  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal) -  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
             p.importe_pagar_comercio = p.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2 ? 0 : p.importe_pagar_comercio;
             return p;
@@ -229,7 +229,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
     this.geoPositionService.geoPositionNow$    
     .pipe(takeUntil(this.destroy$))
     .subscribe((res: GeoPositionModel) => {
-      console.log('geoPositionActual', res);
+      // console.log('geoPositionActual', res);
       res = !res?.latitude ? this.geoPositionActual : res;
       if ( !res.latitude ) { return; }
       // verificar en que paso esta

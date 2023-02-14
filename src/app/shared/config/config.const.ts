@@ -1,3 +1,6 @@
+import { Capacitor } from '@capacitor/core';
+export const IS_NATIVE = Capacitor.getPlatform() !== 'web';
+
 // // pruebas
 // export const URL_SERVER = 'http://192.168.1.39:5819/v3/'; // desarrollo
 // export const URL_SERVER_SOCKET = 'http://192.168.1.39:5819'; // desarrollo
@@ -7,10 +10,15 @@
 // export const URL_CONSULTA_RUC_DNI = 'http://apifacturalo_a.test:8080/api/services/'; // consulta dni o ruc
 
 // produccion
+
 export const URL_SERVER = 'https://app.restobar.papaya.com.pe/api.pwa/v3'; // produccion
 export const URL_SERVER_SOCKET = 'https://app.restobar.papaya.com.pe/'; // produccion
 export const URL_IMG_CARTA = 'https://restobar.papaya.com.pe/file/';
 export const VAPID_PUBLIC = 'BOiwO8PftVFo8MrQfp3oAv4KbVtFdZAQojGKgzyxMCPgiNhg8PySbOSlkxDqd3iKA4J1GhzwFiCIGKmXRiKZM_0';
+
+
+// export const VAPID_PUBLIC = 'BNMTnTvmBqg66i4-5I8SKSqb3VK1lEc-bmjB3bAWnIQ1RiZRwB1PpNIGzeM8Y75NeUYWXhlzjyVrEppOJuyk-1Y';
+// export const VAPID_PRIVATE = 'pBhfgP_TXkhMFVvwCD08GEROyvdpUe7daBgMXeySWFw';
 
 
 export const URL_CONSULTA_RUC_DNI = 'https://apifac.papaya.com.pe/api/services/'; // consulta dni o ruc

@@ -104,7 +104,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
     this.unsubscribeSocket = this.socketService.onRepartidorGetPedidoPendienteAceptar()
     .subscribe((res: any) => {
 
-      console.log('repartidor-get-pedido-pendiente-aceptar', res[0]);
+      // console.log('repartidor-get-pedido-pendiente-aceptar', res);
       this.dataPedidos = res[0].pedido_por_aceptar;
 
       this.isExpress = this.dataPedidos ? this.dataPedidos.isexpress || this.dataPedidos.isretiroatm ? this.dataPedidos.isexpress === 1 || this.dataPedidos.isretiroatm === 1 : false : false;
@@ -128,8 +128,10 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
       if ( this.dataPedidos ) {
+        // console.log('repartidor-get-pedido-pendiente-aceptar dataPedidos', this.dataPedidos);
         this.dataPedidos.pedido_paso_va = res[0].pedido_paso_va;
-        this.yaQuitoPedido = 2;
+        // this.yaQuitoPedido = 2;
+        this.yaQuitoPedido = 0;
         this.pedidoRepartidorService.setPedidoPasoVa(this.dataPedidos.pedido_paso_va);
         this.darFormatoGrupoPedidosRecibidos(this.dataPedidos);
       }
@@ -140,6 +142,8 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
     // opcion 2 // grupo de pedidos
     this.unsubscribeSocket = this.socketService.onRepartidorNuevoPedido()
     .subscribe((res: any) => {
+
+      // console.log('repartidor-nuevo-pedido', res);
       const pedidos = res[1];
 
 
@@ -153,6 +157,8 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.unsubscribeSocketClearPedido = this.socketService.onRepartidorServerQuitaPedido()
     .subscribe((idpedido_res: any) => {
+      // console.log('repartidor-notifica-server-quita-pedido');
+      // console.log('idpedido_res', idpedido_res);
         if ( this.yaQuitoPedido === 1 ) {
           this.pedidoRepartidorService.setPedidoPasoVa(0);
           this.pedidoRepartidorService.setPasoVa(0);
@@ -168,8 +174,12 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private darFormatoGrupoPedidosRecibidos(pedidos: any) {    
     if ( !pedidos ) {return; }
+    // console.log('darFormatoGrupoPedidosRecibidos', new Date().toLocaleDateString());
+    // console.log('pedidos.pedidos.join(', ')', pedidos.pedidos.join(','));
+    const _idSend = Array.from(new Set(pedidos.pedidos)).join(',')
+    // console.log('_idSend', _idSend);
     this.sumAcumuladoPagar = pedidos.importe_pagar;
-    this.pedidoRepartidorService.loadPedidosRecibidos(pedidos.pedidos.join(','))
+    this.pedidoRepartidorService.loadPedidosRecibidos(_idSend)
         .subscribe((response: any) => {
           // console.log('res', response);
 
@@ -192,7 +202,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
           this.pedidoRepartidorService.setLocalIds(pedidos);
           this.pedidoRepartidorService.setLocalItems( this.listPedidosGroup );
 
-          this.pedidoRepartidorService.playAudioNewPedido();
+          // this.pedidoRepartidorService.playAudioNewPedido();
 
         });
   }
@@ -224,7 +234,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
 
   aceptaPedido(_establecimiento: any) {
 
-    console.log('this.dataPedidos', _establecimiento);
+    // console.log('this.dataPedidos', _establecimiento);
     // notificamos al comercio que estos pedidos ya tienen repartidor
     this.socketService.emit('repartidor-acepta-pedido', _establecimiento);
 
@@ -258,7 +268,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   clickTab($event: any) {
-    console.log('$event.index', $event.index);
+    // console.log('$event.index', $event.index);
     this._tabIndex = $event.index;
   }
 
@@ -271,7 +281,7 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   pedidoExpressEntregado(pedidoFinalizado: any) {
-    console.log('finaliza el pedido');
+    // console.log('finaliza el pedido');
     pedidoFinalizado.quitar = true;
     this.quitarPedidoExpress(pedidoFinalizado.idpedido_mandado);
 

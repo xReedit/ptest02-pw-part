@@ -3,6 +3,8 @@ import { SwPush } from '@angular/service-worker';
 import { CrudHttpService } from './crud-http.service';
 import { InfoTockenService } from './info-token.service';
 import { VAPID_PUBLIC } from '../config/config.const';
+
+
 // import { Observable } from 'rxjs/internal/Observable';
 // import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 // import { DialogDesicionComponent } from 'src/app/componentes/dialog-desicion/dialog-desicion.component';
@@ -30,7 +32,19 @@ export class NotificacionPushService {
     });
   }
 
-  getIsTienePermiso(): boolean {
+  async getIsTienePermiso(): Promise<boolean> {
+    await Notification.requestPermission()
+    .then((permission) => {
+      // If the user accepts, let's create a notification
+      // if (permission === "granted") {
+      //   // const notification = new Notification("Hi there!");
+      //   // …
+      // }
+
+      // return permission === "granted"
+    });
+
+
     return Notification.permission === 'granted' ? true : false;
   }
 
@@ -44,11 +58,11 @@ export class NotificacionPushService {
         // this.lanzarPermisoNotificationPush(option);
         this.keySuscribtion();
       // });
-    // }
+    // }    
   }
 
   //  suscriberse
-  private keySuscribtion() {
+  private keySuscribtion() {    
     console.log('keySuscribtion');
     this.swPush
     .requestSubscription({
@@ -57,11 +71,12 @@ export class NotificacionPushService {
     .then(subscription => {
       // send subscription to the server
       console.log('suscrito a notificaciones push', subscription);
-      // this.saveSuscripcion(subscription);
+      this.saveSuscripcion(subscription);
     })
     .catch(console.error);
   }
 
+  // native
   saveSuscripcion(_subscription: any): void {
     const _data = {
       suscripcion: _subscription,

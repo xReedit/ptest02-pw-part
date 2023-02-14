@@ -15,6 +15,7 @@ import {
 
 import { Plugins } from '@capacitor/core';
 import { UtilitariosService } from 'src/app/shared/services/utilitarios.service';
+import { IS_NATIVE } from 'src/app/shared/config/config.const';
 
 const { Geolocation } = Plugins;
 
@@ -47,17 +48,14 @@ export class MainComponent implements OnInit {
 
     this.pedidoRepartidorService.cleanLocal();
 
+    console.log('aaa');
 
+    if (!IS_NATIVE) { return; }
     PushNotifications.requestPermissions().then(result => {
       console.log('result.receive', result.receive);
       if (result.receive === 'granted') {
         // Register with Apple / Google to receive push via APNS/FCM
-        PushNotifications.register()
-        // .then(token => {
-        //   console.log('Token de dispositivo:', token);
-        //   alert('Push registration success, token: ' + token);          
-        //   this.pushNotificationService.saveSuscripcion(token);
-        // });
+        PushNotifications.register()        
       } else {
         // Show some error
         console.log('error al registrar');
@@ -95,10 +93,16 @@ export class MainComponent implements OnInit {
 
   }
 
-  aceptarNotificacion() {
-    try {
-      this.pushNotificationService.getIsTienePermiso();
-    } catch (error) {
+  async aceptarNotificacion() {
+    if (!IS_NATIVE) {
+      try {
+        if ( await this.pushNotificationService.getIsTienePermiso()) {
+          this.pushNotificationService.suscribirse();
+        }
+
+      } 
+      catch (error) {
+      }
     }
 
     this.isOnNotificactionPush = true;
