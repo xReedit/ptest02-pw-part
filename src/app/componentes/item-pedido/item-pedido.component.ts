@@ -41,14 +41,14 @@ export class ItemPedidoComponent implements OnInit, OnChanges  {
   ngOnChanges() {
     // create header using child_id
     this.elRepartidor = this.infoToken.getInfoUs().usuario;
-    console.log(this.listPedidos);
+    // console.log(this.listPedidos);
     // this.extraerListaClientePedido();
   }
 
   ngOnInit() {
     // console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     this.elRepartidor = this.infoToken.getInfoUs().usuario;
-    console.log('this.elRepartidor', this.elRepartidor);
+    // console.log('this.elRepartidor', this.elRepartidor);
     this.leerInfoGroup();
   }
 
@@ -145,7 +145,7 @@ export class ItemPedidoComponent implements OnInit, OnChanges  {
       }
     });
 
-    console.log('listClienteNotificar', listClienteNotificar);
+    // console.log('listClienteNotificar', listClienteNotificar);
 
     if ( listClienteNotificar.length > 0 ) {
       this.socketService.emit('repartidor-notifica-cliente-acepto-pedido', listClienteNotificar);

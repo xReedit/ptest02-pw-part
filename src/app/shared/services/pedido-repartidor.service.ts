@@ -146,8 +146,6 @@ export class PedidoRepartidorService {
       repartidor: !this._repartidor ? this.infoTokenService.getInfoUs().usuario : this._repartidor
     };
 
-    console.log('set-asignar-pedido', _data);
-
     this.crudService.postFree(_data, 'repartidor', 'set-asignar-pedido', true)
       .subscribe(res => {
         // console.log(res);
@@ -159,7 +157,7 @@ export class PedidoRepartidorService {
   }
 
   playAudioNewPedido() {
-    console.trace();
+    // console.trace();
     const audio = new Audio();
     audio.src = './assets/audio/Alarm04.wav';
     audio.load();
@@ -527,7 +525,7 @@ export class PedidoRepartidorService {
 
 
   darFormatoLocalPedidoRepartidorModel(_pedido) {
-    console.log('dar formato pedido');
+    // console.log('dar formato pedido');
     let pedido: PedidoRepartidorModel = new PedidoRepartidorModel;
 
 
@@ -563,8 +561,7 @@ export class PedidoRepartidorService {
   }
 
   // asignacion por barcode o por idpedido
-  confirmarAsignacionReadBarCode(idpedidoLector: number) {
-    console.log('aaaaaaaaa');
+  confirmarAsignacionReadBarCode(idpedidoLector: number) {    
     return new Observable(observer => {
       let orden: any;
       let response = {};

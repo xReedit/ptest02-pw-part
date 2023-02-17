@@ -413,7 +413,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
 
 
   testLlege(item) {
-    console.log('item', item);
+    // console.log('item', item);
     const _newTimeLinePedido = item.time_line
     _newTimeLinePedido.paso = 1;    
     _newTimeLinePedido.llego_al_comercio = true;
@@ -421,7 +421,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
   }
 
   testEnCamino(item) {
-    console.log('item', item);
+    // console.log('item', item);
     const _newTimeLinePedido = item.time_line
     if ( _newTimeLinePedido.paso === 1 ) {
       _newTimeLinePedido.paso = 2;      

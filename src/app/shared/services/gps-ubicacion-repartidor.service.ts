@@ -55,7 +55,7 @@ export class GpsUbicacionRepartidorService {
     if ( this.geoPosition.latitude ===  pos.coords.latitude && this.geoPosition.longitude === pos.coords.longitude) {return; }
     this.geoPosition.latitude = pos.coords.latitude;
     this.geoPosition.longitude = pos.coords.longitude;
-    console.log('this.geoPosition', this.geoPosition);
+    // console.log('this.geoPosition', this.geoPosition);
     this.set();
 
 
@@ -66,12 +66,12 @@ export class GpsUbicacionRepartidorService {
     // -- no aplica tiene que guardar no mas -- para que el comercio sepa su position inicial
 
     // ahora va a guardar cada 2 minutos
-    console.log('transmitiendo pos');
+    // console.log('transmitiendo pos');
     const _mLastPos = this.getMinLastNotificationPosition();
     const _mMinNow =  new Date().getMinutes();
     if ( _mLastPos !== _mMinNow ) {
       if ( _mMinNow % 2 === 0 ) {
-        console.log('save transmitiendo pos');
+        // console.log('save transmitiendo pos');
         this.setMinLastNotificationPosition();
         this.repartidorService.guardarPositionActual(this.geoPosition);
       }
@@ -80,7 +80,7 @@ export class GpsUbicacionRepartidorService {
 
   private errorWatchPosition(err: any) {
     // console.warn('ERROR(' + err.code + '): ' + err.message);
-    console.log('error gps', err);
+    // console.log('error gps', err);
   }
 
   private setMinLastNotificationPosition() {
@@ -113,7 +113,7 @@ export class GpsUbicacionRepartidorService {
 
     const coordinates = await Geolocation.getCurrentPosition();
     this.geoPositionCapacitorNowSource.next(<any>coordinates); 
-    console.log('Current position:', coordinates);
+    // console.log('Current position:', coordinates);
 
     await Geolocation.watchPosition(options,
       (data) => {
