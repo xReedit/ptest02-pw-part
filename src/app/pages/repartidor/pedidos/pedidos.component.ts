@@ -65,6 +65,10 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
     // console.log('this.infoTokenService.infoUsToken', this.infoTokenService.infoUsToken);
 
     // this.listPedidos = new PedidoRepartidorModel[0];
+
+    if (this.listPedidos.length === 0) {
+      localStorage.setItem('sys::count::p', '0')
+    }
   }
 
   ngAfterViewInit(): void {

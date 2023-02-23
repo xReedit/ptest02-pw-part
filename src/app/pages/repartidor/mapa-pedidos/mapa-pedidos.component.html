@@ -2,23 +2,45 @@
     <div class="bg-dark text-white fs-13 d-flex justify-content-between align-items-center p-2">
         <div matRipple class="pl-2 btn-link-2 xCursor" (click)="scanCode = true">
             <div class="d-flex align-items-center">
-                <i class="fa fa-qrcode fa-2x"></i>
-                <span class="fs-11 pl-2">Escanear Codigo</span>
+                <i class="fa fa-shopping-bag"></i>
+                <span class="fs-11 pl-2">Codigo Delivery</span>
             </div>
         </div>
-        <div matRipple class="pr-2" (click)="resumenDelDia()">
+        <!-- <div matRipple class="pr-2" (click)="resumenDelDia()">
             <span class="btn-link-2 xCursor">Resumen</span>
-        </div>
+        </div> -->
     </div>
 
-    <div *ngIf="!isShowResumen" >
+    <div *ngIf="!isShowResumen">
 
         <!-- ahora con lista 280720 -->
         <div *ngIf="scanCode" class="w-100 center-div-screen">
-                
+
             <div *ngIf="!isResulScan" class="animated fadeIn text-center">
-                <app-scan-code-pedido (codeScanSucces)="succesScan($event)"></app-scan-code-pedido>
-                <button class="btn btn-sm btn-secondary" (click)="scanCode=false"><span class="fs-12"> Cancelar</span></button>
+                <!-- <app-scan-code-pedido (codeScanSucces)="succesScan($event)"></app-scan-code-pedido> -->
+                <mat-form-field>
+                    <input matInput placeholder="Código Delivery" class="text-center" autocomplete="off"
+                        name="txt_delivety" #txt_cod>
+                </mat-form-field>
+                <!-- mensaje -->
+                <div *ngIf="msjErrorCodDelivery.length > 0" class="p-2">
+                    <span class="fs-14 fw-600 text-danger animated flash">{{ msjErrorCodDelivery }}</span>
+                </div>
+
+                <br>
+                <div>
+                    <button class="btn btn-secondary mr-2" (click)="goBackListPedidos()">
+                            Cancelar</button>
+                    <ng-container *ngIf="!isRepartidorRed; else elseTemplateIsRed">
+                        <button class="btn btn-success" (click)="succesScan(txt_cod.value)">
+                                Asignarse</button>
+                    </ng-container>
+                    <ng-template #elseTemplateIsRed>
+                        <button class="btn btn-success" (click)="succesScan(txt_cod.value)">
+                                Asignarse</button>
+                    </ng-template>
+
+                </div>
             </div>
 
             <div *ngIf="isResulScan" class="animated fadeIn">
@@ -29,19 +51,21 @@
                     </div>
                 </ng-container>
                 <ng-template #elseTemplate>
-                    
+
                     <div class="w-100 text-center">
                         <p>Pedido Asinado: {{ ordenAsingadaScan.idpedido }}</p>
                         <p>{{ ordenAsingadaScan.json_datos_delivery.p_header.arrDatosDelivery.nombre }}</p>
                         <hr>
                         <div class="d-flex justify-content-center">
-                            <button class="btn btn-sm btn-success mr-1" (click)="isResulScan = false"><span class="fs-12">Escanear Otro</span></button>
-                            <button class="btn btn-sm btn-secondary" (click)="scanCode=false; isResulScan = false"><span class="fs-12">Finalizar Escaneo</span></button>
+                            <button class="btn btn-sm btn-success mr-1" (click)="isResulScan = false"><span
+                                    class="fs-12">Buscar Otro</span></button>
+                            <button class="btn btn-sm btn-secondary" (click)="goBackListPedidos()"><span
+                                    class="fs-12">Finalizar Asignacion</span></button>
                         </div>
                     </div>
 
                 </ng-template>
-                
+
             </div>
 
         </div>
@@ -54,50 +78,57 @@
                 <img src="./assets/images/waiting.JPG" width="250px" alt="waiting">
                 <br><br>
                 <div *ngIf="isRepartidorRed">
-                    <button mat-stroked-button (click)="goBackRepartidorRed()"><i class="fa fa-arrow-left pr-2"></i>  Atas</button>
+                    <button mat-stroked-button (click)="goBackRepartidorRed()"><i class="fa fa-arrow-left pr-2"></i>
+                        Atas</button>
                 </div>
             </div>
 
             <table mat-table class="w-100" *ngIf="listPedidos" [dataSource]="listPedidos">
                 <ng-container matColumnDef="Pedido">
-                <th mat-header-cell *matHeaderCellDef> Pedido </th>
-                <td mat-cell *matCellDef="let element">
-                    <p class="fw-600 fs-12">{{ element.idpedido }}</p>
-                    <p class="fw-100 text-secondary fs-12">
-                        <span class="text-success fs-10" [ngClass]="{'text-danger': element.hora_show > 30}">
-                            {{ element.hora_show }} min
-                        </span>
+                    <th mat-header-cell *matHeaderCellDef> Pedido </th>
+                    <td mat-cell *matCellDef="let element">
+                        <p class="fw-600 fs-12">{{ element.idpedido }}</p>
+                        <p class="fw-100 text-secondary fs-12">
+                            <span class="text-success fs-10" [ngClass]="{'text-danger': element.hora_show > 30}">
+                                {{ element.hora_show }} min
+                            </span>
                         </p>
-                </td>              
+                    </td>
                 </ng-container>
-            
+
                 <ng-container matColumnDef="Cliente">
-                <th mat-header-cell *matHeaderCellDef class="text-left"> Cliente </th>
-                <td mat-cell *matCellDef="let element" class="text-left"> 
-                    <p class="fw-600 fs-12"> {{ element.json_datos_delivery.p_header.arrDatosDelivery.nombre | titlecase }}  </p>
-                    <p class="fw-100 fs-12">
-                        <span class="fw-600 badge" [ngClass]="{'badge-primary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 3, 'badge-info': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2, 'badge-secondary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 1}">
-                            {{element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion | titlecase }} 
-                        </span> 
-                        <span class="text-secondary fs-10 ml-1">
-                            {{ element.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km }} Km
-                        </span>
+                    <th mat-header-cell *matHeaderCellDef class="text-left"> Cliente </th>
+                    <td mat-cell *matCellDef="let element" class="text-left">
+                        <p class="fw-600 fs-12"> {{ element.json_datos_delivery.p_header.arrDatosDelivery.nombre |
+                            titlecase }} </p>
+                        <p class="fw-100 fs-12">
+                            <span class="fw-600 badge"
+                                [ngClass]="{'badge-primary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 3, 'badge-info': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2, 'badge-secondary': element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 1}">
+                                {{element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.descripcion |
+                                titlecase }}
+                            </span>
+                            <span class="text-secondary fs-10 ml-1">
+                                {{ element.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km }}
+                                Km
+                            </span>
                         </p>
-                </td>              
+                    </td>
                 </ng-container>
 
                 <ng-container matColumnDef="Importe">
                     <th mat-header-cell *matHeaderCellDef class="text-right"> Importe </th>
-                    <td mat-cell *matCellDef="let element" class="text-right"> 
-                        <p class="fw-600 fs-12"> {{ element.importe_pagar_comercio | number : '.2' }}  </p>
-                        <p *ngIf="element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2" class="badge badge-info">
+                    <td mat-cell *matCellDef="let element" class="text-right">
+                        <p class="fw-600 fs-12"> {{ element.importe_pagar_comercio | number : '.2' }} </p>
+                        <p *ngIf="element.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2"
+                            class="badge badge-info">
                             pagado con tarjeta
                         </p>
-                    </td>              
+                    </td>
                 </ng-container>
-            
+
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetallePedido(row)" [ngClass]="{'color-checked': row.pwa_estado === 'E'}"></tr>            
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetallePedido(row)"
+                    [ngClass]="{'color-checked': row.pwa_estado === 'E'}"></tr>
             </table>
 
             <div class="w-100 pt-3" *ngIf="listPedidos">
@@ -111,19 +142,20 @@
                         <span class="text-secondary fs-13 pr-2">Comision Entrega: </span>
                         <span class="fw-600 fs-13 badge badge-info"> {{ sumGananciaTotal | number : '.2' }} </span>
                     </div>
-                                    
-                </div>              
+
+                </div>
             </div>
             <br><br>
 
-            
+
         </div>
     </div>
 
     <div *ngIf="isShowResumen" class="animated fadeIn">
         <app-pedidos-atendidos></app-pedidos-atendidos>
-        <div class="text-center w-100">                        
-            <button class="btn btn-sm btn-success" (click)="isShowResumen = false"><i class="fa fa-arrow-left"></i> Atras </button>
+        <div class="text-center w-100">
+            <button class="btn btn-sm btn-success" (click)="isShowResumen = false"><i class="fa fa-arrow-left"></i>
+                Atras </button>
         </div>
     </div>
 
@@ -170,17 +202,19 @@
 
     <!-- <button (click)="goRuta()">ir</button> -->
 
-    <div *ngIf="listPedidos" class="xfooter p-2">
+    <div *ngIf="listPedidos" class="xfooterA p-2">
         <ng-container *ngIf="isEntregadoAll; else elseTemplate">
-            <div  matRipple class="btn btn-secondary w-75 p-2 fs-20 text-white animated fadeInUp delay-0-5s" (click)="entregaTodo()">
-                <span>Listo, pedidos entregados.</span>                
-            </div> 
+            <div matRipple class="btn btn-secondary w-75 p-2 fs-20 text-white animated fadeInUp delay-0-5s"
+                (click)="entregaTodo()">
+                <span>Listo, pedidos entregados.</span>
+            </div>
         </ng-container>
-        <ng-template #elseTemplate>    
-            <div  matRipple class="btn btn-success w-75 p-2 fs-20 text-white animated fadeInUp delay-0-5s" (click)="goRuta()">
+        <ng-template #elseTemplate>
+            <div matRipple class="btn btn-success w-75 p-2 fs-20 text-white animated fadeInUp delay-0-5s"
+                (click)="goRuta()">
                 <span>Ver Ruta</span>
                 <p class="fs-11 fw-100">Ruta mas corta.</p>
-            </div> 
-        </ng-template>        
+            </div>
+        </ng-template>
     </div>
 </div>

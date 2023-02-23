@@ -49,6 +49,15 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
 
   displayedColumns: string[] = ['Pedido', 'Cliente', 'Importe'];
 
+  msjErrorCodDelivery = '';
+
+  countPedidosAsignados: any = 0;
+  countPedidoSetForMe = 0; // cada 2 pedidos lanza tiempo de 15min para volver asignarse del mismo comercio
+  showTimeAsignacion = true;
+
+  private keyTimeSetLastPedido = 'sys::set::p::me';
+  private keyCountSetLastPedido = 'sys::set::p::me::count';
+
   constructor(
     private infoTokenService: InfoTockenService,
     private utilService: UtilitariosService,
@@ -71,6 +80,9 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     this.loadPedidosPendiente();
     this.listenNewPedidos();
 
+    this.countPedidosAsignados = this.isRepartidorRed ? localStorage.getItem('sys::count::p') : 0;
+    console.log('this.countPedidosAsignados', this.countPedidosAsignados);
+
     // si es repartidor de la red
     // va de frente a escanear
     console.log('this.isRepartidorRed', this.isRepartidorRed);
@@ -88,14 +100,14 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     this.geoPositionService.onGeoWatchPosition();
     this.geoPositionActual = this.geoPositionService.geoPosition;
     this.geoPositionService.geoPositionNow$
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((res: GeoPositionModel) => {
-      res = !res?.latitude ? this.geoPositionActual : res;
-      if ( !res.latitude ) { return; }
-      // verificar en que paso esta
-      // si paso 1 verificar si se acerca al coordenadas destino y activar boton accion
-      this.geoPositionActual = res;
-    });
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res: GeoPositionModel) => {
+        res = !res?.latitude ? this.geoPositionActual : res;
+        if (!res.latitude) { return; }
+        // verificar en que paso esta
+        // si paso 1 verificar si se acerca al coordenadas destino y activar boton accion
+        this.geoPositionActual = res;
+      });
 
   }
 
@@ -109,65 +121,120 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     // this.darFormatoGrupoPedidosRecibidos(pendientes);
 
     this.socketService.onRepartidorGetPedidoPendienteAceptar()
-    .subscribe((res: any) => {
-      console.log(res);
-      this.pedidoRepartidorService.setPedidoPorAceptar(res[0].pedido_por_aceptar);
-      this.darFormatoGrupoPedidosRecibidos(res[0].pedido_por_aceptar);
-      this.pedidoRepartidorService.setPedidoPorAceptar(res[0].pedido_por_aceptar);
-    });
+      .subscribe((res: any) => {
+        console.log(res);
+        this.pedidoRepartidorService.setPedidoPorAceptar(res[0].pedido_por_aceptar);
+        this.darFormatoGrupoPedidosRecibidos(res[0].pedido_por_aceptar);
+        this.pedidoRepartidorService.setPedidoPorAceptar(res[0].pedido_por_aceptar);
+      });
   }
 
-  succesScan($event: any) {
+  succesScan(cod: any) {
+    console.log('cod', cod);
+    this.msjErrorCodDelivery = '';
     this.loadingScan = true;
-    this.pedidoRepartidorService.confirmarAsignacionReadBarCode($event)
-    .subscribe((res: any) => {
-      this.loadingScan = false;
-      this.isResulScan = true;
-      this.ordenAsingadaScan = res.elPedido;
-      console.log(res);
-      this.darFormatoGrupoPedidosRecibidos(res.pedidos_repartidor);
-      console.log(res);
-    });
+
+    if (this.countPedidosAsignados > 3) {
+      this.msjErrorCodDelivery = 'Ya tienes muchos pedidos!. Entrega lo que tienes primero.';
+      return;
+    } // solo pueden aceptar 3 pedidos
+
+    localStorage.setItem('sys::count::p', this.countPedidosAsignados);
+    console.log('this.countPedidosAsignados', this.countPedidosAsignados);
+
+    this.pedidoRepartidorService.confirmarAsignacionReadBarCode(cod)
+      .subscribe((res: any) => {
+        if (res) {
+          console.log(res);
+          // pedido con repartidor
+          if (res.elPedido.idrepartidor) {
+            this.msjErrorCodDelivery = 'Ya tiene repatirdor asignado.';
+            // return;
+          } else {
+            const _valIsSetPedido = this.verificarTiempoAsignacion();
+
+            if (!_valIsSetPedido) {
+              this.msjErrorCodDelivery = 'Ya tienes pedidos, la asignación estara disponible en 10min.';
+              return;
+            } else {
+              this.countPedidosAsignados++;
+              this.loadingScan = false;
+              this.isResulScan = true;
+              try {
+                res.elPedido.json_datos_delivery = typeof res.elPedido.json_datos_delivery !== 'object' ? JSON.parse(res.elPedido.json_datos_delivery) : res.elPedido.json_datos_delivery;
+              } catch (error) { }
+
+              this.ordenAsingadaScan = res.elPedido;
+
+              res = this.pedidoRepartidorService.addPedidoInListPedidosPendientes(res.elPedido);
+              this.darFormatoGrupoPedidosRecibidos(res.pedidos_repartidor);
+
+              // notificar asignacion
+              const rowAsignacionNotifica = {
+                nombre: this.ordenAsingadaScan.json_datos_delivery.p_header.nom_us.split(' ')[0],
+                telefono: this.ordenAsingadaScan.json_datos_delivery.p_header.arrDatosDelivery.telefono,
+                // establecimiento: rowDatos.establecimiento.nombre,
+                idpedido: this.ordenAsingadaScan.idpedido,
+                repartidor_nom: this.infoToken.usuario.nombre,
+                repartidor_telefono: this.infoToken.usuario.telefono,
+                idsede: this.ordenAsingadaScan.idsede,
+                idorg: this.ordenAsingadaScan.idorg,
+                repartidor_red: 1 // red papaya
+              };
+
+              const listClienteNotificar = [];
+              listClienteNotificar.push(rowAsignacionNotifica);
+
+              this.socketService.emit('repartidor-notifica-cliente-acepto-pedido', listClienteNotificar);
+              console.log(res);
+            }
+
+          }
+
+        } else {
+          this.msjErrorCodDelivery = 'No se encontro ningún pedido.';
+        }
+      });
   }
 
-  private darFormatoGrupoPedidosRecibidos(pedidos: any) {    
-    if ( !pedidos ) {return; }
+  private darFormatoGrupoPedidosRecibidos(pedidos: any) {
+    if (!pedidos) { return; }
     const sumAcumuladoPagar = pedidos.importe_pagar;
     this.pedidoRepartidorService.loadPedidosRecibidos(pedidos.pedidos.join(','))
-        .subscribe((response: any) => {
-          console.log('res', response);
+      .subscribe((response: any) => {
+        console.log('res', response);
 
-          // formateamos el json_}¿datos
-          let importeTotalPedido;
-          const _listAsignar = response.map(p => {
-            p.json_datos_delivery = JSON.parse(p.json_datos_delivery);
-            // extraemos el importe total, sino de los subtotales -> venta rapida
-            importeTotalPedido  = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal);
-            importeTotalPedido = importeTotalPedido === 0 ? parseFloat(p.json_datos_delivery.p_subtotales[p.json_datos_delivery.p_subtotales.length - 1 ].importe ) : importeTotalPedido;
+        // formateamos el json_}¿datos
+        let importeTotalPedido;
+        const _listAsignar = response.map(p => {
+          p.json_datos_delivery = JSON.parse(p.json_datos_delivery);
+          // extraemos el importe total, sino de los subtotales -> venta rapida
+          importeTotalPedido = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal);
+          importeTotalPedido = importeTotalPedido === 0 ? parseFloat(p.json_datos_delivery.p_subtotales[p.json_datos_delivery.p_subtotales.length - 1].importe) : importeTotalPedido;
 
-            p.importe_pagar_comercio =  parseFloat(importeTotalPedido) -  parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
-            p.importe_pagar_comercio = p.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2 ? 0 : p.importe_pagar_comercio;
+          p.importe_pagar_comercio = parseFloat(importeTotalPedido) - parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
+          p.importe_pagar_comercio = p.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2 ? 0 : p.importe_pagar_comercio;
 
-            const propina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value ? parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value) : 0;
-            p.comsion_entrea_total = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + propina;
-            return p;
-          });
-
-          this.establecimientoIni = _listAsignar[0].json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
-          this.establecimientoIni.longitude = parseFloat(this.establecimientoIni.longitude);
-          this.establecimientoIni.latitude = parseFloat(this.establecimientoIni.latitude);
-
-
-          const listPedidosGroup = JSON.parse(JSON.stringify(_listAsignar));
-
-          this.pedidoRepartidorService.setLocalIds(pedidos);
-          this.pedidoRepartidorService.setLocalItems( listPedidosGroup );
-
-          // this.pedidoRepartidorService.playAudioNewPedido();
-
-          this.iniComponente();
-
+          const propina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value ? parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value) : 0;
+          p.comsion_entrea_total = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + propina;
+          return p;
         });
+
+        this.establecimientoIni = _listAsignar[0].json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
+        this.establecimientoIni.longitude = parseFloat(this.establecimientoIni.longitude);
+        this.establecimientoIni.latitude = parseFloat(this.establecimientoIni.latitude);
+
+
+        const listPedidosGroup = JSON.parse(JSON.stringify(_listAsignar));
+
+        this.pedidoRepartidorService.setLocalIds(pedidos);
+        this.pedidoRepartidorService.setLocalItems(listPedidosGroup);
+
+        // this.pedidoRepartidorService.playAudioNewPedido();
+
+        this.iniComponente();
+
+      });
   }
 
   private iniComponente() {
@@ -180,13 +247,13 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
 
     // ordenar po distancia
     this.listPedidos = this.listPedidos
-        .sort(( a, b ) => parseFloat(a.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km) - parseFloat(b.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km));
+      .sort((a, b) => parseFloat(a.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km) - parseFloat(b.json_datos_delivery.p_header.arrDatosDelivery.establecimiento.distancia_km));
 
     //
     this.checkIsEntregaALL();
 
     // this.comercioPedido = this.listPedidos[0].json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
-    this.dataPedido.idsede  = this.listPedidos[0].idsede; // idsede del grupo de pedidos
+    this.dataPedido.idsede = this.listPedidos[0].idsede; // idsede del grupo de pedidos
 
     this.pedidoRepartidorService.setLocal();
 
@@ -195,8 +262,8 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     // this.geoPositionComercio.longitude = typeof this.comercioPedido.longitude === 'string'  ? parseFloat(this.comercioPedido.longitude) : this.comercioPedido.longitude;
 
     // sumar total a pagar
-    this.sumListPedidos = this.listPedidos.map( p => p.importe_pagar_comercio).reduce((a, b) => a + b, 0);
-    this.sumGananciaTotal = this.listPedidos.map( p => p.comsion_entrea_total).reduce((a, b) => a + b, 0);
+    this.sumListPedidos = this.listPedidos.map(p => p.importe_pagar_comercio).reduce((a, b) => a + b, 0);
+    this.sumGananciaTotal = this.listPedidos.map(p => p.comsion_entrea_total).reduce((a, b) => a + b, 0);
     // this.sumGananciaTotal = this.dataPedido.sumGananciaTotal;
 
     // this.showPasos();
@@ -205,7 +272,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
 
   private calcHora() {
     this.calHoraList();
-    this.timerRun = setInterval(() => {this.calHoraList(); }, 60000);
+    this.timerRun = setInterval(() => { this.calHoraList(); }, 60000);
   }
 
   private calHoraList() {
@@ -236,7 +303,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
         console.log('el pedido', pedido);
         this.checkIsEntregaALL();
 
-        if ( pedido.pwa_estado === 'E' ) {
+        if (pedido.pwa_estado === 'E') {
           this.openDialogCalificacion(pedido);
         }
       }
@@ -256,7 +323,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
   private listenNewPedidos(): void {
     // escuchar pedidos nuevos asignados por el comercio
     this.socketService.onPedidoAsignadoFromComercio()
-    // .pipe(takeUntil(this.destroy$))
+      // .pipe(takeUntil(this.destroy$))
       .subscribe(pedido => {
         console.log('nuevo pedido asignado', pedido);
         // this.loadPedidosPropios();
@@ -326,7 +393,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
       dataCalificado: dataCalificado
     };
 
-    const dialogRef =  this.dialog.open(DialogCalificacionComponent, _dialogConfig);
+    const dialogRef = this.dialog.open(DialogCalificacionComponent, _dialogConfig);
     dialogRef.afterClosed().subscribe(
       data => {
         // notificar al repartidor fin del pedido
@@ -363,6 +430,47 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
 
   goBackRepartidorRed() {
     this.router.navigate(['./main/pedidos']);
+  }
+
+  goBackListPedidos() {
+    if (this.isRepartidorRed) {
+      if (this.countPedidosAsignados > 0) {
+        this.router.navigate(['./main/list-grupo-pedidos']);
+      } else {
+        this.router.navigate(['./main/pedidos']);
+      }
+    } else {
+      this.scanCode = false;
+      this.isResulScan = false;
+    }
+  }
+
+  private verificarTiempoAsignacion(): boolean {
+    if (this.isRepartidorRed) {
+      // tiempo que va
+      let _timeLastSet = localStorage.getItem(this.keyTimeSetLastPedido);
+      _timeLastSet = _timeLastSet ? _timeLastSet : new Date().toLocaleTimeString();
+
+      this.countPedidoSetForMe = parseInt(localStorage.getItem(this.keyCountSetLastPedido), 0);
+      this.countPedidoSetForMe = isNaN(this.countPedidoSetForMe) ? 0 : this.countPedidoSetForMe;
+      this.countPedidoSetForMe++;
+
+      const _timeMin = this.utilService.xTiempoTranscurridos_en_minutos(_timeLastSet);
+
+      // pasado los 10 minutos habilita nuevamente
+      this.countPedidoSetForMe = _timeMin > 10 ? 1 : this.countPedidoSetForMe;
+      localStorage.setItem(this.keyCountSetLastPedido, this.countPedidoSetForMe.toString());
+
+
+      if (this.countPedidoSetForMe > 2) {
+        return false;
+      } else {
+        localStorage.setItem(this.keyTimeSetLastPedido, new Date().toLocaleTimeString());
+        return true;
+      }
+    } else {
+      return true;
+    }
   }
 
   // // resumen de los pedidos
