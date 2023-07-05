@@ -73,7 +73,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.infoToken = this.infoTokenService.getInfoUs();
-    console.log('this.infoToken lista pedidos', this.infoToken);
+    // console.log('this.infoToken lista pedidos', this.infoToken);
     this.isRepartidorRed = !this.infoToken.usuario.idsede_suscrito;
     this.nomRepartidor = this.infoToken.usuario.nombre + ' ' + this.infoToken.usuario.apellido;
 
@@ -81,11 +81,11 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     this.listenNewPedidos();
 
     this.countPedidosAsignados = this.isRepartidorRed ? localStorage.getItem('sys::count::p') : 0;
-    console.log('this.countPedidosAsignados', this.countPedidosAsignados);
+    // console.log('this.countPedidosAsignados', this.countPedidosAsignados);
 
     // si es repartidor de la red
     // va de frente a escanear
-    console.log('this.isRepartidorRed', this.isRepartidorRed);
+    // console.log('this.isRepartidorRed', this.isRepartidorRed);
     this.scanCode = this.isRepartidorRed;
 
     // console.log('this.infoToken', this.infoToken);
@@ -130,7 +130,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
   }
 
   succesScan(cod: any) {
-    console.log('cod', cod);
+    // console.log('cod', cod);
     this.msjErrorCodDelivery = '';
     this.loadingScan = true;
 
@@ -140,14 +140,14 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     } // solo pueden aceptar 3 pedidos
 
     localStorage.setItem('sys::count::p', this.countPedidosAsignados);
-    console.log('this.countPedidosAsignados', this.countPedidosAsignados);
+    // console.log('this.countPedidosAsignados', this.countPedidosAsignados);
 
     this.pedidoRepartidorService.confirmarAsignacionReadBarCode(cod)
-      .subscribe((res: any) => {
-        if (res) {
-          console.log(res);
+      .subscribe((pedidoRes: any) => {
+        if (pedidoRes) {
+          // console.log(pedidoRes);
           // pedido con repartidor
-          if (res.elPedido.idrepartidor) {
+          if (pedidoRes.idrepartidor) {
             this.msjErrorCodDelivery = 'Ya tiene repatirdor asignado.';
             // return;
           } else {
@@ -157,21 +157,22 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
               this.msjErrorCodDelivery = 'Ya tienes pedidos, la asignación estara disponible en 10min.';
               return;
             } else {
+              // res = this.pedidoRepartidorService.addPedidoInListPedidosPendientes(res);
               this.countPedidosAsignados++;
               this.loadingScan = false;
               this.isResulScan = true;
               try {
-                res.elPedido.json_datos_delivery = typeof res.elPedido.json_datos_delivery !== 'object' ? JSON.parse(res.elPedido.json_datos_delivery) : res.elPedido.json_datos_delivery;
+                pedidoRes.json_datos_delivery = typeof pedidoRes.json_datos_delivery !== 'object' ? JSON.parse(pedidoRes.json_datos_delivery) : pedidoRes.json_datos_delivery;
               } catch (error) { }
 
-              this.ordenAsingadaScan = res.elPedido;
+              this.ordenAsingadaScan = pedidoRes;
 
-              res = this.pedidoRepartidorService.addPedidoInListPedidosPendientes(res.elPedido);
-              this.darFormatoGrupoPedidosRecibidos(res.pedidos_repartidor);
+              pedidoRes = this.pedidoRepartidorService.addPedidoInListPedidosPendientes(pedidoRes);
+              this.darFormatoGrupoPedidosRecibidos(pedidoRes.pedidos_repartidor);
 
               // notificar asignacion
               const rowAsignacionNotifica = {
-                nombre: this.ordenAsingadaScan.json_datos_delivery.p_header.nom_us.split(' ')[0],
+                nombre: this.ordenAsingadaScan.json_datos_delivery.p_header.arrDatosDelivery.nombre.split(' ')[0],
                 telefono: this.ordenAsingadaScan.json_datos_delivery.p_header.arrDatosDelivery.telefono,
                 // establecimiento: rowDatos.establecimiento.nombre,
                 idpedido: this.ordenAsingadaScan.idpedido,
@@ -186,7 +187,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
               listClienteNotificar.push(rowAsignacionNotifica);
 
               this.socketService.emit('repartidor-notifica-cliente-acepto-pedido', listClienteNotificar);
-              console.log(res);
+              // console.log(pedidoRes);
             }
 
           }
@@ -202,22 +203,27 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     const sumAcumuladoPagar = pedidos.importe_pagar;
     this.pedidoRepartidorService.loadPedidosRecibidos(pedidos.pedidos.join(','))
       .subscribe((response: any) => {
-        console.log('res', response);
+        // console.log('res', response);
 
         // formateamos el json_}¿datos
         let importeTotalPedido;
         const _listAsignar = response.map(p => {
-          p.json_datos_delivery = JSON.parse(p.json_datos_delivery);
-          // extraemos el importe total, sino de los subtotales -> venta rapida
-          importeTotalPedido = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal);
-          importeTotalPedido = importeTotalPedido === 0 ? parseFloat(p.json_datos_delivery.p_subtotales[p.json_datos_delivery.p_subtotales.length - 1].importe) : importeTotalPedido;
-
-          p.importe_pagar_comercio = parseFloat(importeTotalPedido) - parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
-          p.importe_pagar_comercio = p.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2 ? 0 : p.importe_pagar_comercio;
-
-          const propina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value ? parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value) : 0;
-          p.comsion_entrea_total = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + propina;
-          return p;
+          try {            
+            p.json_datos_delivery = JSON.parse(p.json_datos_delivery);
+            // extraemos el importe total, sino de los subtotales -> venta rapida
+            importeTotalPedido = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.importeTotal);
+            importeTotalPedido = importeTotalPedido === 0 ? parseFloat(p.json_datos_delivery.p_subtotales[p.json_datos_delivery.p_subtotales.length - 1].importe) : importeTotalPedido;
+  
+            p.importe_pagar_comercio = parseFloat(importeTotalPedido) - parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery);
+            p.importe_pagar_comercio = p.json_datos_delivery.p_header.arrDatosDelivery.metodoPago.idtipo_pago === 2 ? 0 : p.importe_pagar_comercio;
+  
+            const propina = p.json_datos_delivery.p_header.arrDatosDelivery.propina.value ? parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.propina.value) : 0;
+            p.comsion_entrea_total = parseFloat(p.json_datos_delivery.p_header.arrDatosDelivery.costoTotalDelivery) + propina;
+            return p;
+          } catch (error) {
+            console.log('error', error);
+            return;
+          }
         });
 
         this.establecimientoIni = _listAsignar[0].json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
@@ -252,6 +258,8 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     //
     this.checkIsEntregaALL();
 
+    // console.log('listPedidos', this.listPedidos);
+
     // this.comercioPedido = this.listPedidos[0].json_datos_delivery.p_header.arrDatosDelivery.establecimiento;
     this.dataPedido.idsede = this.listPedidos[0].idsede; // idsede del grupo de pedidos
 
@@ -262,8 +270,12 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     // this.geoPositionComercio.longitude = typeof this.comercioPedido.longitude === 'string'  ? parseFloat(this.comercioPedido.longitude) : this.comercioPedido.longitude;
 
     // sumar total a pagar
-    this.sumListPedidos = this.listPedidos.map(p => p.importe_pagar_comercio).reduce((a, b) => a + b, 0);
-    this.sumGananciaTotal = this.listPedidos.map(p => p.comsion_entrea_total).reduce((a, b) => a + b, 0);
+    this.sumListPedidos = this.listPedidos.map(p => parseFloat(p.total_r)).reduce((a, b) => a + b, 0);
+    this.sumGananciaTotal = this.listPedidos.map(p => {
+      let costo_delivery = !this.isRepartidorRed ? p.json_datos_delivery.p_subtotales.find(c => c.descripcion.toLowerCase().indexOf('delivery') > -1 || c.descripcion.toLowerCase().indexOf('entrega') > -1) : 0      
+      const costoEntrega = p.comsion_entrea_total ? p.comsion_entrea_total : costo_delivery ? parseFloat(costo_delivery.importe) : 0
+      return costoEntrega
+    }).reduce((a, b) => a + b, 0);
     // this.sumGananciaTotal = this.dataPedido.sumGananciaTotal;
 
     // this.showPasos();
@@ -300,12 +312,12 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DialogOrdenDetalleComponent, _dialogConfig);
     dialogRef.afterClosed().subscribe(
       pedido => {
-        console.log('el pedido', pedido);
+        // console.log('el pedido', pedido);
         this.checkIsEntregaALL();
 
-        if (pedido.pwa_estado === 'E') {
-          this.openDialogCalificacion(pedido);
-        }
+        // if (pedido.pwa_estado === 'E') {
+          // this.openDialogCalificacion(pedido);
+        // }
       }
     );
   }
@@ -325,10 +337,10 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     this.socketService.onPedidoAsignadoFromComercio()
       // .pipe(takeUntil(this.destroy$))
       .subscribe(pedido => {
-        console.log('nuevo pedido asignado', pedido);
+        // console.log('nuevo pedido asignado', pedido);
         // this.loadPedidosPropios();
         const res = this.pedidoRepartidorService.addPedidoInListPedidosPendientes(pedido);
-        console.log(res);
+        // console.log(res);
         this.darFormatoGrupoPedidosRecibidos(res.pedidos_repartidor);
         // this.listPedidos.push(pedido);
         // this.listeService.setNewPedidoRepartoPropio(pedido);
@@ -471,6 +483,10 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
     } else {
       return true;
     }
+  }
+
+  recargarPedido() {
+    location.reload();
   }
 
   // // resumen de los pedidos

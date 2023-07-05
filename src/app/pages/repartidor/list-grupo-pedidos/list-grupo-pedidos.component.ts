@@ -105,9 +105,7 @@ export class ListGrupoPedidosComponent implements OnInit, OnDestroy {
       return p;
     })
 
-    if ( this.listPedidos.length === 0 ) {
-      localStorage.setItem('sys::count::p', '0')
-    }
+   
 
     // ordenar po distancia
     this.listPedidos = this.listPedidos

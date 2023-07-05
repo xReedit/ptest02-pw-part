@@ -82,7 +82,8 @@ export class SocketService {
       secure: true,
       rejectUnauthorized: false,
       // forceNew: true,
-      query: dataSocket
+      query: dataSocket,
+      // transports: ["polling", "websocket"]
       // forceNew: true
     });
 

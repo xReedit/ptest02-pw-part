@@ -96,7 +96,8 @@ export class PedidoRepartidorService {
 
   setLocalItems(obj) {
     // obj = obj ? obj : this.pedidoRepartidor;
-    localStorage.setItem(this.keyLocalItem, btoa(JSON.stringify(obj)));
+    // localStorage.setItem(this.keyLocalItem, btoa(JSON.stringify(obj)));
+    localStorage.setItem(this.keyLocalItem, JSON.stringify(obj));
   }
 
   setPedidoSelect(obj: any) {
@@ -124,7 +125,7 @@ export class PedidoRepartidorService {
 
   getLocalItems(): any {
     const rpt = localStorage.getItem(this.keyLocalItem);
-    return rpt ? JSON.parse(atob(rpt)) : null;
+    return rpt ? JSON.parse(rpt) : null;
   }
 
   getLocal(): PedidoRepartidorModel {
@@ -331,7 +332,7 @@ export class PedidoRepartidorService {
     _rowSubTotal.importe = subTotalDefault;
 
     // sumamos los totales
-    const rowTotal = subotales.filter(x => x.descripcion === 'TOTAL')[0];
+    const rowTotal = subotales.filter(x => x.descripcion.toUpperCase() === 'TOTAL')[0];
 
     // importe que pagara el cliente
     this.pedidoRepartidor.importePagaCliente = rowTotal.importe;
@@ -574,8 +575,8 @@ export class PedidoRepartidorService {
       .subscribe((res: any) => {
 
         orden  = res.data[0];
-        response = this.addPedidoInListPedidosPendientes(orden);
-        observer.next(response);
+        // response = this.addPedidoInListPedidosPendientes(orden);
+        observer.next(orden);
         // const _importePedido = parseFloat(orden.total_r);
         // let pedidos_repartidor = this.getPedidoPorAceptar();
 

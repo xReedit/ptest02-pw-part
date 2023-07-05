@@ -146,5 +146,7 @@
       }
     }
   },
-  "defaultProject": "pwa-app-repartidor"
+  "cli": {
+    "analytics": "3a80993f-a2cf-430a-9682-e4546623f9b8"
+  }
 }
