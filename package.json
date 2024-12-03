@@ -43,7 +43,7 @@
     "http-server": "^14.1.1",
     "pwa-asset-generator": "^6.2.1",
     "rxjs": "~6.5.5",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.4.0",
     "socket.io-client": "^2.2.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
