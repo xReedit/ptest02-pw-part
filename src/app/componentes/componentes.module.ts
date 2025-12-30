@@ -6,7 +6,7 @@ import { MaterialModule } from '../core/material/material.module';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 
-import { DebounceClickDirective } from '../shared/directivas/debounce-click.directive';
+// import { DebounceClickDirective } from '../shared/directivas/debounce-click.directive';
 import { EncuestaOpcionComponent } from './encuesta-opcion/encuesta-opcion.component';
 // import { DialogUbicacionComponent } from './dialog-ubicacion/dialog-ubicacion.component';
 import { AgregarDireccionComponent } from './agregar-direccion/agregar-direccion.component';
@@ -41,7 +41,7 @@ import { ItemPedidoExpressComponent } from './item-pedido-express/item-pedido-ex
 @NgModule({
   declarations: [
     DatosDeliveryComponent,
-    DebounceClickDirective,
+    // DebounceClickDirective,
     EncuestaOpcionComponent,
     AgregarDireccionComponent,
     ItemComercioComponent,
@@ -83,7 +83,7 @@ import { ItemPedidoExpressComponent } from './item-pedido-express/item-pedido-ex
   ],
   exports: [
     DatosDeliveryComponent,
-    DebounceClickDirective,
+    // DebounceClickDirective,
     EncuestaOpcionComponent,
     AgregarDireccionComponent,
     ItemComercioComponent,

@@ -8,7 +8,7 @@ import {  BarcodeFormat } from '@zxing/library/esm5';
 })
 export class ScanCodePedidoComponent implements OnInit {
 
-  @Output() codeScanSucces = new EventEmitter();
+  // @Output() codeScanSucces = new EventEmitter();
   codQR = '';
   hasDevices: boolean;
   hasPermission = true;
@@ -85,7 +85,7 @@ export class ScanCodePedidoComponent implements OnInit {
       return;
     }
 
-    this.codeScanSucces.emit(_codQr[1]);
+    // this.codeScanSucces.emit(_codQr[1]);
     // } catch (error) {
     //   this.resValidQR(false);
     //   return;

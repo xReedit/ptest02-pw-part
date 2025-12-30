@@ -352,7 +352,7 @@ export class MapaPedidosComponent implements OnInit, OnDestroy {
       .subscribe((pedidoFin: PedidoRepartidorModel) => {
         // lanzar calificacion al cliente
         // console.log('fin del pedido', pedidoFin);
-        this.openDialogCalificacion(pedidoFin);
+        // this.openDialogCalificacion(pedidoFin);
       });
   }
 

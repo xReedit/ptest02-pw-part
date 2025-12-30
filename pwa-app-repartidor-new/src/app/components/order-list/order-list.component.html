@@ -1,0 +1,208 @@
+<div class="order-list-container">
+
+    <!-- Header Title -->
+    <div class="section-header">
+        <div class="header-left">
+            <h3>Mis Pedidos</h3>
+            <span class="badge">{{ orders().length }} Asignados</span>
+        </div>
+        <button class="assign-btn-header" (click)="goToAssignOrder()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Asignar
+        </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="orders().length === 0" class="empty-state">
+        <div class="illustration">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package">
+                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                </path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+        </div>
+        <h3>No hay pedidos activos</h3>
+        <p>Estás en línea y listo para recibir nuevas solicitudes de entrega.</p>
+        <button class="refresh-btn" (click)="refresh()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            Actualizar
+        </button>
+    </div>
+
+    <!-- Order Cards -->
+    <div class="cards-container">
+        <div *ngFor="let order of orders(); trackBy: trackByOrderId" class="order-card"
+            [@orderAnimation] (click)="viewDetails(order)">
+
+            <!-- OFFER CARD VIEW (Not Accepted Yet) -->
+            <div *ngIf="isOffered(order)" class="offer-card-content">
+                <div class="offer-header">
+                    <div class="offer-badge">
+                        <span class="blink-dot"></span>
+                        NUEVA SOLICITUD
+                    </div>
+                    <div class="offer-time">
+                        {{ getCountdown(order) }}s
+                    </div>
+                </div>
+
+                <div class="card-content" [class.two-columns]="isRepartidorPropio()">
+                    <div class="info-column" *ngIf="!isRepartidorPropio()">
+                        <div class="column-header">Comercio</div>
+                        <div class="location-name">{{
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.establecimiento?.nombre || 'Comercio'
+                            }}</div>
+                        <div class="location-address">{{
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.establecimiento?.direccion ||
+                            'Dirección'
+                            }}</div>
+                    </div>
+
+                    <div class="info-column">
+                        <div class="column-header">Cliente</div>
+                        <div class="location-name">{{
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.direccionEnvioSelected?.nombre ||
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.nombre ||
+                            order.json_datos_delivery?.arrDatosDelivery?.nombre ||
+                            order.json_datos_delivery?.nombre ||
+                            'Cliente'
+                            }}</div>
+                        <div class="location-meta">
+                            <!-- <span class="distance">1.1 Km</span> -->
+                            <span
+                                class="distance">{{order.json_datos_delivery?.p_header?.arrDatosDelivery?.direccion}}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-column amount-column">
+                        <div class="column-header">Importe</div>
+                        <div class="amount-value">{{ order.total_r | number:'1.2-2' }}</div>
+                        <span class="payment-badge" [ngClass]="getPaymentClass(order)">{{
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.metodoPago?.descripcion ||
+                            order.json_datos_delivery?.arrDatosDelivery?.metodoPago?.descripcion ||
+                            order.json_datos_delivery?.metodoPago?.descripcion ||
+                            'Efectivo' }}</span>
+                    </div>
+                </div>
+
+                <div class="offer-footer">
+                    <div class="countdown-bar-container">
+                        <div class="countdown-bar" [style.width.%]="getCountdownProgress(order)"></div>
+                    </div>
+                    <button class="btn-accept" (click)="acceptOrder(order, $event)">
+                        ACEPTAR PEDIDO
+                    </button>
+                </div>
+            </div>
+
+            <!-- ASSIGNED CARD VIEW (Accepted) -->
+            <div *ngIf="!isOffered(order)" class="assigned-card-content">
+                <!-- Card Header with Order ID, Timeline Badge, and Time/Remove Button -->
+                <div class="card-header">
+                    <div class="order-id-container">
+                        <div class="order-id">
+                            <span class="label">PEDIDO</span>
+                            <span class="value">#{{ order.idpedido }}</span>
+                        </div>
+                        <!-- Timeline Status Badge -->
+                        <div class="timeline-badge" [ngClass]="getTimelineClass(order)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path [attr.d]="getTimelineIcon(order)"></path>
+                            </svg>
+                            <span>{{ getTimelineText(order) }}</span>
+                        </div>
+                    </div>
+                    <!-- Remove Button (when delivered) or Time Display -->
+                    <button *ngIf="order.time_line?.paso === 3" class="btn-remove" (click)="removeOrder(order, $event)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                        Quitar
+                    </button>
+                    <div *ngIf="order.time_line?.paso !== 3" class="order-time" [ngClass]="getTimeClass(order)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        {{ getElapsedTime(order) }}
+                    </div>
+                </div>
+
+                <!-- Two or Three Column Layout: (Comercio) | Cliente | Importe -->
+                <div class="card-content" [class.two-columns]="isRepartidorPropio()">
+                    <div class="info-column" *ngIf="!isRepartidorPropio()">
+                        <div class="column-header">Comercio</div>
+                        <div class="location-name">{{
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.establecimiento?.nombre || 'Comercio'
+                            }}</div>
+                        <div class="location-address">{{
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.establecimiento?.direccion ||
+                            'Dirección'
+                            }}</div>
+                    </div>
+
+                    <div class="info-column">
+                        <div class="column-header">Cliente</div>
+                        <div class="location-name">{{
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.direccionEnvioSelected?.nombre ||
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.nombre ||
+                            order.json_datos_delivery?.arrDatosDelivery?.nombre ||
+                            order.json_datos_delivery?.nombre ||
+                            'Cliente'
+                            }}</div>
+                        <div class="location-meta">
+                            <!-- <span class="distance">1.1 Km</span> -->
+                            <span
+                                class="distance">{{order.json_datos_delivery?.p_header?.arrDatosDelivery?.direccion}}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-column amount-column">
+                        <div class="column-header">Importe</div>
+                        <div class="amount-value">{{ order.total_r | number:'1.2-2' }}</div>
+                        <span class="payment-badge" [ngClass]="getPaymentClass(order)">{{
+                            order.json_datos_delivery?.p_header?.arrDatosDelivery?.metodoPago?.descripcion ||
+                            order.json_datos_delivery?.arrDatosDelivery?.metodoPago?.descripcion ||
+                            order.json_datos_delivery?.metodoPago?.descripcion ||
+                            'Efectivo' }}</span>
+                    </div>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="card-footer">
+                    <div class="totals-row">
+                        <span class="total-label">Total a pagar:</span>
+                        <span class="total-amount">{{ order.importe_pagar_comercio | number:'1.2-2' }}</span>
+                        <div class="earnings-badge">
+                            Ganancia: <strong>4.00</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <app-order-details-modal [order]="selectedOrder" [isOpen]="isModalOpen" (close)="closeModal()">
+    </app-order-details-modal>
+
+</div>

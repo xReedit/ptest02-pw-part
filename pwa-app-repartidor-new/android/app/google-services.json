@@ -1,0 +1,40 @@
+{
+    "project_info": {
+        "project_number": "343768699541",
+        "firebase_url": "https://push-notification-app-papaya.firebaseio.com",
+        "project_id": "push-notification-app-papaya",
+        "storage_bucket": "push-notification-app-papaya.firebasestorage.app"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:343768699541:android:379a6257c34cbd9d02819c",
+                "android_client_info": {
+                    "package_name": "papaya.com.pe.repartidor"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "343768699541-9daf43hju7os5a050nov9dmqienbkgq5.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyD0uzyMZHrcXoeL4y6wknyP9o5_q-DU3oI"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "343768699541-9daf43hju7os5a050nov9dmqienbkgq5.apps.googleusercontent.com",
+                            "client_type": 3
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}

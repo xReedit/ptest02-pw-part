@@ -128,7 +128,7 @@ export class CrudHttpService {
         const url = this.setUrl('login-usuario-autorizado-repartidor', '');
         const header = this.getHeaderHttpClientFormNoToken();
 
-        console.log('url', url);
+        // console.log('url', url);
 
         return this.httpClient.post<any>(url, datos, { headers: header });
     }

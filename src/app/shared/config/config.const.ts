@@ -2,10 +2,10 @@ import { Capacitor } from '@capacitor/core';
 export const IS_NATIVE = Capacitor.getPlatform() !== 'web';
 
 // // pruebas
-//export const URL_SERVER = 'http://192.168.1.39:5819/v3/'; // desarrollo
-//export const URL_SERVER_SOCKET = 'http://192.168.1.39:5819'; // desarrollo
-//export const URL_IMG_CARTA = 'http://192.168.1.65/restobar/file/';
-//export const VAPID_PUBLIC = 'BC7ietauZE99Hx9HkPyuGVr8jaYETyEJgH-gLaYIsbORYobppt9dX49_K_wubDqphu1afi7XrM6x1zAp4kJh_wU';
+// export const URL_SERVER = 'http://192.168.1.39:5819/v3/'; // desarrollo
+// export const URL_SERVER_SOCKET = 'http://192.168.1.39:5819'; // desarrollo
+// export const URL_IMG_CARTA = 'http://192.168.1.65/restobar/file/';
+// export const VAPID_PUBLIC = 'BC7ietauZE99Hx9HkPyuGVr8jaYETyEJgH-gLaYIsbORYobppt9dX49_K_wubDqphu1afi7XrM6x1zAp4kJh_wU';
 
 // export const URL_CONSULTA_RUC_DNI = 'http://apifacturalo_a.test:8080/api/services/'; // consulta dni o ruc
 

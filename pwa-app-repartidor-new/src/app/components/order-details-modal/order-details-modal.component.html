@@ -1,0 +1,183 @@
+<div *ngIf="isOpen" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h4>Pedido #{{ order?.idpedido }}</h4>
+            <button class="close-btn" (click)="closeModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="modal-content">
+
+            <!-- Hero Card: Only instance of Client Name -->
+            <div class="hero-card">
+                <div class="hero-header">
+                    <div class="brand-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                            </path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="brand-info">
+                        <div class="label">Pedido de</div>
+                        <div class="value">{{ dataPedido?.datosDelivery?.nombre || 'Cliente' }}</div>
+                    </div>
+                    <div class="date">{{ order?.fecha_hora | date:'shortTime' }}</div>
+                </div>
+
+                <div class="amount-display">
+                    <div class="label">Total a Cobrar</div>
+                    <div class="amount">S/ {{ totalACobrar | number:'1.2-2' }}</div>
+                </div>
+
+                <div class="tags">
+                    <span class="tag tag-status">{{ deliveryStageText }}</span>
+                    <span class="tag tag-payment">{{ dataPedido?.datosDelivery?.metodoPago?.descripcion || 'Pago'
+                        }}</span>
+                    <span *ngIf="importeEfectivo" class="tag tag-green">Paga: {{ importeEfectivo }}</span>
+                </div>
+            </div>
+
+            <!-- Action Grid -->
+            <div class="action-grid">
+                <button class="btn-action" (click)="callCliente()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                    Llamar
+                </button>
+                <button class="btn-action" (click)="openWhatsApp()">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                    </svg>
+                    WhatsApp
+                </button>
+                <button class="btn-action" (click)="irADireccionCliente()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Ruta
+                </button>
+            </div>
+
+            <!-- List of Order Lines (Airbnb Style) -->
+            <div class="section">
+                <div class="section-title">Líneas del Pedido</div>
+                <div class="data-table">
+
+                    <!-- Address Info (Client Name Removed here as requested) -->
+                    <div class="row">
+                        <div class="row-sub">
+                            <span class="highlight">Dirección:</span> {{ dataPedido?.datosDelivery?.direccion }}<br>
+                            <span class="highlight">Ref:</span> {{ dataPedido?.datosDelivery?.referencia || 'Sin
+                            referencia' }}
+                        </div>
+                    </div>
+
+                    <!-- Products grouped by sections -->
+                    <ng-container *ngFor="let tpc of order?.json_datos_delivery?.p_body?.tipoconsumo">
+                        <ng-container *ngFor="let seccion of tpc.secciones">
+                            <div class="table-section-title">{{ seccion.des }}</div>
+                            <div class="row" *ngFor="let item of seccion.items">
+                                <ng-container *ngIf="item.cantidad_seleccionada > 0">
+                                    <div class="row-main">
+                                        <span class="title">{{ item.cantidad_seleccionada }}x {{ item.des | lowercase
+                                            }}</span>
+                                        <span class="price">S/ {{ item.precio_print | number:'1.2-2' }}</span>
+                                    </div>
+                                    <div class="row-sub" *ngIf="item.subitems_view?.length > 0">
+                                        <div *ngFor="let sub of item.subitems_view">
+                                            + {{ sub.cantidad_seleccionada }} {{ sub.des }}
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+
+                    <!-- Totals Breakdown -->
+                    <div class="row summary" *ngFor="let sub of order?.json_datos_delivery?.p_subtotales">
+                        <span class="label">{{ sub.descripcion }}</span>
+                        <span class="value">S/ {{ sub.importe | number:'1.2-2' }}</span>
+                    </div>
+
+                    <div class="row summary">
+                        <span class="label">Costo de Entrega</span>
+                        <span class="value">S/ {{ dataPedido?.datosDelivery?.costoTotalDelivery || 0 | number:'1.2-2'
+                            }}</span>
+                    </div>
+
+                    <div class="row summary" *ngIf="!isRepartidorPropio()">
+                        <span class="label">Total a Pagar</span>
+                        <span class="value">S/ {{ totalAPagar | number:'1.2-2' }}</span>
+                    </div>
+
+                    <div class="row summary total">
+                        <span class="label">Total a Cobrar</span>
+                        <span class="value">S/ {{ totalACobrar | number:'1.2-2' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Info -->
+            <div class="section" *ngIf="comprobanteSolicitar">
+                <div class="section-title">Facturación</div>
+                <div class="data-table">
+                    <div class="row">
+                        <div class="row-main">
+                            <span class="title">{{ comprobanteSolicitar }}</span>
+                        </div>
+                        <div class="row-sub">{{ indicacionesComprobante }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Release Reason Prompt (Elegant Overlay) -->
+            <div class="liberar-prompt" *ngIf="showLiberarPrompt">
+                <div class="prompt-header">
+                    <h4>Motivo de Cancelación</h4>
+                    <p>Por favor, especifica por qué no puedes completar esta entrega.</p>
+                </div>
+                <div class="prompt-body">
+                    <textarea [(ngModel)]="motivoLiberacion"
+                        placeholder="Ej: Pedido ya fue retirado, restaurante cerrado, etc." rows="3"></textarea>
+                </div>
+                <div class="prompt-footer">
+                    <button class="btn-cancel-prompt" (click)="cancelarLiberarPedido()">Volver</button>
+                    <button class="btn-confirm-prompt" [disabled]="!motivoLiberacion.trim() || isLiberando"
+                        (click)="confirmarLiberarPedido()">
+                        {{ isLiberando ? 'Liberando...' : 'Confirmar' }}
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sticky Footer -->
+        <div class="modal-footer" *ngIf="!showLiberarPrompt">
+            <div class="footer-actions">
+                <button *ngIf="order?.time_line?.paso < 3" class="btn-main" (click)="markAsDelivered()"
+                    [disabled]="!canMarkAsDelivered">
+                    Marcar como Entregado
+                </button>
+                <button *ngIf="order?.time_line?.paso < 3 && canLiberarPedido" class="btn-secondary-action"
+                    (click)="solicitarLiberarPedido()">
+                    Liberar Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

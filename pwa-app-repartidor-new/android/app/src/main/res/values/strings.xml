@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PapayaRepartidor</string>
+    <string name="title_activity_main">PapayaRepartidor</string>
+    <string name="package_name">papaya.com.pe.repartidor</string>
+    <string name="custom_url_scheme">papaya.com.pe.repartidor</string>
+</resources>

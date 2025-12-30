@@ -1,0 +1,193 @@
+<div class="home-layout">
+
+    <!-- Header Section (Only visible on List view for dashboard feel) -->
+    <header class="app-header" *ngIf="activeTab === 'list'">
+        <button class="menu-btn" (click)="toggleSideMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+        
+        <div class="header-center">
+            <span class="greeting">Hola, {{ repartidorNombre }}</span>
+            <span class="status-badge" [class.online]="auth.isOnline()" [class.offline]="!auth.isOnline()">
+                ● {{ auth.isOnline() ? 'En línea' : 'Desconectado' }}
+            </span>
+        </div>
+        
+        <div class="status-toggle-container" (click)="toggleOnlineStatus()">
+            <div class="toggle-switch" [class.active]="auth.isOnline()">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Side Menu -->
+    <div class="side-menu-overlay" *ngIf="isSideMenuOpen" (click)="toggleSideMenu()"></div>
+    <div class="side-menu" [class.open]="isSideMenuOpen">
+        <div class="side-menu-header">
+            <div class="user-avatar">
+                {{ getInitials() }}
+            </div>
+            <div class="user-details">
+                <span class="user-name">{{ repartidorNombre }}</span>
+                <span class="user-role">Repartidor</span>
+            </div>
+        </div>
+        
+        <nav class="side-menu-nav">
+            <button class="menu-item" (click)="openChangePasswordModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span>Cambiar Contraseña</span>
+            </button>
+            
+            <button class="menu-item" (click)="goToDeliveryReport()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>Reporte de Entregas</span>
+            </button>
+            
+            <button class="menu-item logout" (click)="logout()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Cerrar Sesión</span>
+            </button>
+        </nav>
+    </div>
+    
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" *ngIf="isChangePasswordModalOpen" (click)="closeChangePasswordModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Cambiar Contraseña</h3>
+                <button class="modal-close" (click)="closeChangePasswordModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="currentPassword">Contraseña Actual</label>
+                    <input 
+                        type="password" 
+                        id="currentPassword" 
+                        [(ngModel)]="passwordForm.currentPassword"
+                        placeholder="Ingresa tu contraseña actual"
+                        class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPassword">Nueva Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="newPassword" 
+                        [(ngModel)]="passwordForm.newPassword"
+                        placeholder="Ingresa tu nueva contraseña"
+                        class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        [(ngModel)]="passwordForm.confirmPassword"
+                        placeholder="Confirma tu nueva contraseña"
+                        class="form-input">
+                </div>
+                
+                <div class="error-message" *ngIf="passwordError">
+                    {{ passwordError }}
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeChangePasswordModal()">Cancelar</button>
+                <button class="btn-submit" (click)="changePassword()" [disabled]="isChangingPassword">
+                    {{ isChangingPassword ? 'Cambiando...' : 'Cambiar Contraseña' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <main class="content-area" [class.full-height]="activeTab === 'map'">
+        <!-- Banner for Repartidor Propio -->
+        <!-- <div *ngIf="isRepartidorPropio() && activeTab === 'list'" class="propio-banner" (click)="goToPendingOrders()">
+            <div class="banner-content">
+                <i class="bi bi-list-check"></i>
+                <span>Ver Pedidos Pendientes de la Sede</span>
+            </div>
+            <i class="bi bi-chevron-right"></i>
+        </div> -->
+
+        <app-order-list *ngIf="activeTab === 'list'"></app-order-list>
+        <app-map *ngIf="activeTab === 'map'"></app-map>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <button class="nav-item" [class.active]="activeTab === 'list'" (click)="switchTab('list')">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            </div>
+            <span>Pedidos</span>
+        </button>
+
+        <div class="nav-indicator"></div>
+
+        <button class="nav-item" [class.active]="activeTab === 'map'" (click)="switchTab('map')">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                    <line x1="8" y1="2" x2="8" y2="18"></line>
+                    <line x1="16" y1="6" x2="16" y2="22"></line>
+                </svg>
+            </div>
+            <span>Mapa</span>
+        </button>
+    </nav>
+
+    <!-- 🧪 GPS Simulation Controls (Development Only) -->
+    <!-- <div class="gps-simulator" *ngIf="isDevelopment">
+        <button class="sim-btn" [class.active]="geo.isSimulationActive()"
+            (click)="geo.isSimulationActive() ? stopGPSSimulation() : startGPSSimulation()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span *ngIf="!geo.isSimulationActive()">Simular GPS</span>
+            <span *ngIf="geo.isSimulationActive()">Detener</span>
+        </button>
+    </div> -->
+
+</div>

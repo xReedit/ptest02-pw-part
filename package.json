@@ -41,6 +41,7 @@
     "css-star-rating": "^1.2.4",
     "geolocation-utils": "^1.2.2",
     "http-server": "^14.1.1",
+    "pwa-app-repartidor": "file:",
     "pwa-asset-generator": "^6.2.1",
     "rxjs": "~6.5.5",
     "socket.io": "^2.2.0",

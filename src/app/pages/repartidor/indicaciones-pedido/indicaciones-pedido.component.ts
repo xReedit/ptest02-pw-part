@@ -174,7 +174,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
       .subscribe(res => {
         // lanzar calificacion al cliente
         // console.log('fin del pedido idrepartidor', res);
-        this.openDialogCalificacion();
+        // this.openDialogCalificacion();
       });
   }
 
@@ -281,7 +281,7 @@ export class IndicacionesPedidoComponent implements OnInit, OnDestroy {
         this.pedidoRepartidorService.setPasoVa(3);
         break;
       case 4: // terminar pedido / solo si la notificacion socket no llego // o si el cliente no termino el pedido
-        this.openDialogCalificacion();
+        // this.openDialogCalificacion();
         break;
     }
 

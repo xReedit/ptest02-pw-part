@@ -1,0 +1,86 @@
+<div class="login-container">
+    <!-- Logo outside white card -->
+    <div class="logo-container">
+        <div class="logo-icon">
+            <img src="assets/002-motorbike.png" alt="Logo">
+        </div>
+    </div>
+
+    <div class="login-card">
+        <h2>Papaya Repartidor</h2>
+        <p class="subtitle">Inicia sesión para continuar</p>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <!-- Error Message -->
+            <div class="error-message" *ngIf="errorMessage">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                {{ errorMessage }}
+            </div>
+
+            <!-- Username Field -->
+            <div class="form-group">
+                <!-- <label for="nomusuario">Usuario</label> -->
+                <div class="input-wrapper">
+                    <input type="text" id="nomusuario" formControlName="nomusuario" placeholder="Ingrese su usuario">
+                    <span class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <!-- <label for="pass">Contraseña</label> -->
+                <div class="input-wrapper">
+                    <input type="password" id="pass" formControlName="pass" placeholder="Ingrese su contraseña">
+                    <span class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="form-options">
+                <label class="checkbox-container">
+                    <input type="checkbox" formControlName="remember">
+                    <span class="checkmark"></span>
+                    Recordar credenciales
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || isLoading">
+                <span *ngIf="isLoading" class="spinner"></span>
+                <span *ngIf="!isLoading">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                </span>
+                {{ isLoading ? 'Ingresando...' : 'Ingresar' }}
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p class="footer-text">
+                Powered by <span class="brand">Papaya.com.pe</span>
+            </p>
+        </div>
+    </div>
+</div>

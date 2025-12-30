@@ -1,0 +1,595 @@
+<div *ngIf="isOpen" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <h3>Pedido #{{ order?.idpedido }}</h3>
+            <button class="close-btn" (click)="closeModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="modal-content">
+
+            <!-- Comercio -->
+            <div class="section">
+                <h4 class="section-title">Comercio</h4>
+                <div class="info-card">
+                    <h5>{{ dataPedido?.datosDelivery?.establecimiento?.nombre || 'Comercio' }}</h5>
+                    <p class="address">{{ dataPedido?.datosDelivery?.establecimiento?.direccion || 'Dirección del
+                        comercio' }}</p>
+                    <div class="action-buttons">
+                        <!-- <button class="btn-action btn-secondary" (click)="callComercio()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                </path>
+                            </svg>
+                            Llamar
+                        </button> -->
+                        <button class="btn-action btn-info" (click)="irAlComercio()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Ir al comercio
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cliente -->
+            <div class="section">
+                <h4 class="section-title">Cliente</h4>
+                <div class="info-card">
+                    <h5>{{ dataPedido?.datosDelivery?.nombre || 'Cliente' }}</h5>
+                    <p class="address">{{ dataPedido?.datosDelivery?.direccion || 'Dirección del cliente' }}</p>
+                    <p *ngIf="dataPedido?.datosDelivery?.referencia" class="reference">
+                        Ref: {{ dataPedido?.datosDelivery?.referencia }}
+                    </p>
+                    <p *ngIf="dataPedido?.datosDelivery?.telefono" class="phone-display">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                            </path>
+                        </svg>
+                        {{ dataPedido?.datosDelivery?.telefono }}
+                    </p>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-secondary" (click)="callCliente()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                </path>
+                            </svg>
+                            Llamar
+                        </button>
+                        <button class="btn-action btn-whatsapp" (click)="openWhatsApp()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                            </svg>
+                            WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pago y Facturación -->
+            <div class="section">
+                <h4 class="section-title">Método de Pago y Facturación</h4>
+                <div class="info-card">
+                    <div class="payment-info">
+                        <div class="info-row">
+                            <span class="label">Cliente paga con:</span>
+                            <span class="value">{{ dataPedido?.datosDelivery?.metodoPago?.descripcion || 'N/A' }}
+                                <span *ngIf="importeEfectivo" class="amount-badge">{{ importeEfectivo }}</span>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Solicitar:</span>
+                            <span class="value">
+                                <strong>{{ comprobanteSolicitar }}:</strong> {{ indicacionesComprobante }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETALLE DEL PEDIDO -->
+            <div class="section">
+                <h4 class="section-title">El Pedido</h4>
+                <div class="info-card products-card">
+                    <!-- Productos por secciones -->
+                    <ng-container *ngIf="order?.json_datos_delivery?.p_body?.tipoconsumo?.length > 0">
+                        <ng-container *ngFor="let tpc of order.json_datos_delivery.p_body.tipoconsumo">
+                            <ng-container *ngFor="let seccion of tpc.secciones">
+                                <!-- Encabezado de sección -->
+                                <div class="section-header-pedido">
+                                    <span class="section-name">{{ seccion.des | titlecase }}</span>
+                                    <span class="section-count">{{ seccion.count_items }}</span>
+                                </div>
+
+                                <!-- Items de la sección -->
+                                <div *ngFor="let item of seccion.items">
+                                    <div *ngIf="item.cantidad_seleccionada > 0" class="product-item">
+                                        <div class="product-qty">
+                                            {{ item.cantidad_seleccionada | number: '1.0-2' }}x
+                                        </div>
+                                        <div class="product-info">
+                                            <div class="product-name">{{ item.des | lowercase }}</div>
+                                            <div *ngIf="item.indicaciones" class="product-extras">( {{ item.indicaciones
+                                                }} )</div>
+                                            <!-- Subitems -->
+                                            <div *ngIf="item.subitems_view?.length > 0" class="subitems-list">
+                                                <div *ngFor="let subitem of item.subitems_view" class="subitem">
+                                                    <span>{{ subitem.cantidad_seleccionada | number: '1.0-2' }} {{
+                                                        subitem.des }}</span>
+                                                    <span *ngIf="subitem.precio > 0" class="subitem-price">+ {{
+                                                        subitem.precio | number:'1.2-2' }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="product-price">{{ item.precio_print | number:'1.2-2' }}</div>
+                                    </div>
+                                    <div *ngIf="isOpen" class="modal-overlay" (click)="closeModal()">
+                                        <div class="modal-container" (click)="$event.stopPropagation()">
+
+                                            <!-- Header -->
+                                            <div class="modal-header">
+                                                <h3>Pedido #{{ order?.idpedido }}</h3>
+                                                <button class="close-btn" (click)="closeModal()">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                    </svg>
+                                                </button>
+                                            </div>
+
+                                            <!-- Content -->
+                                            <div class="modal-content">
+
+                                                <!-- Comercio -->
+                                                <div class="section">
+                                                    <h4 class="section-title">Comercio</h4>
+                                                    <div class="info-card">
+                                                        <div class="content-comercio">
+                                                            <div>
+                                                                <h5>{{
+                                                                    dataPedido?.datosDelivery?.establecimiento?.nombre
+                                                                    ||
+                                                                    'Comercio' }}</h5>
+                                                                <p class="address">{{
+                                                                    dataPedido?.datosDelivery?.establecimiento?.direccion
+                                                                    ||
+                                                                    'Dirección del
+                                                                    comercio' }}</p>
+                                                            </div>
+                                                            <div class="action-buttons">
+                                                                <button class="btn-action btn-info"
+                                                                    (click)="irAlComercio()">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                        height="16" viewBox="0 0 24 24" fill="none"
+                                                                        stroke="currentColor" stroke-width="2"
+                                                                        stroke-linecap="round" stroke-linejoin="round">
+                                                                        <path
+                                                                            d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z">
+                                                                        </path>
+                                                                        <circle cx="12" cy="10" r="3"></circle>
+                                                                    </svg>
+                                                                    Ir al comercio
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Cliente -->
+                                                <div class="section">
+                                                    <h4 class="section-title">Cliente</h4>
+                                                    <div class="info-card">
+                                                        <h5>{{ dataPedido?.datosDelivery?.nombre || 'Cliente' }}</h5>
+                                                        <p class="address">{{ dataPedido?.datosDelivery?.direccion ||
+                                                            'Dirección del cliente' }}</p>
+                                                        <p *ngIf="dataPedido?.datosDelivery?.referencia"
+                                                            class="reference">
+                                                            Ref: {{ dataPedido?.datosDelivery?.referencia }}
+                                                        </p>
+                                                        <p *ngIf="dataPedido?.datosDelivery?.telefono"
+                                                            class="phone-display">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14"
+                                                                height="14" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round">
+                                                                <path
+                                                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                                                </path>
+                                                            </svg>
+                                                            {{ dataPedido?.datosDelivery?.telefono }}
+                                                        </p>
+                                                        <div class="action-buttons">
+                                                            <button class="btn-action btn-secondary"
+                                                                (click)="callCliente()">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                    height="16" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path
+                                                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                                                    </path>
+                                                                </svg>
+                                                                Llamar
+                                                            </button>
+                                                            <button class="btn-action btn-whatsapp"
+                                                                (click)="openWhatsApp()">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                    height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path
+                                                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                                                                </svg>
+                                                                WhatsApp
+                                                            </button>
+
+                                                            <!-- boton de ir a la direccion del cliente -->
+                                                            <button class="btn-action btn-info"
+                                                                (click)="irADireccionCliente()">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                    height="16" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path
+                                                                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z">
+                                                                    </path>
+                                                                    <circle cx="12" cy="10" r="3"></circle>
+                                                                </svg>
+                                                                Ir
+                                                            </button>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Pago y Facturación -->
+                                                <div class="section">
+                                                    <h4 class="section-title">Método de Pago y Facturación</h4>
+                                                    <div class="info-card">
+                                                        <div class="payment-info">
+                                                            <div class="info-row">
+                                                                <span class="label">Cliente paga con:</span>
+                                                                <span class="value">{{
+                                                                    dataPedido?.datosDelivery?.metodoPago?.descripcion
+                                                                    || 'N/A' }}
+                                                                    <span *ngIf="importeEfectivo"
+                                                                        class="amount-badge">{{ importeEfectivo
+                                                                        }}</span>
+                                                                </span>
+                                                            </div>
+                                                            <div class="info-row">
+                                                                <span class="label">Solicitar:</span>
+                                                                <span class="value">
+                                                                    <strong>{{ comprobanteSolicitar }}:</strong> {{
+                                                                    indicacionesComprobante }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- DETALLE DEL PEDIDO -->
+                                                <div class="section">
+                                                    <h4 class="section-title">El Pedido</h4>
+                                                    <div class="info-card products-card">
+                                                        <!-- Productos por secciones -->
+                                                        <ng-container
+                                                            *ngIf="order?.json_datos_delivery?.p_body?.tipoconsumo?.length > 0">
+                                                            <ng-container
+                                                                *ngFor="let tpc of order.json_datos_delivery.p_body.tipoconsumo">
+                                                                <ng-container *ngFor="let seccion of tpc.secciones">
+                                                                    <!-- Encabezado de sección -->
+                                                                    <div class="section-header-pedido">
+                                                                        <span class="section-name">{{ seccion.des |
+                                                                            titlecase }}</span>
+                                                                        <span class="section-count">{{
+                                                                            seccion.count_items }}</span>
+                                                                    </div>
+
+                                                                    <!-- Items de la sección -->
+                                                                    <div *ngFor="let item of seccion.items">
+                                                                        <div *ngIf="item.cantidad_seleccionada > 0"
+                                                                            class="product-item">
+                                                                            <div class="product-qty">
+                                                                                {{ item.cantidad_seleccionada | number:
+                                                                                '1.0-2' }}x
+                                                                            </div>
+                                                                            <div class="product-info">
+                                                                                <div class="product-name">{{ item.des |
+                                                                                    lowercase }}</div>
+                                                                                <div *ngIf="item.indicaciones"
+                                                                                    class="product-extras">( {{
+                                                                                    item.indicaciones
+                                                                                    }} )</div>
+                                                                                <!-- Subitems -->
+                                                                                <div *ngIf="item.subitems_view?.length > 0"
+                                                                                    class="subitems-list">
+                                                                                    <div *ngFor="let subitem of item.subitems_view"
+                                                                                        class="subitem">
+                                                                                        <span>{{
+                                                                                            subitem.cantidad_seleccionada
+                                                                                            | number: '1.0-2' }} {{
+                                                                                            subitem.des }}</span>
+                                                                                        <span *ngIf="subitem.precio > 0"
+                                                                                            class="subitem-price">+ {{
+                                                                                            subitem.precio |
+                                                                                            number:'1.2-2' }}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="product-price">{{
+                                                                                item.precio_print | number:'1.2-2' }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </ng-container>
+                                                            </ng-container>
+                                                        </ng-container>
+
+                                                        <!-- Subtotales -->
+                                                        <div *ngIf="order?.json_datos_delivery?.p_subtotales?.length > 0"
+                                                            class="subtotals-section">
+                                                            <div *ngFor="let subtotal of order.json_datos_delivery.p_subtotales"
+                                                                class="subtotal-row">
+                                                                <span class="subtotal-label">{{ subtotal.descripcion |
+                                                                    titlecase
+                                                                    }}</span>
+                                                                <span class="subtotal-value">{{ subtotal.importe |
+                                                                    number:'1.2-2'
+                                                                    }}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Costo de Entrega -->
+                                                        <div class="delivery-cost-row">
+                                                            <span class="delivery-label">Costo de Entrega</span>
+                                                            <span class="delivery-value">{{
+                                                                dataPedido?.datosDelivery?.costoTotalDelivery || 0 |
+                                                                number:'1.2-2' }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Footer -->
+                                            <div class="modal-footer">
+                                                <!-- Timeline Status Indicator -->
+                                                <div class="timeline-status text-center" [ngClass]="{
+                'status-going': order?.time_line?.paso === 0,
+                'status-arrived': order?.time_line?.paso === 1,
+                'status-enroute': order?.time_line?.paso === 2,
+                'status-delivered': order?.time_line?.paso === 3
+            }">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    </svg>
+                                                    Ir al comercio
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cliente -->
+                                    <div class="section">
+                                        <h4 class="section-title">Cliente</h4>
+                                        <div class="info-card">
+                                            <h5>{{ dataPedido?.datosDelivery?.nombre || 'Cliente' }}</h5>
+                                            <p class="address">{{ dataPedido?.datosDelivery?.direccion ||
+                                                'Dirección del cliente' }}</p>
+                                            <p *ngIf="dataPedido?.datosDelivery?.referencia" class="reference">
+                                                Ref: {{ dataPedido?.datosDelivery?.referencia }}
+                                            </p>
+                                            <p *ngIf="dataPedido?.datosDelivery?.telefono" class="phone-display">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path
+                                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                                    </path>
+                                                </svg>
+                                                {{ dataPedido?.datosDelivery?.telefono }}
+                                            </p>
+                                            <div class="action-buttons">
+                                                <button class="btn-action btn-secondary" (click)="callCliente()">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path
+                                                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                                        </path>
+                                                    </svg>
+                                                    Llamar
+                                                </button>
+                                                <button class="btn-action btn-whatsapp" (click)="openWhatsApp()">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                        <path
+                                                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                                                    </svg>
+                                                    WhatsApp
+                                                </button>
+
+                                                <!-- boton de ir a la direccion del cliente -->
+                                                <button class="btn-action btn-info" (click)="irADireccionCliente()">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z">
+                                                        </path>
+                                                        <circle cx="12" cy="10" r="3"></circle>
+                                                    </svg>
+                                                    Ir
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Pago y Facturación -->
+                                    <div class="section">
+                                        <h4 class="section-title">Método de Pago y Facturación</h4>
+                                        <div class="info-card">
+                                            <div class="payment-info">
+                                                <div class="info-row">
+                                                    <span class="label">Cliente paga con:</span>
+                                                    <span class="value">{{
+                                                        dataPedido?.datosDelivery?.metodoPago?.descripcion
+                                                        || 'N/A' }}
+                                                        <span *ngIf="importeEfectivo" class="amount-badge">{{
+                                                            importeEfectivo
+                                                            }}</span>
+                                                    </span>
+                                                </div>
+                                                <div class="info-row">
+                                                    <span class="label">Solicitar:</span>
+                                                    <span class="value">
+                                                        <strong>{{ comprobanteSolicitar }}:</strong> {{
+                                                        indicacionesComprobante }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- DETALLE DEL PEDIDO -->
+                                    <div class="section">
+                                        <h4 class="section-title">El Pedido</h4>
+                                        <div class="info-card products-card">
+                                            <!-- Productos por secciones -->
+                                            <ng-container
+                                                *ngIf="order?.json_datos_delivery?.p_body?.tipoconsumo?.length > 0">
+                                                <ng-container
+                                                    *ngFor="let tpc of order.json_datos_delivery.p_body.tipoconsumo">
+                                                    <ng-container *ngFor="let seccion of tpc.secciones">
+                                                        <!-- Encabezado de sección -->
+                                                        <div class="section-header-pedido">
+                                                            <span class="section-name">{{ seccion.des |
+                                                                titlecase }}</span>
+                                                            <span class="section-count">{{
+                                                                seccion.count_items }}</span>
+                                                        </div>
+
+                                                        <!-- Items de la sección -->
+                                                        <div *ngFor="let item of seccion.items">
+                                                            <div *ngIf="item.cantidad_seleccionada > 0"
+                                                                class="product-item">
+                                                                <div class="product-qty">
+                                                                    {{ item.cantidad_seleccionada | number:
+                                                                    '1.0-2' }}x
+                                                                </div>
+                                                                <div class="product-info">
+                                                                    <div class="product-name">{{ item.des |
+                                                                        lowercase }}</div>
+                                                                    <div *ngIf="item.indicaciones"
+                                                                        class="product-extras">( {{
+                                                                        item.indicaciones
+                                                                        }} )</div>
+                                                                    <!-- Subitems -->
+                                                                    <div *ngIf="item.subitems_view?.length > 0"
+                                                                        class="subitems-list">
+                                                                        <div *ngFor="let subitem of item.subitems_view"
+                                                                            class="subitem">
+                                                                            <span>{{
+                                                                                subitem.cantidad_seleccionada
+                                                                                | number: '1.0-2' }} {{
+                                                                                subitem.des }}</span>
+                                                                            <span *ngIf="subitem.precio > 0"
+                                                                                class="subitem-price">+ {{
+                                                                                subitem.precio |
+                                                                                number:'1.2-2' }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="product-price">{{
+                                                                    item.precio_print | number:'1.2-2' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </ng-container>
+                                                </ng-container>
+                                            </ng-container>
+
+                                            <!-- Subtotales -->
+                                            <div *ngIf="order?.json_datos_delivery?.p_subtotales?.length > 0"
+                                                class="subtotals-section">
+                                                <div *ngFor="let subtotal of order.json_datos_delivery.p_subtotales"
+                                                    class="subtotal-row">
+                                                    <span class="subtotal-label">{{ subtotal.descripcion |
+                                                        titlecase
+                                                        }}</span>
+                                                    <span class="subtotal-value">{{ subtotal.importe |
+                                                        number:'1.2-2'
+                                                        }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Costo de Entrega -->
+                                            <div class="delivery-cost-row">
+                                                <span class="delivery-label">Costo de Entrega</span>
+                                                <span class="delivery-value">{{
+                                                    dataPedido?.datosDelivery?.costoTotalDelivery || 0 |
+                                                    number:'1.2-2' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="modal-footer">
+                                    <!-- Timeline Status Indicator -->
+                                    <div class="timeline-status text-center" [ngClass]="{
+                'status-going': order?.time_line?.paso === 0,
+                'status-arrived': order?.time_line?.paso === 1,
+                'status-enroute': order?.time_line?.paso === 2,
+                'status-delivered': order?.time_line?.paso === 3
+            }">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        <span>{{ deliveryStageText }}</span>
+                                    </div>
+                                    <button *ngIf="order?.time_line?.paso < 3" class="btn-primary"
+                                        (click)="markAsDelivered()" [disabled]="!canMarkAsDelivered"
+                                        [class.disabled]="!canMarkAsDelivered">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path
+                                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                            </path>
+                                        </svg>
+                                        Listo, Pedido Entregado
+                                    </button>
+                                </div>
+
+                </div>
+            </div>

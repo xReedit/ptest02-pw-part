@@ -105,10 +105,11 @@ export class PedidosComponent implements OnInit, OnDestroy, AfterViewInit {
     // }
 
     // verificar si tenemos pedidos pendientes por aceptar
+    console.log('aaaaaa');
     this.unsubscribeSocket = this.socketService.onRepartidorGetPedidoPendienteAceptar()
     .subscribe((res: any) => {
 
-      // console.log('repartidor-get-pedido-pendiente-aceptar', res);
+      console.log('repartidor-get-pedido-pendiente-aceptar', res);
       this.dataPedidos = res[0].pedido_por_aceptar;
 
       this.isExpress = this.dataPedidos ? this.dataPedidos.isexpress || this.dataPedidos.isretiroatm ? this.dataPedidos.isexpress === 1 || this.dataPedidos.isretiroatm === 1 : false : false;
