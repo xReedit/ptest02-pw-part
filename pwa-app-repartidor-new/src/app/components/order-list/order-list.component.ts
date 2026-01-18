@@ -2,6 +2,7 @@ import { Component, computed, inject, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { trigger, transition, animate, style } from '@angular/animations';
+
 import { OrderService } from '../../core/services/order.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UiService } from '../../core/services/ui.service';
@@ -14,6 +15,15 @@ import { OrderDetailsModalComponent } from '../order-details-modal/order-details
   templateUrl: './order-list.component.html',
   styleUrl: './order-list.component.scss',
   animations: [
+    trigger('fadeSlide', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-8px)' }),
+        animate('220ms cubic-bezier(0.2, 0, 0, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('180ms cubic-bezier(0.4, 0, 1, 1)', style({ opacity: 0, transform: 'translateY(-6px)' }))
+      ])
+    ]),
     trigger('orderAnimation', [
       transition(':leave', [
         animate('400ms cubic-bezier(0.4, 0, 0.2, 1)', style({
@@ -29,13 +39,14 @@ import { OrderDetailsModalComponent } from '../order-details-modal/order-details
   ]
 })
 export class OrderListComponent implements OnDestroy {
+
   private orderService = inject(OrderService);
   private router = inject(Router);
-  private authService = inject(AuthService);
+  public auth = inject(AuthService);
   private uiService = inject(UiService);
 
   orders = computed(() => this.orderService.orders());
-  isRepartidorPropio = computed(() => !!this.authService.currentUser()?.usuario?.idsede_suscrito);
+  isRepartidorPropio = computed(() => !!this.auth.currentUser()?.usuario?.idsede_suscrito);
 
   // Modal state
   selectedOrder: any = null;
@@ -65,7 +76,7 @@ export class OrderListComponent implements OnDestroy {
   }
 
   goToAssignOrder() {
-    const user = this.authService.currentUser();
+    const user = this.auth.currentUser();
     if (user?.usuario?.idsede_suscrito) {
       this.router.navigate(['/pending-orders-list']);
     } else {
@@ -88,12 +99,18 @@ export class OrderListComponent implements OnDestroy {
    */
   isOffered(order: any): boolean {
     // For Repartidor Propio, orders are NEVER offered, they are always assigned or picked by them
-    const user = this.authService.currentUser();
+    const user = this.auth.currentUser();
     if (user?.usuario?.idsede_suscrito) {
       return false;
     }
 
-    // If pwa_delivery_status is 0 or undefined, it's an offer
+    // Si fue asignado manualmente, NO mostrar como oferta (ya está aceptado implícitamente)
+    if (order.pedido_asignado_manual) {
+      return false;
+    }
+
+    // pwa_delivery_status === 0 significa que es una oferta pendiente de aceptar
+    // pwa_delivery_status >= 1 significa que ya fue aceptado
     return !order.pwa_delivery_status || order.pwa_delivery_status === 0;
   }
 

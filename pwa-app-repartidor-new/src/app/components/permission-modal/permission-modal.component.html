@@ -1,5 +1,5 @@
-<div class="modal-overlay">
-    <div class="modal-container">
+<div class="pr-perm-overlay">
+    <div class="pr-perm-container">
         <!-- Checking State -->
         <div class="checking-container" *ngIf="isChecking">
             <div class="loader"></div>
@@ -8,8 +8,8 @@
         </div>
 
         <!-- Main content (only when not checking) -->
-        <div *ngIf="!isChecking">
-            <div class="modal-header">
+        <div class="pr-perm-content" *ngIf="!isChecking">
+            <div class="pr-perm-header">
                 <div class="icon-container">
                     <i class="permission-icon">🚀</i>
                 </div>
@@ -18,15 +18,15 @@
                     funciones.</p>
             </div>
 
-            <div class="permissions-list">
+            <div class="pr-perm-list">
                 <!-- GPS Permission -->
-                <div class="permission-item" [class.granted]="gpsGranted && !gpsOff" [class.error]="gpsOff">
-                    <div class="item-icon gps">📍</div>
+                <div class="pr-perm-item" [class.pr-perm-granted]="gpsGranted && !gpsOff" [class.pr-perm-error]="gpsOff">
+                    <div class="pr-perm-icon gps">📍</div>
                     <div class="item-content">
                         <h3>Ubicación (GPS)</h3>
                         <p *ngIf="!gpsGranted && !gpsOff">Necesaria para el seguimiento de entregas y cálculo de distancias.</p>
-                        <div *ngIf="gpsOff" class="error-instructions">
-                            <p class="error-text"><strong>⚠️ GPS Desactivado</strong></p>
+                        <div *ngIf="gpsOff" class="pr-perm-error-instructions">
+                            <p class="pr-perm-error-text"><strong>⚠️ GPS Desactivado</strong></p>
                             <ol class="steps-list">
                                 <li>Desliza desde arriba para abrir el panel de ajustes rápidos</li>
                                 <li>Toca el ícono de <strong>Ubicación</strong> para activarlo</li>
@@ -34,32 +34,32 @@
                             </ol>
                         </div>
                     </div>
-                    <div class="status-badge" *ngIf="gpsGranted && !gpsOff">✓</div>
-                    <div class="status-badge error" *ngIf="gpsOff">✕</div>
+                    <div class="pr-perm-status" *ngIf="gpsGranted && !gpsOff">✓</div>
+                    <div class="pr-perm-status pr-perm-status-error" *ngIf="gpsOff">✕</div>
                 </div>
 
                 <!-- Notifications Permission -->
-                <div class="permission-item" [class.granted]="notificationsGranted">
-                    <div class="item-icon notifications">🔔</div>
+                <div class="pr-perm-item" [class.pr-perm-granted]="notificationsGranted">
+                    <div class="pr-perm-icon notifications">🔔</div>
                     <div class="item-content">
                         <h3>Notificaciones</h3>
                         <p>Crucial para recibir avisos de nuevos pedidos y mensajes.</p>
                     </div>
-                    <div class="status-badge" *ngIf="notificationsGranted">✓</div>
+                    <div class="pr-perm-status" *ngIf="notificationsGranted">✓</div>
                 </div>
             </div>
 
-            <div class="modal-footer">
+            <div class="pr-perm-footer">
                 <p class="instruction-text" *ngIf="!allGranted && !gpsOff">
                     Por favor, habilita los permisos faltantes para continuar.
                 </p>
-                <button class="btn-primary" (click)="requestAll()" *ngIf="!allGranted && !gpsOff">
+                <button class="pr-perm-btn" (click)="requestAll()" *ngIf="!allGranted && !gpsOff">
                     Habilitar Ahora
                 </button>
-                <button class="btn-primary" (click)="checkCurrentStatus()" *ngIf="gpsOff">
+                <button class="pr-perm-btn" (click)="checkCurrentStatus()" *ngIf="gpsOff">
                     Verificar de Nuevo
                 </button>
-                <div class="success-message" *ngIf="allGranted">
+                <div class="pr-perm-success" *ngIf="allGranted">
                     <div class="success-icon">✨</div>
                     <p>¡Todo listo! Iniciando aplicación...</p>
                 </div>

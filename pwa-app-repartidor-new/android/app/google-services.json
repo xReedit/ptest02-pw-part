@@ -1,37 +1,64 @@
 {
     "project_info": {
-        "project_number": "343768699541",
-        "firebase_url": "https://push-notification-app-papaya.firebaseio.com",
-        "project_id": "push-notification-app-papaya",
-        "storage_bucket": "push-notification-app-papaya.firebasestorage.app"
+        "project_number": "1022258914393",
+        "project_id": "push-papaya-com-pe",
+        "storage_bucket": "push-papaya-com-pe.firebasestorage.app"
     },
     "client": [
         {
             "client_info": {
-                "mobilesdk_app_id": "1:343768699541:android:379a6257c34cbd9d02819c",
+                "mobilesdk_app_id": "1:1022258914393:android:a6d5a55d1cab8862943d48",
                 "android_client_info": {
-                    "package_name": "papaya.com.pe.repartidor"
+                    "package_name": "express.papaya.com.pe"
                 }
             },
-            "oauth_client": [
-                {
-                    "client_id": "343768699541-9daf43hju7os5a050nov9dmqienbkgq5.apps.googleusercontent.com",
-                    "client_type": 3
-                }
-            ],
+            "oauth_client": [],
             "api_key": [
                 {
-                    "current_key": "AIzaSyD0uzyMZHrcXoeL4y6wknyP9o5_q-DU3oI"
+                    "current_key": "AIzaSyADdA1W2Ngk8dgLuB7cnjVL5rHXQDC6Rmo"
                 }
             ],
             "services": {
                 "appinvite_service": {
-                    "other_platform_oauth_client": [
-                        {
-                            "client_id": "343768699541-9daf43hju7os5a050nov9dmqienbkgq5.apps.googleusercontent.com",
-                            "client_type": 3
-                        }
-                    ]
+                    "other_platform_oauth_client": []
+                }
+            }
+        },
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:1022258914393:android:d49fdd65304eefb8943d48",
+                "android_client_info": {
+                    "package_name": "papaya.com.pe"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyADdA1W2Ngk8dgLuB7cnjVL5rHXQDC6Rmo"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
+                }
+            }
+        },
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:1022258914393:android:572eaa06507d58a1943d48",
+                "android_client_info": {
+                    "package_name": "papaya.com.pe.repartidor"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyADdA1W2Ngk8dgLuB7cnjVL5rHXQDC6Rmo"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
                 }
             }
         }

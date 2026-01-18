@@ -80,6 +80,17 @@
         }
     }
 
+    &.offline {
+        .illustration {
+            color: #ef4444;
+            opacity: 0.25;
+        }
+
+        h3 {
+            color: #ef4444;
+        }
+    }
+
     h3 {
         font-size: 1.25rem;
         margin-bottom: 0.5rem;

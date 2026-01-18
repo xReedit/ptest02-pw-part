@@ -83,13 +83,13 @@ export class AuthService {
      * Cambiar el estado online del repartidor
      * Actualiza el estado local y notifica al servidor
      */
-    async toggleOnlineStatus() {
+    async toggleOnlineStatus(efectivo: number = 0) {
         const newStatus = !this.isOnline();
         this.isOnline.set(newStatus);
         await this.storage.set(this.ONLINE_STATUS_KEY, newStatus.toString());
         
         // Notificar al servidor sobre el cambio de estado
-        await this.notifyOnlineStatusToServer(newStatus);
+        await this.notifyOnlineStatusToServer(newStatus, efectivo);
 
         return newStatus;
     }
@@ -98,19 +98,20 @@ export class AuthService {
      * Establecer el estado online del repartidor
      * Actualiza el estado local y notifica al servidor
      */
-    async setOnlineStatus(status: boolean) {
+    async setOnlineStatus(status: boolean, efectivo: number = 0) {
         this.isOnline.set(status);
         await this.storage.set(this.ONLINE_STATUS_KEY, status.toString());
         
         // Notificar al servidor sobre el cambio de estado
-        await this.notifyOnlineStatusToServer(status);
+        await this.notifyOnlineStatusToServer(status, efectivo);
 
+        return status;
     }
     
     /**
      * Notificar al servidor el estado online del repartidor
      */
-    private async notifyOnlineStatusToServer(isOnline: boolean) {
+    private async notifyOnlineStatusToServer(isOnline: boolean, efectivo: number) {
         try {
             const user = this.currentUser();
             if (!user?.usuario?.idrepartidor) {
@@ -120,7 +121,8 @@ export class AuthService {
             
             const response = await this.http.post('repartidor/set-efectivo-mano', {
                 idrepartidor: user.usuario.idrepartidor,
-                online: isOnline ? 1 : 0
+                online: isOnline ? 1 : 0,
+                efectivo: efectivo
             }).toPromise();
 
         } catch (error) {

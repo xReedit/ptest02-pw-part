@@ -30,6 +30,9 @@ export class HomeComponent implements OnInit {
     newPassword: '',
     confirmPassword: ''
   };
+  isEfectivoModalOpen = false;
+  efectivoAmount = '';
+  efectivoError = '';
   repartidorNombre: any;
   isRepartidorPropio = computed(() => !!this.auth.currentUser()?.usuario?.idsede_suscrito);
   private router = inject(Router);
@@ -54,8 +57,8 @@ export class HomeComponent implements OnInit {
       if (user) {
         this.socketService.connect();
 
-        // Solicitar pedidos pendientes explícitamente al entrar/recargar
-        this.orderService.emitRequestPendingOrders();
+        // NO solicitar pedidos aquí - init() de OrderService ya carga desde storage
+        // Solo emitir cuando el usuario actualice manualmente
 
         this.repartidorNombre = user?.usuario?.nombre
           ? user.usuario.nombre.charAt(0).toUpperCase() + user.usuario.nombre.slice(1).toLowerCase()
@@ -179,10 +182,19 @@ export class HomeComponent implements OnInit {
   }
 
   async toggleOnlineStatus() {
-    const newStatus = await this.auth.toggleOnlineStatus();
+    const currentStatus = this.auth.isOnline();
     
-    // Actualizar estado en socket
-    this.socketService.updateOnlineStatus(newStatus);
+    // Si está offline y quiere ponerse online, mostrar dialog de efectivo para repartidores globales
+    if (!currentStatus && !this.isRepartidorPropio()) {
+      this.openEfectivoModal();
+      return;
+    }
+    
+    // Si está online y quiere ponerse offline, solo cambiar el estado
+    if (currentStatus) {
+      const newStatus = await this.auth.setOnlineStatus(false, 0);
+      this.socketService.updateOnlineStatus(newStatus);
+    }
   }
 
   toggleSideMenu() {
@@ -327,5 +339,44 @@ export class HomeComponent implements OnInit {
    */
   stopGPSSimulation() {
     this.geo.stopSimulation();
+  }
+
+  openEfectivoModal() {
+    this.isEfectivoModalOpen = true;
+    this.efectivoAmount = '';
+    this.efectivoError = '';
+  }
+
+  closeEfectivoModal() {
+    this.isEfectivoModalOpen = false;
+    this.efectivoAmount = '';
+    this.efectivoError = '';
+  }
+
+  async confirmEfectivo() {
+    this.efectivoError = '';
+
+    // Validación
+    if (!this.efectivoAmount || this.efectivoAmount === '') {
+      this.efectivoError = 'Ingresa el monto de efectivo';
+      return;
+    }
+
+    const amount = parseFloat(this.efectivoAmount);
+    if (isNaN(amount) || amount < 0) {
+      this.efectivoError = 'Ingresa un monto válido';
+      return;
+    }
+
+    try {
+      // Cambiar estado a online con el efectivo especificado
+      const newStatus = await this.auth.setOnlineStatus(true, amount);
+      this.socketService.updateOnlineStatus(newStatus);
+      
+      // Cerrar modal
+      this.closeEfectivoModal();
+    } catch (error: any) {
+      this.efectivoError = error?.message || 'Error al actualizar el estado';
+    }
   }
 }

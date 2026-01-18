@@ -1,6 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
+// Import common component styles
+@import 'app/styles/common-components';
+
 :root {
     --primary-color: #00B14F;
     /* Papaya Green */
@@ -216,3 +219,245 @@ button {
 .fs-16 { font-size: 1rem !important; }
 .fs-18 { font-size: 1.125rem !important; }
 .fs-20 { font-size: 1.25rem !important; }
+
+.pr-perm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.pr-perm-container {
+    background: #ffffff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 400px;
+    padding: 32px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+}
+
+.pr-perm-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+}
+
+.pr-perm-header {
+    margin-bottom: 32px;
+}
+
+.pr-perm-header .icon-container {
+    font-size: 48px;
+    margin-bottom: 16px;
+    animation: prPermFloat 3s ease-in-out infinite;
+}
+
+.pr-perm-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+}
+
+.pr-perm-header p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #666;
+}
+
+.pr-perm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+}
+
+.pr-perm-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 16px;
+    text-align: left;
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+}
+
+.pr-perm-item.pr-perm-granted {
+    background: #f0fff4;
+    border-color: #c6f6d5;
+}
+
+.pr-perm-item.pr-perm-granted .pr-perm-icon {
+    background: #c6f6d5;
+    color: #2f855a;
+}
+
+.pr-perm-item.pr-perm-error {
+    background: #fff5f5;
+    border-color: #feb2b2;
+}
+
+.pr-perm-item.pr-perm-error .pr-perm-icon {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.pr-perm-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: #e2e8f0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.pr-perm-item .item-content {
+    flex: 1;
+}
+
+.pr-perm-item .item-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+.pr-perm-item .item-content p {
+    font-size: 13px;
+    margin: 4px 0 0;
+    color: #718096;
+    line-height: 1.4;
+}
+
+.pr-perm-status {
+    font-weight: bold;
+    color: #38a169;
+    font-size: 18px;
+}
+
+.pr-perm-status.pr-perm-status-error {
+    color: #e53e3e;
+}
+
+.pr-perm-error-instructions {
+    margin-top: 8px;
+}
+
+.pr-perm-error-instructions .pr-perm-error-text {
+    color: #c53030;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.pr-perm-error-instructions .steps-list {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+    text-align: left;
+}
+
+.pr-perm-error-instructions .steps-list li {
+    font-size: 13px;
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+
+.pr-perm-error-instructions .steps-list li strong {
+    color: #2d3748;
+}
+
+.pr-perm-footer {
+    margin-top: auto;
+}
+
+.pr-perm-footer .instruction-text {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 16px;
+}
+
+.pr-perm-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0, 97, 255, 0.3);
+}
+
+.pr-perm-btn:active {
+    transform: scale(0.98);
+}
+
+.pr-perm-success .success-icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+}
+
+.pr-perm-success p {
+    font-weight: 600;
+    color: #2f855a;
+    margin: 0;
+}
+
+@keyframes prPermFloat {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+@media (max-width: 420px) {
+    .pr-perm-overlay {
+        padding: 12px;
+    }
+
+    .pr-perm-container {
+        padding: 20px;
+        border-radius: 20px;
+        max-height: calc(100vh - 24px);
+    }
+
+    .pr-perm-header {
+        margin-bottom: 20px;
+    }
+
+    .pr-perm-header h2 {
+        font-size: 22px;
+    }
+
+    .pr-perm-list {
+        margin-bottom: 20px;
+    }
+
+    .pr-perm-btn {
+        padding: 14px;
+    }
+}

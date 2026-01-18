@@ -4,6 +4,7 @@ import { HttpService } from './http.service';
 import { AuthService } from './auth.service';
 import { Capacitor } from '@capacitor/core';
 import { Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface AppNotification {
     title: string;
@@ -20,6 +21,9 @@ export class NotificationService {
     private notificationReceived = new Subject<AppNotification>();
     public notification$ = this.notificationReceived.asObservable();
 
+    private debugSubject = new Subject<string>();
+    public debug$ = this.debugSubject.asObservable();
+
     // Estado del permiso
     private _permissionGranted = false;
     public get permissionGranted(): boolean {
@@ -31,22 +35,58 @@ export class NotificationService {
         private auth: AuthService
     ) { }
 
-    async init() {
+    private getRepartidorId(): number | null {
+        const user: any = this.auth.currentUser();
+        return user?.usuario?.idrepartidor ?? user?.idrepartidor ?? null;
+    }
 
-        if (Capacitor.getPlatform() === 'web') {
+    private log(...args: any[]) {
+        try {
+            const msg = args
+                .map(a => {
+                    if (typeof a === 'string') return a;
+                    try {
+                        return JSON.stringify(a);
+                    } catch {
+                        return String(a);
+                    }
+                })
+                .join(' ');
+            this.debugSubject.next(msg);
+        } catch {
+            this.debugSubject.next('log() error serializando mensaje');
+        }
+    }
+
+    async init() {
+        this.log('init()', { platform: Capacitor.getPlatform(), isNative: Capacitor.isNativePlatform() });
+        if (!Capacitor.isNativePlatform()) {
             await this.initWebPush();
         } else {
             await this.initNativePush();
         }
     }
 
+    async debugRegisterNativePush() {
+        this.log('debugRegisterNativePush()', { platform: Capacitor.getPlatform(), isNative: Capacitor.isNativePlatform() });
+        if (!Capacitor.isNativePlatform()) {
+            this.log('debugRegisterNativePush: NO es plataforma nativa, no aplica');
+            return;
+        }
+        await this.initNativePush();
+    }
+
     /**
      * Inicializa Web Push usando la Notification API del navegador
      */
     private async initWebPush() {
-
         if (!('Notification' in window)) {
+            this.log('WebPush: Notification API no soportada');
+            return;
+        }
 
+        if (!('serviceWorker' in navigator)) {
+            this.log('WebPush: ServiceWorker no soportado');
             return;
         }
 
@@ -54,52 +94,93 @@ export class NotificationService {
 
         if (Notification.permission === 'granted') {
             this._permissionGranted = true;
-
         } else if (Notification.permission === 'default') {
             // Solicitar permiso
             const permission = await Notification.requestPermission();
-
             this._permissionGranted = permission === 'granted';
         } else {
-
             this._permissionGranted = false;
         }
 
-        if (this._permissionGranted) {
-            // Generar un token simulado para web
-            const webToken = 'web-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        this.log('WebPush permission', Notification.permission);
 
-            this.saveToken(webToken);
+        if (this._permissionGranted) {
+            const subscription = await this.getOrCreateWebPushSubscription();
+            if (subscription) {
+                this.saveWebPushSubscription(subscription);
+            } else {
+                this.log('WebPush: no se pudo obtener/crear subscription');
+            }
         }
+    }
+
+    private async getOrCreateWebPushSubscription(): Promise<PushSubscription | null> {
+        try {
+            // Evitar cuelgue silencioso si no hay SW registrado
+            const registration = await Promise.race([
+                navigator.serviceWorker.ready,
+                new Promise<never>((_, reject) =>
+                    setTimeout(() => reject(new Error('serviceWorker.ready timeout (no hay SW activo?)')), 5000)
+                )
+            ]);
+            let subscription = await registration.pushManager.getSubscription();
+
+            if (!subscription) {
+                const vapidPublicKey = environment.vapidPublic;
+                if (!vapidPublicKey) {
+                    return null;
+                }
+
+                subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey) as unknown as BufferSource
+                });
+            }
+
+            return subscription;
+        } catch (e) {
+            this.log('WebPush error getOrCreateWebPushSubscription', e);
+            return null;
+        }
+    }
+
+    private urlBase64ToUint8Array(base64String: string): Uint8Array {
+        const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+
+        const rawData = window.atob(base64);
+        const arrayBuffer = new ArrayBuffer(rawData.length);
+        const outputArray = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
     }
 
     /**
      * Inicializa Push nativo con Capacitor
      */
     private async initNativePush() {
-
         try {
             const permResult = await PushNotifications.requestPermissions();
-
             if (permResult.receive === 'granted') {
                 this._permissionGranted = true;
-                await PushNotifications.register();
             } else {
-
+                this.log('NativePush: permisos NO otorgados', permResult);
                 return;
             }
 
+            // CRÍTICO: registrar listeners ANTES de register() para no perder el evento 'registration'
             PushNotifications.addListener('registration', token => {
-
-                this.saveToken(token.value);
+                this.log('NativePush registration token recibido');
+                this.saveFcmToken(token.value);
             });
 
             PushNotifications.addListener('registrationError', error => {
-
+                this.log('NativePush registrationError', error);
             });
 
             PushNotifications.addListener('pushNotificationReceived', notification => {
-
                 this.notificationReceived.next({
                     title: notification.title || 'Notificación',
                     body: notification.body || '',
@@ -108,11 +189,13 @@ export class NotificationService {
             });
 
             PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-
+                this.log('NativePush actionPerformed', notification);
             });
+
+            await PushNotifications.register();
+            this.log('NativePush: register() llamado');
         } catch (error) {
-
-
+            this.log('NativePush init error', error);
         }
     }
 
@@ -216,28 +299,51 @@ export class NotificationService {
         this.showLocalNotification(notif.title, notif.body, { type });
     }
 
-    private saveToken(token: string) {
-        const user = this.auth.currentUser();
-        if (!user || !user.idcliente) {
-
+    private saveWebPushSubscription(subscription: PushSubscription) {
+        const idrepartidor = this.getRepartidorId();
+        if (!idrepartidor) {
+            this.log('saveWebPushSubscription: sin idrepartidor, no se envía');
             return;
         }
 
         const payload = {
-            suscripcion: {
-                endpoint: token,
-                expirationTime: null,
-                keys: {
-                    p256dh: Capacitor.getPlatform() === 'web' ? 'web-app' : 'native-app',
-                    auth: Capacitor.getPlatform() === 'web' ? 'web-app' : 'native-app'
-                }
-            },
-            idcliente: user.idcliente
+            idrepartidor: idrepartidor,
+            pwa_code_verification: JSON.stringify(subscription),
+            fcm_token: null
         };
 
-        this.http.post('repartidor/push-suscripcion', payload, true).subscribe({
-            next: () => {},
-            error: () => {}
+        this.log('saveWebPushSubscription POST', payload);
+        this.http.post('repartidor/set-suscription-notification-push', payload, true).subscribe({
+            next: (resp) => {
+                this.log('saveWebPushSubscription OK', resp);
+            },
+            error: (err) => {
+                this.log('saveWebPushSubscription ERROR', err);
+            }
+        });
+    }
+
+    private saveFcmToken(token: string) {
+        const idrepartidor = this.getRepartidorId();
+        if (!idrepartidor) {
+            this.log('saveFcmToken: sin idrepartidor, no se envía');
+            return;
+        }
+
+        const payload = {
+            idrepartidor: idrepartidor,
+            pwa_code_verification: null,
+            fcm_token: token
+        };
+
+        this.log('saveFcmToken POST', payload);
+        this.http.post('repartidor/set-suscription-notification-push', payload, true).subscribe({
+            next: (resp) => {
+                this.log('saveFcmToken OK', resp);
+            },
+            error: (err) => {
+                this.log('saveFcmToken ERROR', err);
+            }
         });
     }
 }

@@ -41,6 +41,11 @@ export class OrderDetailsModalComponent implements OnInit, OnChanges, OnDestroy 
     currentTime = Date.now();
     private timerInterval: any;
 
+    // Processing states
+    isProcessing = false;
+    processingType: 'delivered' | 'cancelled' | null = null;
+    showSuccessAnimation = false;
+
     constructor(
         private orderService: OrderService,
         private authService: AuthService,
@@ -52,7 +57,6 @@ export class OrderDetailsModalComponent implements OnInit, OnChanges, OnDestroy 
     ngOnInit() {
         if (this.order) {
             this.processOrderData();
-
         }
 
         // Update current time every second to check liberation eligibility
@@ -69,14 +73,12 @@ export class OrderDetailsModalComponent implements OnInit, OnChanges, OnDestroy 
         // Si el estado de isOpen cambia, gestionamos el botón de atrás
         if (changes['isOpen']) {
             if (this.isOpen) {
-
                 this.uiService.setBackHandler(() => {
 
                     this.closeModal();
                     return true;
                 });
             } else {
-
                 this.uiService.setBackHandler(null);
             }
         }
@@ -226,22 +228,37 @@ export class OrderDetailsModalComponent implements OnInit, OnChanges, OnDestroy 
 
     /**
      * Check if "Liberar Pedido" button should be visible
-     * Minimum 2 minutes (120,000 ms) since acceptance
+     * Requiere: pedido aceptado (pwa_delivery_status >= 1) + mínimo 2 minutos desde aceptación
      */
     get canLiberarPedido(): boolean {
+        // IMPORTANTE: Primero verificar que el pedido esté aceptado
+        if (!this.order?.pwa_delivery_status || this.order.pwa_delivery_status < 1) {
+            return false;
+        }
+
         const timeline = this.order?.time_line;
-        if (!timeline?.hora_pedido_aceptado) return true; // Default to true if no timestamp (legacy)
+        if (!timeline?.hora_pedido_aceptado) {
+            return true; // Default to true if no timestamp (legacy)
+        }
 
         const acceptTime = timeline.hora_pedido_aceptado;
         const diff = this.currentTime - acceptTime;
+        const minutosPasados = Math.floor(diff / 60000);
+        const segundosRestantes = Math.floor((120000 - diff) / 1000);
+        
         return diff >= 120000; // 2 minutes in ms
     }
 
     /**
      * Check if "Pedido Entregado" button should be enabled
-     * Button is only enabled when driver is en route to client (paso >= 2)
+     * Requiere: pedido aceptado (pwa_delivery_status >= 1) + en camino al cliente (paso >= 2)
      */
     get canMarkAsDelivered(): boolean {
+        // IMPORTANTE: Primero verificar que el pedido esté aceptado
+        if (!this.order?.pwa_delivery_status || this.order.pwa_delivery_status < 1) {
+            return false;
+        }
+
         const timeline: TimeLinePedido = this.order?.time_line || createDefaultTimeLine();
         // Enable button only if driver has left the business (paso >= 2)
         return timeline.paso >= 2;
@@ -270,11 +287,17 @@ export class OrderDetailsModalComponent implements OnInit, OnChanges, OnDestroy 
     /**
      * Mark order as delivered
      */
-    markAsDelivered() {
+    async markAsDelivered() {
         if (!this.canMarkAsDelivered) {
-
             return;
         }
+
+        // Mostrar overlay de procesamiento
+        this.isProcessing = true;
+        this.processingType = 'delivered';
+
+        // Simular delay para la animación del loader
+        await new Promise(resolve => setTimeout(resolve, 800));
 
         // Initialize timeline if not exists
         if (!this.order.time_line) {
@@ -312,7 +335,18 @@ export class OrderDetailsModalComponent implements OnInit, OnChanges, OnDestroy 
         // Notify server that order is delivered
         this.socket.emit('repartidor-notifica-fin-one-pedido', dataPedido);
 
-        // Close modal immediately to show smooth transition
+        // Mostrar animación de éxito
+        this.showSuccessAnimation = true;
+
+        // Esperar que termine la animación de éxito
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Resetear estados
+        this.isProcessing = false;
+        this.showSuccessAnimation = false;
+        this.processingType = null;
+
+        // Close modal
         this.closeModal();
 
         // Remove order from list with smooth animation after a short delay
@@ -342,26 +376,39 @@ export class OrderDetailsModalComponent implements OnInit, OnChanges, OnDestroy 
      */
     async confirmarLiberarPedido() {
         if (!this.motivoLiberacion.trim()) {
-
             return;
         }
 
+        // Ocultar el prompt de liberación
+        this.showLiberarPrompt = false;
+        
+        // Mostrar overlay de procesamiento
+        this.isProcessing = true;
+        this.processingType = 'cancelled';
         this.isLiberando = true;
+
+        // Simular delay para la animación del loader
+        await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Cerrar el modal inmediatamente para mejor UX
-        this.closeModal();
-        
-        // Ejecutar la liberación en segundo plano
-        // El OrderService se encarga de la animación y remoción
+        // Ejecutar la liberación
         const success = await this.orderService.liberarPedido(this.order.idpedido, this.motivoLiberacion);
 
         if (success) {
+            // Mostrar animación de éxito
+            this.showSuccessAnimation = true;
 
-        } else {
-
+            // Esperar que termine la animación de éxito
+            await new Promise(resolve => setTimeout(resolve, 1500));
         }
         
+        // Resetear estados
+        this.isProcessing = false;
+        this.showSuccessAnimation = false;
+        this.processingType = null;
         this.isLiberando = false;
-        this.showLiberarPrompt = false;
+        this.motivoLiberacion = '';
+
+        // Cerrar el modal
+        this.closeModal();
     }
 }

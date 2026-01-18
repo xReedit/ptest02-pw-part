@@ -1,0 +1,12 @@
+{
+  "icon": {
+    "source": "resources/icon.png",
+    "platforms": {
+      "android": {
+        "adaptive": true,
+        "foreground": "resources/icon.png",
+        "background": "#00A859"
+      }
+    }
+  }
+}
